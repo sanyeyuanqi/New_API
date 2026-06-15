@@ -68,6 +68,12 @@ export function ForgotPasswordForm({
     defaultValues: { email: '' },
   })
   const turnstileReady = !isTurnstileEnabled || Boolean(turnstileToken)
+  const labelClass =
+    'text-[13px] font-medium text-slate-800 dark:text-slate-200'
+  const inputClass =
+    'h-10 rounded-lg border-slate-200 bg-white text-sm shadow-none focus-visible:ring-2 focus-visible:ring-slate-900/10 dark:border-white/15 dark:bg-zinc-950/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:ring-white/15'
+  const primaryButtonClass =
+    'mt-2 h-10 w-full justify-center gap-2 rounded-lg bg-slate-950 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 dark:border dark:border-white/15 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800'
 
   async function onSubmit(data: z.infer<typeof forgotPasswordFormSchema>) {
     if (!validateTurnstile()) return
@@ -93,7 +99,7 @@ export function ForgotPasswordForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-2', className)}
+        className={cn('grid gap-4', className)}
         {...props}
       >
         <FormField
@@ -101,9 +107,13 @@ export function ForgotPasswordForm({
           name='email'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel className={labelClass}>Email</FormLabel>
               <FormControl>
-                <Input placeholder='name@example.com' {...field} />
+                <Input
+                  placeholder='name@example.com'
+                  className={inputClass}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -112,7 +122,7 @@ export function ForgotPasswordForm({
 
         <Button
           type='submit'
-          className='mt-2'
+          className={primaryButtonClass}
           disabled={isLoading || isActive || !turnstileReady}
         >
           {isActive

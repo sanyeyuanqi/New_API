@@ -25,29 +25,24 @@ export function ForgotPassword() {
   const { t } = useTranslation()
   return (
     <AuthLayout>
-      <div className='w-full space-y-8'>
-        <div className='space-y-3'>
-          <h2 className='text-center text-2xl font-semibold tracking-tight sm:text-left'>
+      <div className='w-full space-y-6'>
+        <div className='space-y-1.5 text-center'>
+          <h2 className='text-[1.65rem] leading-tight font-semibold tracking-normal text-slate-950 sm:text-[1.75rem] dark:text-slate-50'>
             {t('Forgot password')}
           </h2>
-          <p className='text-muted-foreground text-left text-sm sm:text-base'>
-            {t(
-              'Enter your registered email and we will send you a link to reset your password.'
-            )}
-          </p>
-          <p className='text-muted-foreground text-left text-sm sm:text-base'>
-            {t("Don't have an account?")}{' '}
-            <Link
-              to='/sign-up'
-              className='hover:text-primary font-medium underline underline-offset-4'
-            >
-              {t('Sign up')}
-            </Link>
-            .
-          </p>
         </div>
 
-        <ForgotPasswordForm className='space-y-0' />
+        <ForgotPasswordForm />
+
+        <p className='text-center text-sm text-slate-500 dark:text-slate-400'>
+          {t("Don't have an account?")}{' '}
+          <Link
+            to='/sign-up'
+            className='font-semibold text-slate-950 underline underline-offset-4 transition-colors hover:text-slate-700 dark:text-slate-100 dark:hover:text-white'
+          >
+            {t('Sign up')}
+          </Link>
+        </p>
       </div>
     </AuthLayout>
   )

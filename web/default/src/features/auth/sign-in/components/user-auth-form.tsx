@@ -105,6 +105,12 @@ export function UserAuthForm({
   )
   const hasAlternativeLogin =
     passkeyLoginEnabled || hasWeChatLogin || hasOAuthLogin
+  const labelClass =
+    'text-[13px] font-medium text-slate-800 dark:text-slate-200'
+  const inputClass =
+    'h-10 rounded-lg border-slate-200 bg-white text-sm shadow-none focus-visible:ring-2 focus-visible:ring-slate-900/10 dark:border-white/15 dark:bg-zinc-950/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:ring-white/15'
+  const primaryButtonClass =
+    'h-10 w-full justify-center gap-2 rounded-lg bg-slate-950 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 dark:border dark:border-white/15 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800'
 
   useEffect(() => {
     if (requiresLegalConsent) {
@@ -286,7 +292,7 @@ export function UserAuthForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('grid gap-5', className)}
+        className={cn('grid gap-4', className)}
         {...props}
       >
         {passwordLoginEnabled && (
@@ -297,12 +303,14 @@ export function UserAuthForm({
               name='username'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('Email or Username')}</FormLabel>
+                  <FormLabel className={labelClass}>
+                    {t('Email or Username')}
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder={t('Enter your email or username')}
                       autoComplete='username'
-                      className='h-11'
+                      className={inputClass}
                       {...field}
                     />
                   </FormControl>
@@ -318,19 +326,21 @@ export function UserAuthForm({
               render={({ field }) => (
                 <FormItem>
                   <div className='flex items-center justify-between'>
-                    <FormLabel>{t('Password')}</FormLabel>
+                    <FormLabel className={labelClass}>
+                      {t('Password')}
+                    </FormLabel>
                     <Link
                       to='/forgot-password'
-                      className='text-muted-foreground hover:text-primary text-sm font-medium transition-colors'
+                      className='text-[13px] font-medium text-slate-500 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100'
                     >
-                      {t('Forgot password?')}
+                      {t('Forgot password')}
                     </Link>
                   </div>
                   <FormControl>
                     <PasswordInput
                       placeholder={t('Enter your password')}
                       autoComplete='current-password'
-                      className='h-11'
+                      className={inputClass}
                       {...field}
                     />
                   </FormControl>
@@ -342,10 +352,14 @@ export function UserAuthForm({
             {/* Submit Button */}
             <Button
               type='submit'
-              className='h-11 w-full justify-center gap-2 font-medium'
+              className={primaryButtonClass}
               disabled={isLoading || (requiresLegalConsent && !agreedToLegal)}
             >
-              {isLoading ? <Loader2 className='h-4 w-4 animate-spin' /> : <LogIn className='h-4 w-4' />}
+              {isLoading ? (
+                <Loader2 className='h-4 w-4 animate-spin' />
+              ) : (
+                <LogIn className='h-4 w-4' />
+              )}
               {t('Log in')}
             </Button>
 
@@ -384,7 +398,7 @@ export function UserAuthForm({
                   variant='outline'
                   disabled={passkeyButtonDisabled}
                   onClick={handlePasskeyLogin}
-                  className='h-11 w-full justify-center gap-2 rounded-lg'
+                  className='h-10 w-full justify-center gap-2 rounded-lg'
                 >
                   {isPasskeyLoading ? (
                     <Loader2 className='h-4 w-4 animate-spin' />
@@ -398,7 +412,9 @@ export function UserAuthForm({
               <OAuthProviders
                 status={status}
                 disabled={isLoading || (requiresLegalConsent && !agreedToLegal)}
-                onWeChatLogin={hasWeChatLogin ? handleOpenWeChatDialog : undefined}
+                onWeChatLogin={
+                  hasWeChatLogin ? handleOpenWeChatDialog : undefined
+                }
                 isWeChatLoading={isWeChatSubmitting}
               />
             </div>

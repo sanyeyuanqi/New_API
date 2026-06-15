@@ -104,6 +104,12 @@ export function SignUpForm({
     true
   const hasWeChatLogin = Boolean(status?.wechat_login)
   const turnstileReady = !isTurnstileEnabled || Boolean(turnstileToken)
+  const labelClass =
+    'text-[13px] font-medium text-slate-800 dark:text-slate-200'
+  const inputClass =
+    'h-10 rounded-lg border-slate-200 bg-white text-sm shadow-none focus-visible:ring-2 focus-visible:ring-slate-900/10 dark:border-white/15 dark:bg-zinc-950/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:ring-white/15'
+  const primaryButtonClass =
+    'mt-2 h-10 w-full justify-center gap-2 rounded-lg bg-slate-950 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 dark:border dark:border-white/15 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800'
 
   const wechatQrCodeUrl = useMemo(() => {
     return (
@@ -235,9 +241,13 @@ export function SignUpForm({
           name='username'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('Username')}</FormLabel>
+              <FormLabel className={labelClass}>{t('Username')}</FormLabel>
               <FormControl>
-                <Input placeholder={t('Enter your username')} {...field} />
+                <Input
+                  placeholder={t('Enter your username')}
+                  className={inputClass}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -250,10 +260,11 @@ export function SignUpForm({
           name='password'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('Password')}</FormLabel>
+              <FormLabel className={labelClass}>{t('Password')}</FormLabel>
               <FormControl>
                 <PasswordInput
                   placeholder={t('Enter password (8-20 characters)')}
+                  className={inputClass}
                   {...field}
                 />
               </FormControl>
@@ -268,9 +279,15 @@ export function SignUpForm({
           name='confirmPassword'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{t('Confirm password')}</FormLabel>
+              <FormLabel className={labelClass}>
+                {t('Confirm password')}
+              </FormLabel>
               <FormControl>
-                <PasswordInput placeholder={t('Confirm password')} {...field} />
+                <PasswordInput
+                  placeholder={t('Confirm password')}
+                  className={inputClass}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -286,13 +303,14 @@ export function SignUpForm({
               name='email'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
+                  <FormLabel className={labelClass}>
                     {t('Email (required for verification)')}
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder={t('name@example.com')}
                       type='email'
+                      className={inputClass}
                       {...field}
                     />
                   </FormControl>
@@ -308,11 +326,13 @@ export function SignUpForm({
                   placeholder={t('Verification code')}
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
+                  className={inputClass}
                 />
               </div>
               <Button
                 variant='outline'
                 type='button'
+                className='h-10 rounded-lg border-slate-200 px-3 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-white/10 dark:bg-white/[0.04] dark:text-slate-200 dark:hover:bg-white/[0.08]'
                 disabled={
                   isLoading ||
                   isSendingCode ||
@@ -354,7 +374,7 @@ export function SignUpForm({
         {/* Submit Button */}
         <Button
           type='submit'
-          className='mt-2 w-full justify-center gap-2'
+          className={primaryButtonClass}
           disabled={
             isLoading ||
             (requiresLegalConsent && !agreedToLegal) ||

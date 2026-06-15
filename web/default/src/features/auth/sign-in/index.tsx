@@ -30,12 +30,12 @@ export function SignIn() {
 
   return (
     <AuthLayout>
-      <div className='w-full space-y-8'>
-        <div className='space-y-2'>
-          <h2 className='text-3xl font-bold tracking-tight'>
-            {t('Welcome back')}
+      <div className='w-full space-y-6'>
+        <div className='space-y-1.5 text-center'>
+          <h2 className='text-[1.65rem] leading-tight font-semibold tracking-normal text-slate-950 sm:text-[1.75rem] dark:text-slate-50'>
+            {t('Log in')}
           </h2>
-          <p className='text-muted-foreground text-sm leading-relaxed'>
+          <p className='text-sm leading-relaxed text-slate-500 dark:text-slate-400'>
             {t('Log in to your account to continue')}
           </p>
         </div>
@@ -45,16 +45,16 @@ export function SignIn() {
         <TermsFooter
           variant='sign-in'
           status={status}
-          className='text-center'
+          className='text-center text-xs text-slate-500 dark:text-slate-400'
         />
 
         {!status?.self_use_mode_enabled &&
           status?.register_enabled !== false && (
-            <p className='text-muted-foreground text-center text-sm'>
+            <p className='text-center text-sm text-slate-500 dark:text-slate-400'>
               {t("Don't have an account?")}{' '}
               <Link
                 to='/sign-up'
-                className='text-primary hover:text-primary/80 font-medium underline underline-offset-4 transition-colors'
+                className='font-semibold text-slate-950 underline underline-offset-4 transition-colors hover:text-slate-700 dark:text-slate-100 dark:hover:text-white'
               >
                 {t('Sign up')}
               </Link>

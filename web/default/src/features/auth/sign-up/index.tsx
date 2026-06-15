@@ -29,21 +29,11 @@ export function SignUp() {
 
   return (
     <AuthLayout>
-      <div className='w-full space-y-8'>
-        <div className='space-y-2'>
-          <h2 className='text-center text-2xl font-semibold tracking-tight sm:text-left'>
-            {t('Create an account')}
+      <div className='w-full space-y-6'>
+        <div className='space-y-1.5 text-center'>
+          <h2 className='text-[1.65rem] leading-tight font-semibold tracking-normal text-slate-950 sm:text-[1.75rem] dark:text-slate-50'>
+            {t('Sign up')}
           </h2>
-          <p className='text-muted-foreground text-left text-sm sm:text-base'>
-            {t('Already have an account?')}{' '}
-            <Link
-              to='/sign-in'
-              className='hover:text-primary font-medium underline underline-offset-4'
-            >
-              {t('Sign in')}
-            </Link>
-            .
-          </p>
         </div>
 
         <SignUpForm />
@@ -51,8 +41,18 @@ export function SignUp() {
         <TermsFooter
           variant='sign-up'
           status={status}
-          className='text-center'
+          className='text-center text-xs text-slate-500 dark:text-slate-400'
         />
+
+        <p className='text-center text-sm text-slate-500 dark:text-slate-400'>
+          {t('Already have an account?')}{' '}
+          <Link
+            to='/sign-in'
+            className='font-semibold text-slate-950 underline underline-offset-4 transition-colors hover:text-slate-700 dark:text-slate-100 dark:hover:text-white'
+          >
+            {t('Sign in')}
+          </Link>
+        </p>
       </div>
     </AuthLayout>
   )

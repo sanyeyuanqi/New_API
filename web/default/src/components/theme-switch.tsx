@@ -44,10 +44,16 @@ export function ThemeSwitch() {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger
-        render={<Button variant='ghost' size='icon' className='h-9 w-9' />}
+        render={
+          <Button
+            variant='ghost'
+            size='icon'
+            className='h-8 w-8 rounded-md text-slate-700 hover:bg-slate-100 hover:text-slate-950 dark:text-zinc-500 dark:hover:bg-zinc-800/70 dark:hover:text-zinc-200'
+          />
+        }
       >
-        <Sun className='size-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90' />
-        <Moon className='absolute size-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0' />
+        <Sun className='size-[1.05rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90' />
+        <Moon className='absolute size-[1.05rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0' />
         <span className='sr-only'>{t('Toggle theme')}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end'>
