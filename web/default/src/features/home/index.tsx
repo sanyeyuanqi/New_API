@@ -20,7 +20,6 @@ import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { Markdown } from '@/components/ui/markdown'
 import { PublicLayout } from '@/components/layout'
-import { Footer } from '@/components/layout/components/footer'
 import { CTA, Features, Hero, HowItWorks, Stats } from './components'
 import { useHomePageContent } from './hooks'
 
@@ -62,12 +61,14 @@ export function Home() {
 
   return (
     <PublicLayout showMainContainer={false}>
-      <Hero isAuthenticated={isAuthenticated} />
-      <Stats />
-      <Features />
-      <HowItWorks />
-      <CTA isAuthenticated={isAuthenticated} />
-      <Footer />
+      <main className='relative isolate overflow-hidden bg-[linear-gradient(180deg,#f8fafc_0%,#eef4ff_34%,#f7f7fb_72%,#ffffff_100%)] dark:bg-[linear-gradient(180deg,#050505_0%,#0a0a0b_42%,#111113_100%)]'>
+        <div className='pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_18%_12%,rgba(14,165,233,0.13),transparent_30%),radial-gradient(circle_at_76%_18%,rgba(16,185,129,0.10),transparent_28%),radial-gradient(circle_at_50%_72%,rgba(245,158,11,0.08),transparent_32%)] dark:bg-[radial-gradient(circle_at_18%_12%,rgba(148,163,184,0.10),transparent_32%),radial-gradient(circle_at_76%_20%,rgba(255,255,255,0.055),transparent_28%)]' />
+        <Hero isAuthenticated={isAuthenticated} />
+        <Stats />
+        <Features />
+        <HowItWorks />
+        <CTA isAuthenticated={isAuthenticated} />
+      </main>
     </PublicLayout>
   )
 }

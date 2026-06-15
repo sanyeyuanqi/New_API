@@ -99,16 +99,32 @@ export function useFilters(models: PricingModel[]) {
     [updateFilters]
   )
   const setVendorFilter = useCallback(
-    (v: string) => updateFilters({ vendor: v === FILTER_ALL ? undefined : v }),
+    (v: string) =>
+      updateFilters({
+        vendor: v === FILTER_ALL ? undefined : v,
+        quotaType: undefined,
+        endpointType: undefined,
+        tag: undefined,
+      }),
     [updateFilters]
   )
   const setGroupFilter = useCallback(
-    (v: string) => updateFilters({ group: v === FILTER_ALL ? undefined : v }),
+    (v: string) =>
+      updateFilters({
+        group: v === FILTER_ALL ? undefined : v,
+        vendor: undefined,
+        quotaType: undefined,
+        endpointType: undefined,
+        tag: undefined,
+      }),
     [updateFilters]
   )
   const setQuotaTypeFilter = useCallback(
     (v: string) =>
-      updateFilters({ quotaType: v === QUOTA_TYPES.ALL ? undefined : v }),
+      updateFilters({
+        quotaType: v === QUOTA_TYPES.ALL ? undefined : v,
+        endpointType: undefined,
+      }),
     [updateFilters]
   )
   const setEndpointTypeFilter = useCallback(
@@ -119,7 +135,12 @@ export function useFilters(models: PricingModel[]) {
     [updateFilters]
   )
   const setTagFilter = useCallback(
-    (v: string) => updateFilters({ tag: v === FILTER_ALL ? undefined : v }),
+    (v: string) =>
+      updateFilters({
+        tag: v === FILTER_ALL ? undefined : v,
+        quotaType: undefined,
+        endpointType: undefined,
+      }),
     [updateFilters]
   )
   const setTokenUnit = useCallback(

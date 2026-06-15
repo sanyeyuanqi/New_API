@@ -19,7 +19,6 @@ For commercial licensing, please contact support@quantumnous.com
 import { Link } from '@tanstack/react-router'
 import { CherryStudio } from '@lobehub/icons'
 import { ArrowRight, BookOpen } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { useStatus } from '@/hooks/use-status'
 import { Button } from '@/components/ui/button'
 import { HeroTerminalDemo } from '../hero-terminal-demo'
@@ -44,7 +43,6 @@ const MoreIcon = () => (
 )
 
 export function Hero(props: HeroProps) {
-  const { t } = useTranslation()
   const { status } = useStatus()
   const docsUrl =
     (status?.docs_link as string | undefined) || 'https://docs.newapi.pro'
@@ -55,80 +53,66 @@ export function Hero(props: HeroProps) {
       return (
         <Button
           variant='outline'
-          className='group border-border/50 hover:border-border hover:bg-muted/50 inline-flex h-11 items-center gap-1.5 rounded-lg px-5 text-sm font-medium'
+          className='group inline-flex h-11 items-center gap-1.5 rounded-lg border-slate-200/80 bg-white/70 px-5 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur hover:bg-white dark:border-white/10 dark:bg-white/[0.055] dark:text-slate-200 dark:hover:bg-white/[0.09]'
           render={
             <a href={docsUrl} target='_blank' rel='noopener noreferrer' />
           }
         >
           <BookOpen className='text-muted-foreground/80 group-hover:text-foreground size-4 transition-colors duration-200' />
-          <span>{t('Docs')}</span>
+          <span>接入文档</span>
         </Button>
       )
     }
     return (
       <Button
         variant='outline'
-        className='group border-border/50 hover:border-border hover:bg-muted/50 inline-flex h-11 items-center gap-1.5 rounded-lg px-5 text-sm font-medium'
+        className='group inline-flex h-11 items-center gap-1.5 rounded-lg border-slate-200/80 bg-white/70 px-5 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur hover:bg-white dark:border-white/10 dark:bg-white/[0.055] dark:text-slate-200 dark:hover:bg-white/[0.09]'
         render={<Link to={docsUrl} />}
       >
         <BookOpen className='text-muted-foreground/80 group-hover:text-foreground size-4 transition-colors duration-200' />
-        <span>{t('Docs')}</span>
+        <span>接入文档</span>
       </Button>
     )
   }
 
   return (
-    <section className='relative z-10 overflow-hidden px-6 pt-24 pb-16 md:pt-32 md:pb-24 lg:pt-36 lg:pb-28'>
-      {/* Radial gradient background */}
+    <section className='relative z-10 overflow-hidden px-6 pt-24 pb-14 md:px-8 md:pt-32 md:pb-20 lg:pt-36 lg:pb-24'>
+      <div className='pointer-events-none absolute top-20 left-1/2 -z-10 h-[42rem] w-[92rem] -translate-x-1/2 rounded-full bg-white/50 blur-3xl dark:bg-white/[0.035]' />
       <div
         aria-hidden
-        className='pointer-events-none absolute inset-0 -z-10 opacity-25 dark:opacity-[0.12]'
-        style={{
-          background: [
-            'radial-gradient(ellipse 60% 50% at 20% 20%, oklch(0.72 0.18 250 / 80%) 0%, transparent 70%)',
-            'radial-gradient(ellipse 50% 40% at 80% 15%, oklch(0.65 0.15 200 / 60%) 0%, transparent 70%)',
-            'radial-gradient(ellipse 40% 35% at 40% 80%, oklch(0.70 0.12 280 / 40%) 0%, transparent 70%)',
-          ].join(', '),
-        }}
-      />
-      {/* Grid pattern */}
-      <div
-        aria-hidden
-        className='absolute inset-0 -z-10 bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px),linear-gradient(to_bottom,var(--border)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_30%,black_20%,transparent_100%)] bg-[size:4rem_4rem] opacity-[0.08]'
+        className='absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(15,23,42,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.055)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_68%_50%_at_50%_20%,black_12%,transparent_100%)] bg-[size:4.5rem_4.5rem] opacity-70 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.07)_1px,transparent_1px)] dark:opacity-40'
       />
 
-      <div className='mx-auto grid max-w-6xl grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-8'>
+      <div className='mx-auto grid max-w-[1480px] grid-cols-1 items-center gap-14 lg:grid-cols-12 lg:gap-14 xl:gap-20'>
         {/* Left Column: Title, description, action buttons and application support */}
-        <div className='flex flex-col items-start text-left lg:col-span-6'>
+        <div className='flex flex-col items-start text-left lg:col-span-6 xl:col-span-5'>
           {/* Top Pill Badge */}
           <div
-            className='landing-animate-fade-up mb-5 inline-flex items-center gap-1.5 rounded-full border border-blue-500/20 bg-blue-500/5 px-3 py-1.5 text-[11px] font-medium text-blue-600 opacity-0 shadow-xs dark:border-blue-400/20 dark:bg-blue-400/5 dark:text-blue-400'
+            className='landing-animate-fade-up mb-6 inline-flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/75 px-3.5 py-1.5 text-[11px] font-semibold text-slate-700 opacity-0 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.055] dark:text-slate-200'
             style={{ animationDelay: '0ms' }}
           >
             <span className='relative flex size-1.5'>
-              <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-75' />
-              <span className='relative inline-flex size-1.5 rounded-full bg-blue-500 dark:bg-blue-400' />
+              <span className='absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75' />
+              <span className='relative inline-flex size-1.5 rounded-full bg-emerald-500' />
             </span>
-            <span>{t('AI Application Infrastructure Foundation')}</span>
+            <span>连界 API 智能网关</span>
           </div>
 
           <h1
-            className='landing-animate-fade-up text-[clamp(2.25rem,4.5vw,3.25rem)] leading-[1.15] font-bold tracking-tight'
+            className='landing-animate-fade-up max-w-3xl text-[clamp(2.8rem,5.2vw,5.35rem)] leading-[0.98] font-semibold tracking-tight text-slate-950 dark:text-white'
             style={{ animationDelay: '60ms' }}
           >
-            {t('Unified API Gateway for')}
+            连接全球模型，
             <br />
-            <span className='bg-gradient-to-r from-blue-400 via-violet-400 to-purple-500 bg-clip-text text-transparent'>
-              {t('Vast Range of AI Models')}
+            <span className='bg-gradient-to-r from-slate-950 via-cyan-600 to-emerald-500 bg-clip-text text-transparent dark:from-white dark:via-slate-300 dark:to-zinc-500'>
+              统一 AI 生产力入口
             </span>
           </h1>
           <p
-            className='landing-animate-fade-up text-muted-foreground/80 mt-5 max-w-xl text-base leading-relaxed opacity-0 md:text-[15px]'
+            className='landing-animate-fade-up mt-7 max-w-2xl text-base leading-8 text-slate-600 opacity-0 md:text-[16px] dark:text-slate-400'
             style={{ animationDelay: '120ms' }}
           >
-            {t(
-              'Access a vast selection of models via a standard, unified API protocol. Power AI applications, manage digital assets, and connect the Future.'
-            )}
+            以一套标准协议接入主流 AI 服务商，统一管理模型路由、密钥权限、额度计费与调用观测，让团队以更低成本构建稳定的智能应用。
           </p>
 
           <div
@@ -138,10 +122,10 @@ export function Hero(props: HeroProps) {
             {props.isAuthenticated ? (
               <>
                 <Button
-                  className='group h-11 rounded-lg px-5 text-sm font-medium'
+                  className='group h-11 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(15,23,42,0.18)] hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200'
                   render={<Link to='/dashboard' />}
                 >
-                  {t('Go to Dashboard')}
+                  前往控制台
                   <ArrowRight className='ml-1.5 size-4 transition-transform duration-200 group-hover:translate-x-0.5' />
                 </Button>
                 {renderDocsButton()}
@@ -149,37 +133,34 @@ export function Hero(props: HeroProps) {
             ) : (
               <>
                 <Button
-                  className='group h-11 rounded-lg px-5 text-sm font-medium'
+                  className='group h-11 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(15,23,42,0.18)] hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200'
                   render={<Link to='/sign-up' />}
                 >
-                  {t('Get Started')}
+                  开始接入
                   <ArrowRight className='ml-1.5 size-4 transition-transform duration-200 group-hover:translate-x-0.5' />
                 </Button>
                 <Button
                   variant='outline'
-                  className='border-border/50 hover:border-border hover:bg-muted/50 h-11 rounded-lg px-5 text-sm font-medium'
+                  className='h-11 rounded-lg border-slate-200/80 bg-white/70 px-5 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur hover:bg-white dark:border-white/10 dark:bg-white/[0.055] dark:text-slate-200 dark:hover:bg-white/[0.09]'
                   render={<Link to='/pricing' />}
                 >
-                  {t('View Pricing')}
+                  模型与价格
                 </Button>
                 {renderDocsButton()}
               </>
             )}
           </div>
 
-          {/* Supported Apps (参考图二样式，进行卡片化和信息扩充设计，增加视觉高度) */}
           <div
-            className='landing-animate-fade-up mt-10 w-full max-w-xl opacity-0'
+            className='landing-animate-fade-up mt-11 w-full max-w-2xl opacity-0'
             style={{ animationDelay: '240ms' }}
           >
             <div className='mb-4 flex flex-col gap-1'>
-              <span className='text-muted-foreground/50 text-[10px] font-bold tracking-[0.15em] uppercase'>
-                {t('Supported Applications')}
+              <span className='text-[10px] font-bold tracking-[0.15em] text-slate-400 uppercase dark:text-slate-500'>
+                客户端与工作流
               </span>
-              <p className='text-muted-foreground/60 text-xs leading-relaxed'>
-                {t(
-                  'Supports one-click configuration and perfectly adapts to NewAPI multi-protocol configuration.'
-                )}
+              <p className='text-xs leading-relaxed text-slate-500 dark:text-slate-400'>
+                一套密钥适配常用客户端、SDK 与自动化流程，减少重复配置。
               </p>
             </div>
             <div className='flex flex-wrap items-center gap-3'>
@@ -188,7 +169,7 @@ export function Hero(props: HeroProps) {
                 href='https://cherry-ai.com'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='group border-border/40 bg-muted/15 text-foreground/80 hover:border-border hover:bg-muted/30 hover:text-foreground flex items-center gap-3 rounded-full border px-5 py-2.5 text-sm font-medium shadow-[0_1px_2.5px_rgba(0,0,0,0.01)] backdrop-blur-xs transition-all duration-300 hover:scale-[1.02]'
+                className='group flex items-center gap-3 rounded-full border border-slate-200/80 bg-white/65 px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-slate-950 dark:border-white/10 dark:bg-white/[0.055] dark:text-slate-300 dark:hover:bg-white/[0.09] dark:hover:text-white'
               >
                 <CherryStudio.Color size={24} className='shrink-0' />
                 <span>Cherry Studio</span>
@@ -199,7 +180,7 @@ export function Hero(props: HeroProps) {
                 href='https://ccswitch.io'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='group border-border/40 bg-muted/15 text-foreground/80 hover:border-border hover:bg-muted/30 hover:text-foreground flex items-center gap-3 rounded-full border px-5 py-2.5 text-sm font-medium shadow-[0_1px_2.5px_rgba(0,0,0,0.01)] backdrop-blur-xs transition-all duration-300 hover:scale-[1.02]'
+                className='group flex items-center gap-3 rounded-full border border-slate-200/80 bg-white/65 px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-slate-950 dark:border-white/10 dark:bg-white/[0.055] dark:text-slate-300 dark:hover:bg-white/[0.09] dark:hover:text-white'
               >
                 <img
                   src='https://ccswitch.io/favicon.png'
@@ -221,10 +202,9 @@ export function Hero(props: HeroProps) {
                 <span>CC Switch</span>
               </a>
 
-              {/* "更多" */}
-              <div className='group border-border/40 bg-muted/15 text-foreground/55 hover:border-border hover:bg-muted/30 hover:text-foreground flex cursor-default items-center gap-2.5 rounded-full border px-5 py-2.5 text-sm font-medium shadow-[0_1px_2.5px_rgba(0,0,0,0.01)] backdrop-blur-xs transition-all duration-300 hover:scale-[1.02]'>
+              <div className='group flex cursor-default items-center gap-2.5 rounded-full border border-slate-200/80 bg-white/65 px-5 py-2.5 text-sm font-medium text-slate-500 shadow-sm backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:bg-white hover:text-slate-950 dark:border-white/10 dark:bg-white/[0.055] dark:text-slate-400 dark:hover:bg-white/[0.09] dark:hover:text-white'>
                 <MoreIcon />
-                <span>{t('More Apps')}</span>
+                <span>更多集成</span>
               </div>
             </div>
           </div>
@@ -232,10 +212,10 @@ export function Hero(props: HeroProps) {
 
         {/* Right Column: Hero Terminal API Demo */}
         <div
-          className='landing-animate-fade-up flex w-full justify-center opacity-0 lg:col-span-6'
+          className='landing-animate-fade-up flex w-full justify-center opacity-0 lg:col-span-6 xl:col-span-7'
           style={{ animationDelay: '320ms' }}
         >
-          <HeroTerminalDemo className='mt-8 lg:mt-0' />
+          <HeroTerminalDemo className='mt-8 max-w-[780px] lg:mt-0' />
         </div>
       </div>
     </section>

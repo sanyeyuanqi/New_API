@@ -57,9 +57,7 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
   const groups = props.model.enable_groups || []
   const endpoints = props.model.supported_endpoint_types || []
   const modelIconKey = props.model.icon || props.model.vendor_icon
-  const modelIcon = modelIconKey
-    ? getLobeIcon(modelIconKey, 28)
-    : null
+  const modelIcon = modelIconKey ? getLobeIcon(modelIconKey, 30) : null
   const initial = props.model.model_name?.charAt(0).toUpperCase() || '?'
   const isDynamicPricing =
     props.model.billing_mode === 'tiered_expr' &&
@@ -90,14 +88,15 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
   return (
     <div
       className={cn(
-        'group relative flex flex-col rounded-xl border p-3 transition-colors sm:p-5',
-        'hover:bg-muted/20'
+        'group relative min-h-[168px] flex flex-col rounded-2xl border border-slate-200/80 bg-white/58 p-4 shadow-[0_18px_50px_rgba(15,23,42,0.045)] transition-all sm:p-5',
+        'hover:-translate-y-0.5 hover:border-slate-300/80 hover:bg-white/78 hover:shadow-[0_24px_70px_rgba(15,23,42,0.08)]',
+        'dark:border-white/10 dark:bg-white/[0.035] dark:hover:border-white/16 dark:hover:bg-white/[0.06] dark:hover:shadow-[0_24px_70px_rgba(0,0,0,0.3)]'
       )}
     >
       {/* Header: icon + name + price + actions */}
       <div className='flex items-start justify-between gap-2.5 sm:gap-3'>
         <div className='flex min-w-0 items-start gap-2.5 sm:gap-3'>
-          <div className='bg-muted/40 flex size-9 shrink-0 items-center justify-center rounded-lg sm:size-10 sm:rounded-xl'>
+          <div className='flex size-9 shrink-0 items-center justify-center rounded-full sm:size-10'>
             {modelIcon || (
               <span className='text-muted-foreground text-sm font-bold'>
                 {initial}
@@ -206,7 +205,7 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
           <button
             type='button'
             onClick={props.onClick}
-            className='text-muted-foreground hover:text-foreground hover:bg-muted inline-flex items-center gap-1 rounded-md border px-2 py-1 text-xs transition-colors sm:px-2.5 sm:py-1.5'
+            className='text-muted-foreground hover:text-foreground inline-flex items-center gap-1 rounded-full border border-slate-200/80 bg-white/65 px-2.5 py-1 text-xs transition-colors hover:bg-white sm:px-3 sm:py-1.5 dark:border-white/10 dark:bg-white/[0.045] dark:hover:bg-white/[0.08]'
           >
             {t('Details')}
             <ChevronRight className='size-3.5' />
@@ -214,7 +213,7 @@ export const ModelCard = memo(function ModelCard(props: ModelCardProps) {
           <button
             type='button'
             onClick={handleCopy}
-            className='text-muted-foreground hover:text-foreground hover:bg-muted rounded-md border p-1.5 transition-colors'
+            className='text-muted-foreground hover:text-foreground rounded-full border border-slate-200/80 bg-white/65 p-1.5 transition-colors hover:bg-white dark:border-white/10 dark:bg-white/[0.045] dark:hover:bg-white/[0.08]'
             title={t('Copy')}
           >
             <Copy className='size-3.5' />

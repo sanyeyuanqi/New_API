@@ -17,7 +17,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useRef, useEffect, useCallback } from 'react'
-import { useTranslation } from 'react-i18next'
 
 interface CounterProps {
   end: number
@@ -95,28 +94,26 @@ interface StatItem {
 }
 
 export function Stats(_props: StatsProps) {
-  const { t } = useTranslation()
-
   const stats: StatItem[] = [
-    { end: 50, suffix: '+', label: t('upstream services integrated') },
-    { end: 100, suffix: '+', label: t('model billing support') },
-    { end: 50, suffix: '+', label: t('compatible API routes') },
-    { end: 10, suffix: '+', label: t('scheduling controls') },
+    { end: 50, suffix: '+', label: '上游服务统一接入' },
+    { end: 100, suffix: '+', label: '模型与计费规则' },
+    { end: 50, suffix: '+', label: '兼容 API 路由' },
+    { end: 10, suffix: '+', label: '运营调度策略' },
   ]
 
   return (
-    <div className='border-border/40 bg-muted/10 relative z-10 border-y'>
-      <div className='mx-auto max-w-6xl px-6 py-10 md:py-12'>
-        <div className='grid grid-cols-2 gap-8 md:grid-cols-4 md:gap-12'>
+    <div className='relative z-10 px-6 md:px-8'>
+      <div className='mx-auto max-w-[1480px] rounded-[1.75rem] border border-white/70 bg-white/64 px-6 py-6 shadow-[0_30px_110px_rgba(15,23,42,0.10)] backdrop-blur-2xl md:px-8 md:py-8 dark:border-white/10 dark:bg-white/[0.055] dark:shadow-[0_28px_90px_rgba(0,0,0,0.42)]'>
+        <div className='grid grid-cols-2 gap-4 md:grid-cols-4'>
           {stats.map((s) => (
             <div
               key={s.label}
-              className='flex flex-col items-center text-center'
+              className='rounded-2xl border border-slate-200/70 bg-white/46 px-4 py-6 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:border-white/10 dark:bg-black/20'
             >
-              <span className='text-2xl font-bold tracking-tight md:text-3xl'>
+              <span className='text-2xl font-semibold tracking-tight text-slate-950 md:text-4xl dark:text-white'>
                 <Counter end={s.end} suffix={s.suffix} decimals={s.decimals} />
               </span>
-              <span className='text-muted-foreground mt-1.5 text-xs'>
+              <span className='mt-2 block text-xs leading-relaxed text-slate-500 dark:text-slate-400'>
                 {s.label}
               </span>
             </div>

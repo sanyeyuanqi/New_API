@@ -21,6 +21,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { User, Wallet, LogOut, Settings } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
+import { cn } from '@/lib/utils'
 import { getUserAvatarFallback, getUserAvatarStyle } from '@/lib/avatar'
 import { ROLE } from '@/lib/roles'
 import useDialogState from '@/hooks/use-dialog'
@@ -38,7 +39,12 @@ import { SignOutDialog } from '@/components/sign-out-dialog'
 
 const avatarFallbackClassName = 'font-semibold text-white'
 
-export function ProfileDropdown() {
+interface ProfileDropdownProps {
+  showName?: boolean
+  className?: string
+}
+
+export function ProfileDropdown(props: ProfileDropdownProps = {}) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const [open, setOpen] = useDialogState()
@@ -56,16 +62,29 @@ export function ProfileDropdown() {
     <>
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger
-          render={<Button variant='ghost' className='relative size-6 p-0' />}
+          render={
+            <Button
+              variant='ghost'
+              className={cn(
+                'relative h-8 rounded-lg px-2 text-slate-700 hover:bg-slate-950/[0.04] dark:text-slate-300 dark:hover:bg-white/[0.06]',
+                props.showName ? 'max-w-[180px] gap-2' : 'size-6 p-0',
+                props.className
+              )}
+            />
+          }
         >
-          <Avatar className='size-6'>
-            <AvatarFallback
-              className={`${avatarFallbackClassName} text-[11px]`}
-              style={avatarFallbackStyle}
-            >
-              {avatarFallback}
-            </AvatarFallback>
-          </Avatar>
+          {props.showName ? (
+            <span className='truncate text-sm font-medium'>{displayName}</span>
+          ) : (
+            <Avatar className='size-6'>
+              <AvatarFallback
+                className={`${avatarFallbackClassName} text-[11px]`}
+                style={avatarFallbackStyle}
+              >
+                {avatarFallback}
+              </AvatarFallback>
+            </Avatar>
+          )}
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' sideOffset={8} className='w-56'>
           <div className='flex items-center gap-2 px-1.5 py-1.5'>

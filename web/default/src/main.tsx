@@ -32,6 +32,7 @@ import { getStatus } from '@/lib/api'
 import { installBuildMetadata } from '@/lib/build-metadata'
 import '@/lib/dayjs'
 import { applyFaviconToDom } from '@/lib/dom-utils'
+import { DEFAULT_SYSTEM_NAME } from '@/lib/constants'
 import { initializeFrontendCache } from '@/lib/frontend-cache'
 import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from './context/direction-provider'
@@ -117,12 +118,15 @@ const rootElement = document.getElementById('root')!
 ;(function initSystemBranding() {
   try {
     if (typeof window === 'undefined' || typeof document === 'undefined') return
+    const normalizeName = (name?: string) =>
+      !name || name === 'New API' ? DEFAULT_SYSTEM_NAME : name
     const apply = (name: string) => {
-      document.title = name
+      const normalizedName = normalizeName(name)
+      document.title = normalizedName
       const metaTitle = document.querySelector(
         'meta[name="title"]'
       ) as HTMLMetaElement | null
-      if (metaTitle) metaTitle.setAttribute('content', name)
+      if (metaTitle) metaTitle.setAttribute('content', normalizedName)
     }
     // Cache-first
     try {

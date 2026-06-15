@@ -17,17 +17,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { ReactNode } from 'react'
-import { ChevronDown, RotateCcw } from 'lucide-react'
+import { RotateCcw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getLobeIcon } from '@/lib/lobe-icon'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
 import {
   ENDPOINT_TYPES,
   FILTER_ALL,
@@ -72,6 +67,7 @@ export interface PricingSidebarProps {
   hasActiveFilters: boolean
   onClearFilters: () => void
   className?: string
+  compact?: boolean
 }
 
 function countBy(
@@ -79,6 +75,28 @@ function countBy(
   predicate: (model: PricingModel) => boolean
 ): number {
   return models.reduce((count, model) => count + (predicate(model) ? 1 : 0), 0)
+}
+
+function modelHasGroup(model: PricingModel, group: string): boolean {
+  return group === FILTER_ALL || Boolean(model.enable_groups?.includes(group))
+}
+
+function modelHasVendor(model: PricingModel, vendor: string): boolean {
+  return vendor === FILTER_ALL || model.vendor_name === vendor
+}
+
+function modelHasTag(model: PricingModel, tag: string): boolean {
+  if (tag === FILTER_ALL) return true
+  return parseTags(model.tags)
+    .map((item) => item.toLowerCase())
+    .includes(tag.toLowerCase())
+}
+
+function modelHasQuotaType(model: PricingModel, quotaType: string): boolean {
+  if (quotaType === QUOTA_TYPES.ALL) return true
+  return quotaType === QUOTA_TYPES.TOKEN
+    ? model.quota_type === 0
+    : model.quota_type === 1
 }
 
 function formatGroupRatio(ratio: number | undefined): string | undefined {
@@ -99,10 +117,10 @@ function FilterChip(props: {
       type='button'
       onClick={props.onClick}
       className={cn(
-        'group inline-flex max-w-full items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-all',
+        'group inline-flex max-w-full items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-medium transition-all',
         props.active
-          ? 'border-foreground/30 bg-foreground/5 text-foreground shadow-sm'
-          : 'border-border/70 bg-background text-muted-foreground hover:border-border hover:bg-muted/50 hover:text-foreground'
+          ? 'border-slate-950/20 bg-slate-950 text-white shadow-[0_8px_18px_rgba(15,23,42,0.16)] dark:border-white/20 dark:bg-white dark:text-slate-950'
+          : 'border-slate-200/80 bg-white/70 text-slate-500 shadow-sm hover:border-slate-300 hover:bg-white hover:text-slate-950 dark:border-white/10 dark:bg-white/[0.055] dark:text-slate-400 dark:hover:bg-white/[0.09] dark:hover:text-white'
       )}
       title={props.option.label}
     >
@@ -115,8 +133,8 @@ function FilterChip(props: {
           className={cn(
             'rounded-md px-1.5 py-0.5 text-[10px]',
             props.active
-              ? 'bg-background text-foreground'
-              : 'bg-muted text-muted-foreground'
+              ? 'bg-white/18 text-white dark:bg-black/10 dark:text-slate-950'
+              : 'bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-400'
           )}
         >
           {props.option.suffix ?? props.option.count}
@@ -127,30 +145,36 @@ function FilterChip(props: {
 }
 
 function FilterSection(props: FilterSectionProps) {
+  const [allOption, ...options] = props.options
+  const isAllActive = props.value === allOption?.value
+
   return (
-    <Collapsible
-      defaultOpen
-      className='border-border/70 border-b pb-3 last:border-b-0'
-    >
-      <CollapsibleTrigger className='group flex w-full items-center justify-between py-2.5 text-left'>
-        <span className='text-foreground text-sm font-semibold'>
+    <div className='rounded-2xl border border-slate-200/70 bg-white/42 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] dark:border-white/10 dark:bg-white/[0.035]'>
+      <div className='flex items-center justify-between gap-3 pb-3'>
+        <span className='text-sm font-semibold text-slate-950 dark:text-slate-100'>
           {props.title}
         </span>
-        <ChevronDown className='text-muted-foreground size-4 transition-transform group-data-[panel-open]:rotate-180' />
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <div className='flex flex-wrap gap-1.5'>
-          {props.options.map((option) => (
+        <div className='flex shrink-0 items-center gap-2'>
+          {allOption && (
             <FilterChip
-              key={option.value}
-              option={option}
-              active={props.value === option.value}
-              onClick={() => props.onChange(option.value)}
+              option={allOption}
+              active={isAllActive}
+              onClick={() => props.onChange(allOption.value)}
             />
-          ))}
+          )}
         </div>
-      </CollapsibleContent>
-    </Collapsible>
+      </div>
+      <div className='flex flex-wrap gap-2'>
+        {options.map((option) => (
+          <FilterChip
+            key={option.value}
+            option={option}
+            active={props.value === option.value}
+            onClick={() => props.onChange(option.value)}
+          />
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -158,19 +182,38 @@ export function PricingSidebar(props: PricingSidebarProps) {
   const { t } = useTranslation()
   const quotaTypeLabels = getQuotaTypeLabels(t)
   const endpointTypeLabels = getEndpointTypeLabels(t)
+  const groupModels = props.models.filter((model) =>
+    modelHasGroup(model, props.groupFilter)
+  )
+  const vendorModels = groupModels.filter((model) =>
+    modelHasVendor(model, props.vendorFilter)
+  )
+  const tagModels = vendorModels.filter((model) =>
+    modelHasTag(model, props.tagFilter)
+  )
+  const quotaModels = tagModels.filter((model) =>
+    modelHasQuotaType(model, props.quotaTypeFilter)
+  )
+  const availableTags = Array.from(
+    new Set(
+      vendorModels.flatMap((model) =>
+        parseTags(model.tags).map((tag) => tag.toLowerCase())
+      )
+    )
+  ).sort((a, b) => a.localeCompare(b))
 
   const vendorOptions: FilterOption[] = [
     {
       value: FILTER_ALL,
-      label: t('All Vendors'),
-      count: props.models.length,
+      label: t('All'),
+      count: groupModels.length,
     },
     ...props.vendors
       .map((vendor) => ({
         value: vendor.name,
         label: vendor.name,
         count: countBy(
-          props.models,
+          groupModels,
           (model) => model.vendor_name === vendor.name
         ),
         icon: vendor.icon ? getLobeIcon(vendor.icon, 14) : undefined,
@@ -181,7 +224,7 @@ export function PricingSidebar(props: PricingSidebarProps) {
   const groupOptions: FilterOption[] = [
     {
       value: FILTER_ALL,
-      label: t('All Groups'),
+      label: t('All'),
     },
     ...props.groups.map((group) => ({
       value: group,
@@ -193,43 +236,39 @@ export function PricingSidebar(props: PricingSidebarProps) {
   const quotaOptions: FilterOption[] = [
     {
       value: QUOTA_TYPES.ALL,
-      label: quotaTypeLabels[QUOTA_TYPES.ALL],
-      count: props.models.length,
+      label: t('All'),
+      count: tagModels.length,
     },
     {
       value: QUOTA_TYPES.TOKEN,
       label: quotaTypeLabels[QUOTA_TYPES.TOKEN],
-      count: countBy(props.models, (model) => model.quota_type === 0),
+      count: countBy(tagModels, (model) => model.quota_type === 0),
     },
     {
       value: QUOTA_TYPES.REQUEST,
       label: quotaTypeLabels[QUOTA_TYPES.REQUEST],
-      count: countBy(props.models, (model) => model.quota_type === 1),
+      count: countBy(tagModels, (model) => model.quota_type === 1),
     },
-  ]
+  ].filter((option) => option.value === QUOTA_TYPES.ALL || option.count > 0)
 
   const tagOptions: FilterOption[] = [
     {
       value: FILTER_ALL,
-      label: t('All Tags'),
-      count: props.models.length,
+      label: t('All'),
+      count: vendorModels.length,
     },
-    ...props.tags.map((tag) => ({
+    ...availableTags.map((tag) => ({
       value: tag,
       label: tag,
-      count: countBy(props.models, (model) =>
-        parseTags(model.tags)
-          .map((item) => item.toLowerCase())
-          .includes(tag.toLowerCase())
-      ),
+      count: countBy(vendorModels, (model) => modelHasTag(model, tag)),
     })),
   ]
 
   const endpointOptions: FilterOption[] = [
     {
       value: ENDPOINT_TYPES.ALL,
-      label: endpointTypeLabels[ENDPOINT_TYPES.ALL],
-      count: props.models.length,
+      label: t('All'),
+      count: quotaModels.length,
     },
     ...Object.entries(endpointTypeLabels)
       .filter(([value]) => value !== ENDPOINT_TYPES.ALL)
@@ -237,18 +276,35 @@ export function PricingSidebar(props: PricingSidebarProps) {
         value,
         label,
         count: countBy(
-          props.models,
+          quotaModels,
           (model) => model.supported_endpoint_types?.includes(value) ?? false
         ),
-      })),
+      }))
+      .filter((option) => option.count > 0),
   ]
 
   return (
-    <aside className={cn('rounded-xl border p-3', props.className)}>
-      <div className='mb-2.5 flex items-center justify-between gap-2'>
+    <aside
+      className={cn(
+        props.compact
+          ? 'p-0'
+          : 'rounded-3xl border border-white/70 bg-white/58 p-4 shadow-[0_24px_80px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/[0.045] dark:shadow-[0_24px_70px_rgba(0,0,0,0.32)]',
+        props.className
+      )}
+    >
+      <div className='mb-4 flex items-start justify-between gap-3'>
         <div>
-          <h2 className='text-foreground text-sm font-bold'>{t('Filter')}</h2>
-          <p className='text-muted-foreground mt-1 text-xs'>
+          <div className='flex items-center gap-2'>
+            <h2 className='text-sm font-semibold tracking-tight text-slate-950 dark:text-slate-100'>
+              {t('Filter')}
+            </h2>
+            {props.hasActiveFilters && (
+              <Badge className='rounded-full bg-slate-950 px-2 py-0.5 text-[11px] text-white dark:bg-white dark:text-slate-950'>
+                {t('Enabled')}
+              </Badge>
+            )}
+          </div>
+          <p className='mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400'>
             {t('Refine models by provider, group, type, and tags.')}
           </p>
         </div>
@@ -258,20 +314,14 @@ export function PricingSidebar(props: PricingSidebarProps) {
           size='sm'
           onClick={props.onClearFilters}
           disabled={!props.hasActiveFilters}
-          className='h-7 gap-1.5 px-2 text-xs'
+          className='h-8 shrink-0 gap-1.5 rounded-full px-2.5 text-xs text-slate-500 hover:bg-slate-950/[0.04] hover:text-slate-950 disabled:opacity-35 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-white'
         >
           <RotateCcw className='size-3.5' />
           {t('Reset')}
         </Button>
       </div>
 
-      {props.hasActiveFilters && (
-        <Badge variant='secondary' className='mb-3'>
-          {t('Filters active')}
-        </Badge>
-      )}
-
-      <div className='space-y-1'>
+      <div className='space-y-3'>
         <FilterSection
           title={t('Groups')}
           value={props.groupFilter}
