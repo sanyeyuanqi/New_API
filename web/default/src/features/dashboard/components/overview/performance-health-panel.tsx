@@ -102,20 +102,20 @@ export function PerformanceHealthPanel() {
   const hasData = models.length > 0
 
   return (
-    <section className='bg-card h-full overflow-hidden rounded-2xl border shadow-xs'>
+    <section className='bg-card @container/perf h-full w-full min-w-0 overflow-hidden rounded-2xl border shadow-xs'>
       <div className='flex items-center gap-2 border-b px-4 py-3 sm:px-5'>
         <HeartPulse
           className='text-muted-foreground/60 size-4 shrink-0'
           aria-hidden='true'
         />
         <h3 className='text-sm font-semibold'>{t('Performance health')}</h3>
-        <span className='text-muted-foreground ml-auto text-xs'>
+        <span className='text-muted-foreground ml-auto hidden text-xs @md/perf:block'>
           {t('Performance metrics for the last 24 hours')}
         </span>
       </div>
 
-      <div className='space-y-3 p-4 sm:p-5'>
-        <div className='grid grid-cols-3 gap-2'>
+      <div className='space-y-3 p-3 @md/perf:p-4 @xl/perf:p-5'>
+        <div className='grid grid-cols-3 gap-1.5 @md/perf:gap-2'>
           <MetricCell
             icon={HeartPulse}
             label={t('Success rate')}
@@ -149,7 +149,7 @@ export function PerformanceHealthPanel() {
               <span className='text-muted-foreground mb-1 block text-[11px] font-medium'>
                 {t('Top models by traffic')}
               </span>
-              <div className='grid grid-cols-1 gap-x-4 sm:grid-cols-2'>
+              <div className='grid grid-cols-1 gap-x-4 @xl/perf:grid-cols-2'>
                 {topModels.map((model) => (
                   <div
                     key={model.model_name}
@@ -195,8 +195,8 @@ function MetricCell(props: {
 }) {
   const Icon = props.icon
   return (
-    <div className='bg-muted/40 rounded-xl px-3 py-2.5'>
-      <div className='text-muted-foreground flex items-center gap-1.5 text-[11px] font-medium'>
+    <div className='bg-muted/40 min-w-0 rounded-xl px-2 py-2 @md/perf:px-3 @md/perf:py-2.5'>
+      <div className='text-muted-foreground flex min-w-0 items-center gap-1 text-[10px] font-medium @md/perf:gap-1.5 @md/perf:text-[11px]'>
         <Icon className='size-3 shrink-0' aria-hidden='true' />
         <span className='truncate'>{props.label}</span>
       </div>
@@ -205,7 +205,7 @@ function MetricCell(props: {
       ) : (
         <div
           className={cn(
-            'mt-1.5 font-mono text-sm font-semibold tabular-nums',
+            'mt-1.5 truncate font-mono text-xs font-semibold tabular-nums @md/perf:text-sm',
             props.valueClassName
           )}
         >

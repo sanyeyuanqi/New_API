@@ -233,9 +233,14 @@ export function ChatPresetsItem({ item }: { item: NavChatPresets }) {
           >
             {item.icon && <item.icon className='h-4 w-4 shrink-0' />}
             <span className='min-w-0 flex-1 truncate'>{item.title}</span>
-            <ChevronRight className='ms-auto h-4 w-4 shrink-0 opacity-70' />
+            <ChevronRight className='pointer-events-none absolute end-1 top-1/2 size-3 -translate-y-1/2 opacity-60' />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align='start'>
+          <DropdownMenuContent
+            side='right'
+            align='start'
+            sideOffset={18}
+            className='min-w-44'
+          >
             {visiblePresets.map((preset) => (
               <DropdownPresetItem
                 key={preset.id}

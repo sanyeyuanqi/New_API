@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useMemo } from 'react'
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { Menu } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -31,23 +31,34 @@ import { type TopNavLink } from '../types'
 
 type TopNavProps = React.HTMLAttributes<HTMLElement> & {
   links: TopNavLink[]
+  expanded?: boolean
 }
 
 /**
  * 顶部导航栏组件
  * 在大屏幕显示水平导航，在小屏幕显示下拉菜单
  */
-export function TopNav({ className, links, ...props }: TopNavProps) {
+export function TopNav({
+  className,
+  links,
+  expanded: _expanded = false,
+  ...props
+}: TopNavProps) {
+  const location = useLocation()
   // 规范化链接，确保所有可选属性都有默认值
   const normalizedLinks = useMemo(
     () =>
       links.map((link) => ({
-        isActive: false,
         disabled: false,
         external: false,
         ...link,
+        isActive:
+          link.isActive ??
+          (link.href === '/'
+            ? location.pathname === '/'
+            : location.pathname.startsWith(link.href)),
       })),
-    [links]
+    [links, location.pathname]
   )
 
   return (
@@ -56,9 +67,15 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
       <div className='lg:hidden'>
         <DropdownMenu modal={false}>
           <DropdownMenuTrigger
-            render={<Button size='icon' variant='outline' className='size-7' />}
+            render={
+              <Button
+                size='icon'
+                variant='outline'
+                className='size-10 rounded-full border-slate-200/80 bg-white/70 shadow-none dark:border-white/10 dark:bg-white/[0.045]'
+              />
+            }
           >
-            <Menu />
+            <Menu className='size-4' />
           </DropdownMenuTrigger>
           <DropdownMenuContent side='bottom' align='start'>
             {normalizedLinks.map(
@@ -95,7 +112,7 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
       {/* 桌面端水平导航 */}
       <nav
         className={cn(
-          'hidden items-center space-x-4 lg:flex lg:space-x-4 xl:space-x-6',
+          'absolute top-1/2 left-1/2 hidden h-8 min-w-0 -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1 rounded-lg border-transparent bg-transparent p-0 shadow-none backdrop-blur-none transition-[width,max-width] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] lg:inline-flex dark:border-transparent dark:bg-transparent',
           className
         )}
         {...props}
@@ -107,7 +124,12 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
               href={href}
               target='_blank'
               rel='noopener noreferrer'
-              className={`hover:text-primary text-sm font-medium transition-colors ${isActive ? '' : 'text-muted-foreground'}`}
+              className={cn(
+                'inline-flex h-7 items-center rounded-lg px-2.5 text-xs font-medium transition-colors',
+                isActive
+                  ? 'bg-slate-950 text-white shadow-sm dark:bg-white dark:text-slate-950'
+                  : 'text-slate-500 hover:bg-slate-950/[0.045] hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/[0.075] dark:hover:text-white'
+              )}
             >
               {title}
             </a>
@@ -116,7 +138,13 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
               key={`${title}-${href}`}
               to={href}
               disabled={disabled}
-              className={`hover:text-primary text-sm font-medium transition-colors ${isActive ? '' : 'text-muted-foreground'}`}
+              className={cn(
+                'inline-flex h-7 items-center rounded-lg px-2.5 text-xs font-medium transition-colors',
+                isActive
+                  ? 'bg-slate-950 text-white shadow-sm dark:bg-white dark:text-slate-950'
+                  : 'text-slate-500 hover:bg-slate-950/[0.045] hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/[0.075] dark:hover:text-white',
+                disabled && 'pointer-events-none opacity-50'
+              )}
             >
               {title}
             </Link>

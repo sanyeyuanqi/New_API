@@ -16,17 +16,16 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useLocation } from '@tanstack/react-router'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { NotificationPopover } from '@/components/notification-popover'
 import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
 import { defaultTopNavLinks } from '../config/top-nav.config'
 import { type TopNavLink } from '../types'
 import { Header } from './header'
-import { SystemBrand } from './system-brand'
 import { TopNav } from './top-nav'
 
 /**
@@ -96,51 +95,58 @@ export function AppHeader({
   navLinks = defaultTopNavLinks,
   showTopNav = true,
   leftContent,
-  showSearch = true,
   rightContent,
   showNotifications = true,
   showConfigDrawer = true,
   showProfileDropdown = true,
 }: AppHeaderProps) {
+  const location = useLocation()
   // Prioritize dynamically generated links from backend
   const dynamicLinks = useTopNavLinks()
   const links = dynamicLinks.length > 0 ? dynamicLinks : navLinks
-
+  const expandTopNav =
+    location.pathname.startsWith('/dashboard') ||
+    location.pathname.startsWith('/console')
   // Notifications hook
   const notifications = useNotifications()
 
   return (
     <>
-      <Header>
-        <SystemBrand variant='inline' />
-
+      <Header
+        className='bg-transparent'
+        contentClassName='relative mx-3 mt-3 h-12 w-[calc(100%-1.5rem)] rounded-xl border border-slate-200/70 bg-white/62 px-2.5 shadow-[0_12px_36px_rgba(15,23,42,0.08)] backdrop-blur-2xl transition-[width,max-width,margin,border-color,background-color,box-shadow] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] dark:border-white/10 dark:bg-zinc-950/58 dark:shadow-[0_14px_46px_rgba(0,0,0,0.42)] [&_[data-slot=button]]:rounded-lg [&_[data-slot=button]]:text-slate-600 [&_[data-slot=button]]:hover:bg-slate-950/[0.055] dark:[&_[data-slot=button]]:text-slate-300 dark:[&_[data-slot=button]]:hover:bg-white/[0.075]'
+      >
         {leftContent ? (
           <div className='ms-2 flex items-center'>{leftContent}</div>
+        ) : showTopNav ? (
+          <TopNav links={links} expanded={expandTopNav} />
         ) : null}
 
         {rightContent ?? (
-          <div className='ms-auto flex items-center gap-1 sm:gap-2'>
-            {showTopNav && (
-              <div className='me-1 hidden lg:block'>
-                <TopNav links={links} />
-              </div>
-            )}
-            {showSearch && <Search />}
-            {showNotifications && (
-              <NotificationPopover
-                open={notifications.popoverOpen}
-                onOpenChange={notifications.setPopoverOpen}
-                unreadCount={notifications.unreadCount}
-                activeTab={notifications.activeTab}
-                onTabChange={notifications.setActiveTab}
-                notice={notifications.notice}
-                announcements={notifications.announcements}
-                loading={notifications.loading}
-              />
-            )}
-            <LanguageSwitcher />
-            {showConfigDrawer && <ConfigDrawer />}
-            {showProfileDropdown && <ProfileDropdown />}
+          <div className='ms-auto flex min-w-0 items-center gap-2'>
+            <div className='flex h-12 items-center gap-1 px-1 [&_[data-slot=button]]:size-8'>
+              {showNotifications && (
+                <NotificationPopover
+                  open={notifications.popoverOpen}
+                  onOpenChange={notifications.setPopoverOpen}
+                  unreadCount={notifications.unreadCount}
+                  activeTab={notifications.activeTab}
+                  onTabChange={notifications.setActiveTab}
+                  notice={notifications.notice}
+                  announcements={notifications.announcements}
+                  loading={notifications.loading}
+                />
+              )}
+              <LanguageSwitcher />
+              {showConfigDrawer && <ConfigDrawer />}
+              {showProfileDropdown && (
+                <ProfileDropdown
+                  showName
+                  nameMode='username'
+                  className='!h-8 !w-auto max-w-[10rem] px-2'
+                />
+              )}
+            </div>
           </div>
         )}
       </Header>

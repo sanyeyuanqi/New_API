@@ -268,29 +268,29 @@ export function SummaryCards() {
           </StaggerContainer>
         </div>
 
-        <div className='bg-warning/10 flex flex-col justify-between gap-4 border-t p-4 sm:p-5 xl:border-t-0 xl:border-l'>
-          <div className='flex flex-col gap-3'>
-            <div className='flex items-center justify-between'>
+        <div className='bg-background/35 flex min-h-full flex-col border-t p-4 sm:p-5 xl:border-t-0 xl:border-l'>
+          <div className='flex flex-1 flex-col gap-4'>
+            <div className='flex items-start justify-between gap-3'>
               <span className='text-muted-foreground text-xs font-medium'>
                 {t('Credit remaining')}
               </span>
-              <span className='flex items-center gap-1.5'>
+              <span className='bg-card flex shrink-0 items-center gap-1.5 rounded-full border px-2 py-1 shadow-xs'>
                 <span
                   className={cn('size-1.5 rounded-full', healthCfg.dotClass)}
                   aria-hidden='true'
                 />
-                <span className='text-muted-foreground text-[11px] font-medium'>
+                <span className='text-muted-foreground text-[11px] leading-none font-medium'>
                   {t(healthCfg.labelKey)}
                 </span>
               </span>
             </div>
 
-            <div className='font-mono text-2xl font-semibold tracking-tight'>
+            <div className='font-mono text-3xl leading-none font-semibold tracking-tight'>
               {formatQuota(remainQuota)}
             </div>
 
-            <div className='grid grid-cols-2 gap-2'>
-              <div className='bg-background/60 rounded-lg px-2.5 py-2'>
+            <div className='grid grid-cols-1 gap-2 min-[90rem]:grid-cols-2'>
+              <div className='bg-card rounded-xl border px-3 py-2.5 shadow-xs'>
                 <div className='text-muted-foreground flex items-center gap-1 text-[11px] leading-none font-medium'>
                   <Flame className='size-3 shrink-0' aria-hidden='true' />
                   <span className='truncate'>{t('Last 24h usage')}</span>
@@ -299,7 +299,7 @@ export function SummaryCards() {
                   {formatQuota(recentUsage)}
                 </div>
               </div>
-              <div className='bg-background/60 rounded-lg px-2.5 py-2'>
+              <div className='bg-card rounded-xl border px-3 py-2.5 shadow-xs'>
                 <div className='text-muted-foreground flex items-center gap-1 text-[11px] leading-none font-medium'>
                   {runwayDays !== null && runwayDays < 3 ? (
                     <TrendingDown
@@ -335,7 +335,10 @@ export function SummaryCards() {
             </div>
           </div>
 
-          <Button className='justify-between' render={<Link to='/wallet' />}>
+          <Button
+            className='mt-4 h-9 justify-between rounded-lg px-3 shadow-none'
+            render={<Link to='/wallet' />}
+          >
             <span>{t('Wallet')}</span>
             <ArrowRight data-icon='inline-end' />
           </Button>

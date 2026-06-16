@@ -41,6 +41,7 @@ const avatarFallbackClassName = 'font-semibold text-white'
 
 interface ProfileDropdownProps {
   showName?: boolean
+  nameMode?: 'display' | 'username'
   className?: string
 }
 
@@ -50,6 +51,8 @@ export function ProfileDropdown(props: ProfileDropdownProps = {}) {
   const [open, setOpen] = useDialogState()
   const user = useAuthStore((state) => state.auth.user)
   const { displayName, roleLabel } = useUserDisplay(user)
+  const triggerName =
+    props.nameMode === 'username' ? user?.username || displayName : displayName
   const isSuperAdmin = user?.role === ROLE.SUPER_ADMIN
   const avatarName = user?.username || displayName
   const avatarFallback = getUserAvatarFallback(avatarName)
@@ -74,7 +77,7 @@ export function ProfileDropdown(props: ProfileDropdownProps = {}) {
           }
         >
           {props.showName ? (
-            <span className='truncate text-sm font-medium'>{displayName}</span>
+            <span className='truncate text-sm font-medium'>{triggerName}</span>
           ) : (
             <Avatar className='size-6'>
               <AvatarFallback

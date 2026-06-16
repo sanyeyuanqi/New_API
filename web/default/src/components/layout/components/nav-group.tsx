@@ -63,8 +63,8 @@ export function NavGroup({ title, items }: NavGroupProps) {
   const href = useLocation({ select: (location) => location.href })
 
   return (
-    <SidebarGroup className='px-2 py-1'>
-      <SidebarGroupLabel className='text-muted-foreground/70 px-2 text-[11px] font-medium tracking-wider uppercase'>
+    <SidebarGroup className='px-2 py-0.5'>
+      <SidebarGroupLabel className='text-muted-foreground/65 h-7 px-2 text-[11px] font-medium tracking-wide uppercase'>
         {title}
       </SidebarGroupLabel>
       <SidebarMenu>
@@ -222,9 +222,14 @@ function SidebarMenuCollapsedDropdown({
           {item.icon && <item.icon className='shrink-0' />}
           <span className='min-w-0 flex-1 truncate'>{item.title}</span>
           {item.badge && <NavBadge>{item.badge}</NavBadge>}
-          <ChevronRight className='ms-auto size-4 shrink-0 transition-transform duration-200 group-data-[popup-open]/dropdown-trigger:rotate-90' />
+          <ChevronRight className='pointer-events-none absolute end-1 top-1/2 size-3 -translate-y-1/2 opacity-60' />
         </DropdownMenuTrigger>
-        <DropdownMenuContent side='right' align='start' sideOffset={4}>
+        <DropdownMenuContent
+          side='right'
+          align='start'
+          sideOffset={18}
+          className='min-w-44'
+        >
           <DropdownMenuGroup>
             <DropdownMenuLabel>
               {item.title} {item.badge ? `(${item.badge})` : ''}
