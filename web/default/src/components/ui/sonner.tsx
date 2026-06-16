@@ -18,11 +18,11 @@ For commercial licensing, please contact support@quantumnous.com
 */
 'use client'
 
+import type { CSSProperties } from 'react'
 import {
   CheckmarkCircle02Icon,
   InformationCircleIcon,
   Alert02Icon,
-  MultiplicationSignCircleIcon,
   Loading03Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
@@ -31,11 +31,32 @@ import { useTheme } from '@/context/theme-provider'
 
 const Toaster = (props: ToasterProps) => {
   const { resolvedTheme } = useTheme()
+  const { toastOptions, ...sonnerProps } = props
 
   return (
     <Sonner
       theme={resolvedTheme}
       className='toaster group'
+      toastOptions={{
+        ...toastOptions,
+        classNames: {
+          toast:
+            'min-h-12 w-[min(340px,calc(100vw-2rem))] rounded-xl border px-4 py-3 pr-10 !shadow-[0_14px_34px_rgba(15,23,42,0.12)] backdrop-blur-xl dark:!shadow-[0_16px_42px_rgba(0,0,0,0.45)]',
+          error:
+            'border-slate-200 bg-white text-slate-900 dark:border-white/10 dark:bg-zinc-950 dark:text-slate-100',
+          success:
+            'border-emerald-200 bg-white text-emerald-600 dark:border-emerald-500/25 dark:bg-zinc-950 dark:text-emerald-300',
+          warning:
+            'border-amber-200 bg-white text-amber-600 dark:border-amber-500/25 dark:bg-zinc-950 dark:text-amber-300',
+          info: 'border-sky-200 bg-white text-sky-600 dark:border-sky-500/25 dark:bg-zinc-950 dark:text-sky-300',
+          title: 'text-sm font-medium leading-5',
+          description: 'text-muted-foreground text-xs leading-5',
+          icon: 'mt-0.5',
+          closeButton:
+            '!top-3 !right-3 !left-auto !translate-x-0 !translate-y-0 border-transparent bg-transparent text-slate-400 shadow-none transition-colors hover:bg-slate-100 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-white/10 dark:hover:text-slate-200',
+          ...toastOptions?.classNames,
+        },
+      }}
       icons={{
         success: (
           <HugeiconsIcon
@@ -58,13 +79,7 @@ const Toaster = (props: ToasterProps) => {
             className='size-4'
           />
         ),
-        error: (
-          <HugeiconsIcon
-            icon={MultiplicationSignCircleIcon}
-            strokeWidth={2}
-            className='size-4'
-          />
-        ),
+        error: null,
         loading: (
           <HugeiconsIcon
             icon={Loading03Icon}
@@ -92,15 +107,15 @@ const Toaster = (props: ToasterProps) => {
           '--warning-border':
             'color-mix(in oklch, var(--warning) 38%, var(--border))',
           '--warning-text': 'var(--warning)',
-          '--error-bg':
-            'color-mix(in oklch, var(--destructive) 16%, var(--popover))',
+          '--error-bg': 'color-mix(in oklch, var(--destructive) 4%, white)',
           '--error-border':
-            'color-mix(in oklch, var(--destructive) 35%, var(--border))',
+            'color-mix(in oklch, var(--destructive) 24%, var(--border))',
           '--error-text': 'var(--destructive)',
-          '--border-radius': 'var(--radius)',
-        } as React.CSSProperties
+          '--border-radius': '12px',
+          '--width': '340px',
+        } as CSSProperties
       }
-      {...props}
+      {...sonnerProps}
     />
   )
 }

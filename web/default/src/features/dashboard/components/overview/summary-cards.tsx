@@ -268,8 +268,8 @@ export function SummaryCards() {
           </StaggerContainer>
         </div>
 
-        <div className='bg-background/35 flex min-h-full flex-col border-t p-4 sm:p-5 xl:border-t-0 xl:border-l'>
-          <div className='flex flex-1 flex-col gap-4'>
+        <div className='bg-background/35 flex min-h-full flex-col justify-center border-t p-4 sm:p-5 xl:border-t-0 xl:border-l'>
+          <div className='flex flex-1 flex-col justify-center gap-5'>
             <div className='flex items-start justify-between gap-3'>
               <span className='text-muted-foreground text-xs font-medium'>
                 {t('Credit remaining')}
@@ -285,22 +285,33 @@ export function SummaryCards() {
               </span>
             </div>
 
-            <div className='font-mono text-3xl leading-none font-semibold tracking-tight'>
-              {formatQuota(remainQuota)}
+            <div className='flex items-center justify-between gap-4'>
+              <div className='min-w-0 font-mono text-3xl leading-none font-semibold tracking-tight'>
+                {formatQuota(remainQuota)}
+              </div>
+              <Button
+                variant='outline'
+                size='sm'
+                className='h-8 shrink-0 rounded-full px-3 text-xs font-semibold shadow-xs'
+                render={<Link to='/wallet' />}
+              >
+                <span>{t('Recharge')}</span>
+                <ArrowRight data-icon='inline-end' />
+              </Button>
             </div>
 
-            <div className='grid grid-cols-1 gap-2 min-[90rem]:grid-cols-2'>
-              <div className='bg-card rounded-xl border px-3 py-2.5 shadow-xs'>
-                <div className='text-muted-foreground flex items-center gap-1 text-[11px] leading-none font-medium'>
+            <div className='grid grid-cols-1 gap-2.5'>
+              <div className='bg-card flex h-10 items-center justify-between gap-3 rounded-full border px-3.5 shadow-xs'>
+                <div className='text-muted-foreground flex min-w-0 items-center gap-1 text-[11px] leading-none font-medium'>
                   <Flame className='size-3 shrink-0' aria-hidden='true' />
                   <span className='truncate'>{t('Last 24h usage')}</span>
                 </div>
-                <div className='text-foreground mt-1.5 truncate text-xs font-semibold tabular-nums'>
+                <div className='text-foreground shrink-0 truncate text-xs font-semibold tabular-nums'>
                   {formatQuota(recentUsage)}
                 </div>
               </div>
-              <div className='bg-card rounded-xl border px-3 py-2.5 shadow-xs'>
-                <div className='text-muted-foreground flex items-center gap-1 text-[11px] leading-none font-medium'>
+              <div className='bg-card flex h-10 items-center justify-between gap-3 rounded-full border px-3.5 shadow-xs'>
+                <div className='text-muted-foreground flex min-w-0 items-center gap-1 text-[11px] leading-none font-medium'>
                   {runwayDays !== null && runwayDays < 3 ? (
                     <TrendingDown
                       className='size-3 shrink-0'
@@ -316,7 +327,7 @@ export function SummaryCards() {
                 </div>
                 <div
                   className={cn(
-                    'mt-1.5 truncate text-xs font-semibold tabular-nums',
+                    'shrink-0 truncate text-xs font-semibold tabular-nums',
                     healthLevel === 'critical' && 'text-destructive',
                     healthLevel === 'caution' && 'text-warning'
                   )}
@@ -335,13 +346,6 @@ export function SummaryCards() {
             </div>
           </div>
 
-          <Button
-            className='mt-4 h-9 justify-between rounded-lg px-3 shadow-none'
-            render={<Link to='/wallet' />}
-          >
-            <span>{t('Wallet')}</span>
-            <ArrowRight data-icon='inline-end' />
-          </Button>
         </div>
       </div>
     </div>

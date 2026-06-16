@@ -16,7 +16,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { User, Wallet, LogOut, Settings } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -56,10 +55,7 @@ export function ProfileDropdown(props: ProfileDropdownProps = {}) {
   const isSuperAdmin = user?.role === ROLE.SUPER_ADMIN
   const avatarName = user?.username || displayName
   const avatarFallback = getUserAvatarFallback(avatarName)
-  const avatarFallbackStyle = useMemo(
-    () => getUserAvatarStyle(avatarName),
-    [avatarName]
-  )
+  const avatarFallbackStyle = getUserAvatarStyle(avatarName)
 
   return (
     <>
@@ -90,15 +86,7 @@ export function ProfileDropdown(props: ProfileDropdownProps = {}) {
           )}
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' sideOffset={8} className='w-56'>
-          <div className='flex items-center gap-2 px-1.5 py-1.5'>
-            <Avatar className='size-8'>
-              <AvatarFallback
-                className={`${avatarFallbackClassName} text-xs`}
-                style={avatarFallbackStyle}
-              >
-                {avatarFallback}
-              </AvatarFallback>
-            </Avatar>
+          <div className='flex items-center px-1.5 py-1.5'>
             <div className='flex flex-1 flex-col gap-0.5 overflow-hidden'>
               <p className='text-foreground truncate text-sm font-medium'>
                 {displayName}

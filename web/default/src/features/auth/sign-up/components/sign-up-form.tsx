@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type MouseEvent } from 'react'
 import type { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -181,6 +181,13 @@ export function SignUpForm({
       // Errors are handled by global interceptor
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  function handleSubmitButtonClick(event: MouseEvent<HTMLButtonElement>) {
+    if (requiresLegalConsent && !agreedToLegal) {
+      event.preventDefault()
+      toast.error(legalConsentErrorMessage)
     }
   }
 
@@ -364,26 +371,23 @@ export function SignUpForm({
           </div>
         )}
 
+        {/* Submit Button */}
+        <Button
+          type='submit'
+          className={primaryButtonClass}
+          disabled={isLoading || !turnstileReady}
+          onClick={handleSubmitButtonClick}
+        >
+          {isLoading ? <Loader2 className='h-4 w-4 animate-spin' /> : null}
+          {t('Create account')}
+        </Button>
+
         <LegalConsent
           status={status}
           checked={agreedToLegal}
           onCheckedChange={setAgreedToLegal}
           className='mt-1'
         />
-
-        {/* Submit Button */}
-        <Button
-          type='submit'
-          className={primaryButtonClass}
-          disabled={
-            isLoading ||
-            (requiresLegalConsent && !agreedToLegal) ||
-            !turnstileReady
-          }
-        >
-          {isLoading ? <Loader2 className='h-4 w-4 animate-spin' /> : null}
-          {t('Create account')}
-        </Button>
 
         {oauthRegisterEnabled && (
           <OAuthProviders

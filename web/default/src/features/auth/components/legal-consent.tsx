@@ -16,11 +16,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
+import { getPrivacyPolicy, getUserAgreement } from '@/features/legal/api'
 import type { SystemStatus } from '../types'
+import { LegalDocumentDialog } from './legal-document-dialog'
 
 interface LegalConsentProps {
   status: SystemStatus | null
@@ -36,6 +39,9 @@ export function LegalConsent({
   className,
 }: LegalConsentProps) {
   const { t } = useTranslation()
+  const [activeDocument, setActiveDocument] = useState<
+    'user-agreement' | 'privacy-policy' | null
+  >(null)
   const hasUserAgreement = Boolean(status?.user_agreement_enabled)
   const hasPrivacyPolicy = Boolean(status?.privacy_policy_enabled)
 
@@ -48,48 +54,83 @@ export function LegalConsent({
   }
 
   return (
-    <div
-      className={cn(
-        'border-border/60 bg-muted/40 flex items-start gap-3 rounded-md border p-3',
-        className
-      )}
-    >
-      <Checkbox
-        id='legal-consent'
-        checked={checked}
-        onCheckedChange={handleChange}
-        className='mt-0.5'
-      />
-      <Label
-        htmlFor='legal-consent'
-        className='text-muted-foreground items-start gap-1 text-left text-xs leading-5 font-normal'
+    <>
+      <div
+        className={cn(
+          'border-border/60 bg-muted/40 flex items-start gap-3 rounded-md border p-3',
+          className
+        )}
       >
-        <span>
-          {t('I have read and agree to the')}{' '}
-          {hasUserAgreement && (
-            <a
-              href='/user-agreement'
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-primary hover:underline'
-            >
-              {t('User Agreement')}
-            </a>
+        <Checkbox
+          id='legal-consent'
+          checked={checked}
+          onCheckedChange={handleChange}
+          className='mt-0.5'
+        />
+        <Label
+          htmlFor='legal-consent'
+          className='text-muted-foreground items-start gap-1 text-left text-xs leading-5 font-normal'
+        >
+          <span>
+            {t('I have read and agree to the')}{' '}
+            {hasUserAgreement && (
+              <button
+                type='button'
+                className='text-primary cursor-pointer p-0 align-baseline hover:underline'
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  setActiveDocument('user-agreement')
+                }}
+              >
+                {t('User Agreement')}
+              </button>
+            )}
+            {hasUserAgreement && hasPrivacyPolicy && ' and the '}
+            {hasPrivacyPolicy && (
+              <button
+                type='button'
+                className='text-primary cursor-pointer p-0 align-baseline hover:underline'
+                onClick={(event) => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  setActiveDocument('privacy-policy')
+                }}
+              >
+                {t('Privacy Policy')}
+              </button>
+            )}
+            .
+          </span>
+        </Label>
+      </div>
+
+      {hasUserAgreement && (
+        <LegalDocumentDialog
+          open={activeDocument === 'user-agreement'}
+          onOpenChange={(open) => {
+            if (!open) setActiveDocument(null)
+          }}
+          queryKey='user-agreement'
+          fetchDocument={getUserAgreement}
+          emptyMessage={t(
+            'The administrator has not configured a user agreement yet.'
           )}
-          {hasUserAgreement && hasPrivacyPolicy && ' and the '}
-          {hasPrivacyPolicy && (
-            <a
-              href='/privacy-policy'
-              target='_blank'
-              rel='noopener noreferrer'
-              className='text-primary hover:underline'
-            >
-              {t('Privacy Policy')}
-            </a>
+        />
+      )}
+      {hasPrivacyPolicy && (
+        <LegalDocumentDialog
+          open={activeDocument === 'privacy-policy'}
+          onOpenChange={(open) => {
+            if (!open) setActiveDocument(null)
+          }}
+          queryKey='privacy-policy'
+          fetchDocument={getPrivacyPolicy}
+          emptyMessage={t(
+            'The administrator has not configured a privacy policy yet.'
           )}
-          .
-        </span>
-      </Label>
-    </div>
+        />
+      )}
+    </>
   )
 }

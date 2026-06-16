@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { DEFAULT_SYSTEM_NAME } from '@/lib/constants'
 import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import {
@@ -50,7 +51,10 @@ export function SystemBrand(props: SystemBrandProps) {
   const { logo } = useSystemConfig()
 
   const variant = props.variant ?? 'sidebar'
-  const name = status?.system_name || props.defaultName || 'New API'
+  const name =
+    !status?.system_name || status.system_name === 'New API'
+      ? props.defaultName || DEFAULT_SYSTEM_NAME
+      : status.system_name
   const version =
     status?.version || props.defaultVersion || t('Unknown version')
 

@@ -78,7 +78,7 @@ export function PublicHeader(props: PublicHeaderProps) {
   const [authPromptSecondsLeft, setAuthPromptSecondsLeft] =
     useState(AUTH_PROMPT_SECONDS)
   const { auth } = useAuthStore()
-  const { systemName, loading } = useSystemConfig()
+  const { systemName, logo: systemLogo, loading } = useSystemConfig()
   const dynamicLinks = useTopNavLinks()
   const notifications = useNotifications()
   const routerState = useRouterState()
@@ -193,8 +193,21 @@ export function PublicHeader(props: PublicHeaderProps) {
             {/* Logo */}
             <Link
               to={homeUrl}
-              className='group flex shrink-0 items-center rounded-lg px-2 py-1 transition-colors hover:bg-slate-950/[0.03] dark:hover:bg-white/[0.05]'
+              className='group flex shrink-0 items-center gap-2 rounded-lg px-2 py-1 transition-colors hover:bg-slate-950/[0.03] dark:hover:bg-white/[0.05]'
             >
+              {loading ? (
+                <Skeleton className='size-6 rounded-md' />
+              ) : props.logo ? (
+                props.logo
+              ) : (
+                <span className='flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md'>
+                  <img
+                    src={systemLogo}
+                    alt={t('Logo')}
+                    className='size-full object-contain'
+                  />
+                </span>
+              )}
               <span className='text-sm font-semibold tracking-tight text-slate-950 dark:text-slate-100'>
                 {loading ? <Skeleton className='h-4 w-16' /> : displaySiteName}
               </span>

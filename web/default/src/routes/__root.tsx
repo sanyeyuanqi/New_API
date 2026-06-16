@@ -47,7 +47,7 @@ function RootComponent() {
     <ThemeCustomizationProvider>
       <NavigationProgress />
       <Outlet />
-      <Toaster closeButton duration={5000} position='top-center' richColors />
+      <Toaster closeButton duration={5000} position='top-right' />
     </ThemeCustomizationProvider>
   )
 }

@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, type MouseEvent } from 'react'
 import type { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -177,6 +177,13 @@ export function UserAuthForm({
       // Errors are handled by global interceptor
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  function handleSubmitButtonClick(event: MouseEvent<HTMLButtonElement>) {
+    if (requiresLegalConsent && !agreedToLegal) {
+      event.preventDefault()
+      toast.error(legalConsentErrorMessage)
     }
   }
 
@@ -353,7 +360,8 @@ export function UserAuthForm({
             <Button
               type='submit'
               className={primaryButtonClass}
-              disabled={isLoading || (requiresLegalConsent && !agreedToLegal)}
+              disabled={isLoading}
+              onClick={handleSubmitButtonClick}
             >
               {isLoading ? (
                 <Loader2 className='h-4 w-4 animate-spin' />

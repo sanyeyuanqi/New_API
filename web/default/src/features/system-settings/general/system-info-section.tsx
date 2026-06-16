@@ -16,10 +16,12 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import type { ComponentProps } from 'react'
 import * as z from 'zod'
 import type { Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
+import { cn } from '@/lib/utils'
 import {
   Form,
   FormControl,
@@ -30,14 +32,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
@@ -73,6 +67,28 @@ type SystemInfoSectionProps = {
 function normalizeValue(value: unknown): string {
   if (value === undefined || value === null) return ''
   return typeof value === 'string' ? value : String(value)
+}
+
+type SystemInfoTextareaProps = ComponentProps<typeof Textarea> & {
+  variant?: 'short' | 'long'
+}
+
+function SystemInfoTextarea({
+  className,
+  variant = 'long',
+  ...props
+}: SystemInfoTextareaProps) {
+  return (
+    <Textarea
+      className={cn(
+        '[field-sizing:fixed] resize-y overflow-auto',
+        'font-mono text-xs leading-5',
+        variant === 'short' ? 'h-24 min-h-20' : 'h-56 max-h-[60vh] min-h-36',
+        className
+      )}
+      {...props}
+    />
+  )
 }
 
 export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
@@ -133,7 +149,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
     <>
       <FormNavigationGuard when={isDirty} />
 
-      <SettingsSection title={t('System Information')}>
+      <SettingsSection title={t('System Information')} className='max-w-6xl'>
         <Form {...form}>
           <SettingsForm onSubmit={handleSubmit}>
             <SettingsPageFormActions
@@ -143,7 +159,7 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
               isResetDisabled={!isDirty}
             />
             <FormDirtyIndicator isDirty={isDirty} />
-            <SettingsFormGrid>
+            <SettingsFormGrid className='lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]'>
               <FormField
                 control={form.control}
                 name='SystemName'
@@ -207,11 +223,11 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                   <FormItem>
                     <FormLabel>{t('Footer')}</FormLabel>
                     <FormControl>
-                      <Textarea
+                      <SystemInfoTextarea
                         placeholder={t(
                           '© 2025 Your Company. All rights reserved.'
                         )}
-                        rows={4}
+                        variant='short'
                         {...field}
                       />
                     </FormControl>
@@ -230,11 +246,10 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                   <FormItem>
                     <FormLabel>{t('About')}</FormLabel>
                     <FormControl>
-                      <Textarea
+                      <SystemInfoTextarea
                         placeholder={t(
                           'Enter HTML code (e.g., <p>About us...</p>) or a URL (e.g., https://example.com) to embed as iframe'
                         )}
-                        rows={4}
                         {...field}
                       />
                     </FormControl>
@@ -257,8 +272,8 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                       <FormLabel>{t('Home Page Content')}</FormLabel>
                       <FormControl>
                         <Textarea
+                          className='[field-sizing:fixed] h-64 max-h-[60vh] min-h-40 resize-y overflow-auto font-mono text-xs leading-5'
                           placeholder={t('Welcome to our New API...')}
-                          rows={6}
                           {...field}
                         />
                       </FormControl>
@@ -280,11 +295,10 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                   <FormItem>
                     <FormLabel>{t('User Agreement')}</FormLabel>
                     <FormControl>
-                      <Textarea
+                      <SystemInfoTextarea
                         placeholder={t(
                           'Provide Markdown, HTML, or an external URL for the user agreement'
                         )}
-                        rows={6}
                         {...field}
                       />
                     </FormControl>
@@ -305,11 +319,10 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                   <FormItem>
                     <FormLabel>{t('Privacy Policy')}</FormLabel>
                     <FormControl>
-                      <Textarea
+                      <SystemInfoTextarea
                         placeholder={t(
                           'Provide Markdown, HTML, or an external URL for the privacy policy'
                         )}
-                        rows={6}
                         {...field}
                       />
                     </FormControl>
