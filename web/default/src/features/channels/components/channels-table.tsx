@@ -341,6 +341,24 @@ export function ChannelsTable() {
     ...groupOptions,
   ]
 
+  const getColumnClassName = (columnId: string) => {
+    switch (columnId) {
+      case 'select':
+        return 'w-10 p-0'
+      case 'id':
+      case 'priority':
+      case 'weight':
+      case 'response_time':
+        return 'text-center'
+      case 'balance':
+        return 'font-mono'
+      case 'actions':
+        return 'text-right'
+      default:
+        return undefined
+    }
+  }
+
   return (
     <DataTablePage
       table={table}
@@ -353,6 +371,8 @@ export function ChannelsTable() {
       )}
       skeletonKeyPrefix='channel-skeleton'
       applyHeaderSize
+      getColumnClassName={getColumnClassName}
+      tableClassName='[&_[data-slot=table-cell]]:h-11 [&_[data-slot=table-cell]]:px-3 [&_[data-slot=table-head]]:px-3'
       toolbarProps={{
         searchPlaceholder: t('Filter by name, ID, or key...'),
         searchDebounceMs: 500,

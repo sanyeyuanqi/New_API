@@ -19,7 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { useState, type ComponentProps, type ReactNode } from 'react'
 import { type Table } from '@tanstack/react-table'
 import { useMediaQuery } from '@/hooks'
-import { ChevronDown, Loader2 } from 'lucide-react'
+import { ChevronDown, Loader2, RotateCcw, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -40,6 +40,8 @@ interface LogsFilterToolbarProps<TData> {
   table: Table<TData>
   primaryFilters: ReactNode
   advancedFilters?: ReactNode
+  primaryFiltersClassName?: string
+  inlineActions?: boolean
   mobilePinnedFilters?: ReactNode
   mobileFilters?: ReactNode
   mobileFilterCount?: number
@@ -102,6 +104,66 @@ export function LogsFilterToolbar<TData>(props: LogsFilterToolbarProps<TData>) {
     props.onSearch()
     setMobileFiltersOpen(false)
   }
+
+  const actionControls = (
+    <div className='bg-muted/40 ms-auto flex flex-wrap items-center justify-end gap-0.5 rounded-lg border p-0.5 [&_[data-slot=button]]:h-7 [&_[data-slot=button]]:rounded-md [&_[data-slot=button]]:px-2.5 [&_[data-slot=button]]:text-xs [&_[data-slot=button]]:shadow-none'>
+      {hasAdvancedFilters && (
+        <Button
+          type='button'
+          variant='ghost'
+          onClick={() => setAdvancedOpen((open) => !open)}
+          aria-expanded={advancedOpen}
+          className={cn(
+            'text-muted-foreground hover:text-foreground gap-1 px-2',
+            props.hasAdvancedActiveFilters &&
+              !advancedOpen &&
+              'text-primary hover:text-primary'
+          )}
+        >
+          {advancedOpen ? t('Collapse') : t('Expand')}
+          {activeAdvancedCount > 0 && (
+            <Badge className='ml-0.5 size-5 justify-center p-0 text-[10px]'>
+              {activeAdvancedCount}
+            </Badge>
+          )}
+          <ChevronDown
+            className={cn(
+              'size-3.5 transition-transform duration-200',
+              advancedOpen && 'rotate-180'
+            )}
+          />
+        </Button>
+      )}
+
+      <Button
+        type='button'
+        variant='ghost'
+        size='sm'
+        onClick={props.onReset}
+        disabled={!props.hasActiveFilters}
+        className='text-muted-foreground hover:bg-background hover:text-foreground disabled:bg-transparent'
+      >
+        <RotateCcw className='size-3.5' />
+        {t('Reset')}
+      </Button>
+      <Button
+        type='button'
+        variant='secondary'
+        size='sm'
+        onClick={props.onSearch}
+        disabled={props.searchLoading}
+        className='bg-background text-foreground hover:bg-background/80 min-w-14 border'
+      >
+        {props.searchLoading ? (
+          <Loader2 className='size-3.5 animate-spin' />
+        ) : (
+          <Search className='size-3.5' />
+        )}
+        {t('Search')}
+      </Button>
+      <DataTableViewOptions table={props.table} />
+    </div>
+  )
 
   if (isMobile && props.mobilePinnedFilters != null) {
     return (
@@ -192,61 +254,42 @@ export function LogsFilterToolbar<TData>(props: LogsFilterToolbarProps<TData>) {
         props.className
       )}
     >
-      <div className='grid grid-cols-1 gap-2 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]'>
-        {props.primaryFilters}
-        {advancedOpen && props.advancedFilters}
-      </div>
-
-      <div className='mt-2 flex flex-wrap items-center gap-2'>
-        {props.stats}
-        <div className='ms-auto flex flex-wrap items-center justify-end gap-1.5 sm:gap-2'>
-          {hasAdvancedFilters && (
-            <Button
-              type='button'
-              variant='ghost'
-              onClick={() => setAdvancedOpen((open) => !open)}
-              aria-expanded={advancedOpen}
-              className={cn(
-                'text-muted-foreground hover:text-foreground gap-1 px-2',
-                props.hasAdvancedActiveFilters &&
-                  !advancedOpen &&
-                  'text-primary hover:text-primary'
-              )}
-            >
-              {advancedOpen ? t('Collapse') : t('Expand')}
-              {activeAdvancedCount > 0 && (
-                <Badge className='ml-0.5 size-5 justify-center p-0 text-[10px]'>
-                  {activeAdvancedCount}
-                </Badge>
-              )}
-              <ChevronDown
-                className={cn(
-                  'size-3.5 transition-transform duration-200',
-                  advancedOpen && 'rotate-180'
-                )}
-              />
-            </Button>
-          )}
-
-          <Button
-            type='button'
-            variant='outline'
-            onClick={props.onReset}
-            disabled={!props.hasActiveFilters}
+      {props.inlineActions ? (
+        <div className='flex flex-col gap-2 lg:flex-row lg:items-center'>
+          <div
+            className={cn(
+              'grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]',
+              props.primaryFiltersClassName
+            )}
           >
-            {t('Reset')}
-          </Button>
-          <Button
-            type='button'
-            onClick={props.onSearch}
-            disabled={props.searchLoading}
-          >
-            {props.searchLoading && <Loader2 className='animate-spin' />}
-            {t('Search')}
-          </Button>
-          <DataTableViewOptions table={props.table} />
+            {props.primaryFilters}
+          </div>
+          {actionControls}
         </div>
-      </div>
+      ) : (
+        <div
+          className={cn(
+            'grid grid-cols-1 gap-2 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]',
+            props.primaryFiltersClassName
+          )}
+        >
+          {props.primaryFilters}
+          {advancedOpen && props.advancedFilters}
+        </div>
+      )}
+
+      {props.inlineActions && advancedOpen && props.advancedFilters && (
+        <div className='mt-2 grid grid-cols-1 gap-2 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]'>
+          {props.advancedFilters}
+        </div>
+      )}
+
+      {(!props.inlineActions || props.stats) && (
+        <div className='mt-2 flex flex-wrap items-center gap-2'>
+          {props.stats}
+          {!props.inlineActions && actionControls}
+        </div>
+      )}
     </div>
   )
 }

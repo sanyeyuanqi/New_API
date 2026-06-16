@@ -24,9 +24,11 @@ import {
 } from '@/components/page-transition'
 import { LanguagePreferencesCard } from './components/language-preferences-card'
 import { PasskeyCard } from './components/passkey-card'
+import { ProfilePreferencesCard } from './components/profile-preferences-card'
 import { ProfileHeader } from './components/profile-header'
 import { ProfileSecurityCard } from './components/profile-security-card'
 import { ProfileSettingsCard } from './components/profile-settings-card'
+import { ProfileStatsCard } from './components/profile-stats-card'
 import { SidebarModulesCard } from './components/sidebar-modules-card'
 import { TwoFACard } from './components/two-fa-card'
 import { useProfile } from './hooks'
@@ -39,31 +41,40 @@ export function Profile() {
 
   return (
     <Main>
-      <div className='min-h-0 flex-1 overflow-auto px-3 py-3 sm:px-4 sm:py-6'>
-        <CardStaggerContainer className='mx-auto flex w-full max-w-7xl flex-col gap-4 sm:gap-6'>
+      <div className='min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-3 [-webkit-overflow-scrolling:touch] sm:px-4 sm:py-6'>
+        <CardStaggerContainer className='flex w-full flex-col gap-4 sm:gap-6'>
           <CardStaggerItem>
-            <ProfileHeader profile={profile} loading={loading} />
+            <ProfileHeader
+              profile={profile}
+              loading={loading}
+              onProfileUpdate={refreshProfile}
+            />
           </CardStaggerItem>
 
           <CardStaggerItem>
             <div className='grid gap-4 sm:gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.46fr)] xl:items-start'>
               <div className='space-y-4 sm:space-y-6'>
+                <ProfileStatsCard profile={profile} loading={loading} />
+                <LanguagePreferencesCard
+                  profile={profile}
+                  onProfileUpdate={refreshProfile}
+                />
                 <ProfileSettingsCard
                   profile={profile}
                   loading={loading}
                   onProfileUpdate={refreshProfile}
                 />
-                <LanguagePreferencesCard
-                  profile={profile}
-                  onProfileUpdate={refreshProfile}
-                />
-                <ProfileSecurityCard profile={profile} loading={loading} />
               </div>
 
               <div className='space-y-4 sm:space-y-6 xl:sticky xl:top-6'>
                 {canConfigureSidebar && <SidebarModulesCard />}
                 <PasskeyCard loading={loading} />
                 <TwoFACard loading={loading} />
+                <ProfilePreferencesCard
+                  profile={profile}
+                  onProfileUpdate={refreshProfile}
+                />
+                <ProfileSecurityCard profile={profile} loading={loading} />
               </div>
             </div>
           </CardStaggerItem>

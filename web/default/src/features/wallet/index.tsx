@@ -271,8 +271,8 @@ export function Wallet(props: WalletProps) {
           <div
             className={
               checkinEnabled
-                ? 'mx-auto grid w-full max-w-[1800px] gap-4 sm:gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(380px,440px)] xl:items-start'
-                : 'mx-auto flex w-full max-w-7xl flex-col gap-4 sm:gap-5'
+                ? 'grid w-full gap-4 sm:gap-5 xl:grid-cols-2 xl:items-start'
+                : 'flex w-full flex-col gap-4 sm:gap-5'
             }
           >
             <div className='flex min-w-0 flex-col gap-4 sm:gap-5'>
@@ -281,7 +281,7 @@ export function Wallet(props: WalletProps) {
               <div
                 className={
                   showSubscriptionPanel
-                    ? 'grid gap-4 2xl:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)] 2xl:items-start'
+                    ? 'grid gap-4 2xl:grid-cols-[minmax(0,1fr)_minmax(360px,0.8fr)] 2xl:items-start'
                     : 'grid gap-4'
                 }
               >
@@ -339,7 +339,7 @@ export function Wallet(props: WalletProps) {
             </div>
 
             {checkinEnabled && (
-              <div className='min-w-0 xl:sticky xl:top-4'>
+              <div className='min-w-0 self-start'>
                 <CheckinCalendarCard
                   checkinEnabled={checkinEnabled}
                   turnstileEnabled={turnstileEnabled}

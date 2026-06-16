@@ -318,6 +318,7 @@ function renderDefaultRow<TData>(
     <DataTableRow
       key={row.id}
       row={row}
+      isSelected={row.getIsSelected()}
       className={cn(props.tableBodyRowClassName, props.getRowClassName?.(row))}
       getColumnClassName={getColumnClassName}
     />

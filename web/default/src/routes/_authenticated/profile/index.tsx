@@ -20,5 +20,13 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Profile } from '@/features/profile'
 
 export const Route = createFileRoute('/_authenticated/profile/')({
-  component: Profile,
+  component: RouteComponent,
 })
+
+function RouteComponent() {
+  return (
+    <div data-profile-fullscreen className='flex min-h-0 flex-1 flex-col overflow-hidden'>
+      <Profile />
+    </div>
+  )
+}

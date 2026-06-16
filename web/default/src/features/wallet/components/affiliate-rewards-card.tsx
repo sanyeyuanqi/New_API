@@ -104,7 +104,7 @@ export function AffiliateRewardsCard({
           <CopyButton
             value={affiliateLink}
             variant='outline'
-            className='bg-background size-9 shrink-0'
+            className='bg-background size-9 shrink-0 hover:bg-background dark:hover:bg-background'
             iconClassName='size-4'
             tooltip={t('Copy referral link')}
             aria-label={t('Copy referral link')}

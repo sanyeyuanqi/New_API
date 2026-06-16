@@ -20,12 +20,10 @@ import { useState, useEffect, useCallback } from 'react'
 import { Bell, Loader2, Mail, Server, Webhook } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { ROLE } from '@/lib/roles'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Switch } from '@/components/ui/switch'
 import { PasswordInput } from '@/components/password-input'
 import { updateUserSettings } from '../../api'
 import {
@@ -53,7 +51,6 @@ interface NotificationTabProps {
 
 export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
   const { t } = useTranslation()
-  const isAdmin = (profile?.role ?? 0) >= ROLE.ADMIN
   const [loading, setLoading] = useState(false)
   const [settings, setSettings] = useState<UserSettings>({
     notify_type: 'email',
@@ -129,7 +126,7 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
           onValueChange={(value) =>
             updateField('notify_type', value as NotifyType)
           }
-          className='grid grid-cols-4 gap-1.5 sm:gap-3'
+          className='grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-2.5'
         >
           {NOTIFICATION_METHODS.map((method) => {
             const Icon = NOTIFICATION_ICONS[method.value]
@@ -138,9 +135,9 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
               <Label
                 key={method.value}
                 htmlFor={method.value}
-                className={`flex min-h-16 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border p-2 text-center transition-colors sm:min-h-20 sm:gap-2 sm:border-2 sm:p-3 ${
+                className={`flex min-h-14 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border p-2 text-center transition-colors sm:min-h-16 sm:gap-2 ${
                   isSelected
-                    ? 'border-primary bg-primary/5 text-primary'
+                    ? 'border-transparent bg-primary/5 text-primary ring-1 ring-primary/20'
                     : 'border-muted hover:border-muted-foreground/25 hover:bg-muted/50'
                 }`}
               >
@@ -308,79 +305,6 @@ export function NotificationTab({ profile, onUpdate }: NotificationTabProps) {
           </div>
         </>
       )}
-
-      {/* Divider */}
-      <div className='border-t' />
-
-      {/* Preferences Section */}
-      <div className='space-y-3'>
-        <div>
-          <h4 className='text-sm font-medium'>{t('Preferences')}</h4>
-          <p className='text-muted-foreground mt-1 text-xs'>
-            {t('Configure your account behavior preferences')}
-          </p>
-        </div>
-
-        {/* Receive Upstream Model Update Notifications (admin only) */}
-        {isAdmin && (
-          <div className='flex items-start justify-between gap-3 rounded-lg border p-3 sm:items-center sm:p-4'>
-            <div className='space-y-0.5'>
-              <Label htmlFor='upstreamModelUpdateNotify'>
-                {t('Receive Upstream Model Update Notifications')}
-              </Label>
-              <p className='text-muted-foreground line-clamp-3 text-xs sm:line-clamp-none sm:text-sm'>
-                {t(
-                  'Only available for admins. When enabled, you will receive a summary notification via your selected method when the scheduled model check detects upstream model changes or check failures.'
-                )}
-              </p>
-            </div>
-            <Switch
-              id='upstreamModelUpdateNotify'
-              className='shrink-0'
-              checked={settings.upstream_model_update_notify_enabled}
-              onCheckedChange={(checked) =>
-                updateField('upstream_model_update_notify_enabled', checked)
-              }
-            />
-          </div>
-        )}
-
-        {/* Accept Unset Model Price */}
-        <div className='flex items-start justify-between gap-3 rounded-lg border p-3 sm:items-center sm:p-4'>
-          <div className='space-y-0.5'>
-            <Label htmlFor='acceptUnsetPrice'>
-              {t('Accept Unpriced Models')}
-            </Label>
-            <p className='text-muted-foreground text-xs sm:text-sm'>
-              {t('Allow using models without price configuration')}
-            </p>
-          </div>
-          <Switch
-            id='acceptUnsetPrice'
-            className='shrink-0'
-            checked={settings.accept_unset_model_ratio_model}
-            onCheckedChange={(checked) =>
-              updateField('accept_unset_model_ratio_model', checked)
-            }
-          />
-        </div>
-
-        {/* Record IP Log */}
-        <div className='flex items-start justify-between gap-3 rounded-lg border p-3 sm:items-center sm:p-4'>
-          <div className='space-y-0.5'>
-            <Label htmlFor='recordIp'>{t('Record IP Address')}</Label>
-            <p className='text-muted-foreground text-xs sm:text-sm'>
-              {t('Log IP address for usage and error logs')}
-            </p>
-          </div>
-          <Switch
-            id='recordIp'
-            className='shrink-0'
-            checked={settings.record_ip_log}
-            onCheckedChange={(checked) => updateField('record_ip_log', checked)}
-          />
-        </div>
-      </div>
 
       {/* Save Button */}
       <div className='flex justify-end'>

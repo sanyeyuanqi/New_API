@@ -24,18 +24,20 @@ import type { DataTableColumnClassName } from './types'
 type DataTableRowProps<TData> = {
   row: Row<TData>
   className?: string
+  isSelected?: boolean
   getColumnClassName?: DataTableColumnClassName
 } & Omit<React.ComponentProps<typeof TableRow>, 'children'>
 
 function DataTableRowInner<TData>({
   row,
   className,
+  isSelected = row.getIsSelected(),
   getColumnClassName,
   ...rowProps
 }: DataTableRowProps<TData>) {
   return (
     <TableRow
-      data-state={row.getIsSelected() ? 'selected' : undefined}
+      data-state={isSelected ? 'selected' : undefined}
       className={className}
       {...rowProps}
     >
@@ -58,6 +60,6 @@ export const DataTableRow = React.memo(DataTableRowInner, (prev, next) => {
   return (
     prev.row === next.row &&
     prev.className === next.className &&
-    prev.row.getIsSelected() === next.row.getIsSelected()
+    prev.isSelected === next.isSelected
   )
 }) as typeof DataTableRowInner

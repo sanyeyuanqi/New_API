@@ -255,7 +255,7 @@ export function AccountBindingsTab({
           }
         },
       },
-    ].filter((binding) => binding.isEnabled)
+    ].filter((binding) => binding.isEnabled && binding.id !== 'email')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, status, t])
 

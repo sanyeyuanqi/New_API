@@ -165,7 +165,7 @@ export function TaskLogsFilterBar<TData>(props: TaskLogsFilterBarProps<TData>) {
       : t('Filter by task ID')
   const hasAdditionalFilters = !!filterValue || !!filters.channel
   const dateRangeFilter = (
-    <LogsFilterField wide>
+    <LogsFilterField>
       <CompactDateTimeRangePicker
         start={filters.startTime}
         end={filters.endTime}
@@ -201,6 +201,12 @@ export function TaskLogsFilterBar<TData>(props: TaskLogsFilterBarProps<TData>) {
   return (
     <LogsFilterToolbar
       table={props.table}
+      inlineActions
+      primaryFiltersClassName={
+        isAdmin
+          ? 'lg:grid-cols-[26rem_36rem_12rem]'
+          : 'lg:grid-cols-[26rem_36rem]'
+      }
       primaryFilters={
         <>
           {dateRangeFilter}

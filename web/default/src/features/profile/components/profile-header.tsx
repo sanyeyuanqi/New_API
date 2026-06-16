@@ -16,15 +16,17 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { Activity, BarChart3, WalletCards } from 'lucide-react'
+import { useState } from 'react'
+import { Mail } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { formatCompactNumber, formatQuota } from '@/lib/format'
 import { getRoleLabel } from '@/lib/roles'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StatusBadge } from '@/components/status-badge'
 import { getUserInitials, getDisplayName } from '../lib'
 import type { UserProfile } from '../types'
+import { EmailBindDialog } from './dialogs/email-bind-dialog'
 
 // ============================================================================
 // Profile Header Component
@@ -33,10 +35,16 @@ import type { UserProfile } from '../types'
 interface ProfileHeaderProps {
   profile: UserProfile | null
   loading: boolean
+  onProfileUpdate: () => void
 }
 
-export function ProfileHeader({ profile, loading }: ProfileHeaderProps) {
+export function ProfileHeader({
+  profile,
+  loading,
+  onProfileUpdate,
+}: ProfileHeaderProps) {
   const { t } = useTranslation()
+  const [emailDialogOpen, setEmailDialogOpen] = useState(false)
 
   if (loading) {
     return (
@@ -57,17 +65,6 @@ export function ProfileHeader({ profile, loading }: ProfileHeaderProps) {
             </div>
           </div>
         </div>
-        <div className='border-t'>
-          <div className='divide-border/60 grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0'>
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className='px-4 py-3.5 sm:px-5 sm:py-4'>
-                <Skeleton className='h-3.5 w-20' />
-                <Skeleton className='mt-2 h-7 w-28' />
-                <Skeleton className='mt-1.5 h-3.5 w-24' />
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     )
   }
@@ -77,31 +74,12 @@ export function ProfileHeader({ profile, loading }: ProfileHeaderProps) {
   const displayName = getDisplayName(profile)
   const initials = getUserInitials(profile)
   const roleLabel = getRoleLabel(profile.role)
-  const stats = [
-    {
-      label: t('Current Balance'),
-      value: formatQuota(profile.quota),
-      description: t('Remaining quota'),
-      icon: WalletCards,
-    },
-    {
-      label: t('Total Usage'),
-      value: formatQuota(profile.used_quota),
-      description: t('Total consumed quota'),
-      icon: BarChart3,
-    },
-    {
-      label: t('API Requests'),
-      value: formatCompactNumber(profile.request_count),
-      description: t('Total requests made'),
-      icon: Activity,
-    },
-  ]
 
   return (
     <div className='bg-card overflow-hidden rounded-lg border'>
       <div className='p-3 sm:p-5'>
-        <div className='flex items-center gap-3 text-left sm:gap-4'>
+        <div className='flex flex-col gap-4 text-left lg:flex-row lg:items-start lg:justify-between'>
+          <div className='flex min-w-0 items-center gap-3 sm:gap-4'>
           <Avatar className='ring-background h-12 w-12 rounded-xl text-sm ring-2 sm:h-16 sm:w-16 sm:rounded-2xl sm:text-lg sm:ring-4'>
             <AvatarFallback className='bg-primary/10 text-primary rounded-xl sm:rounded-2xl'>
               {initials}
@@ -141,29 +119,46 @@ export function ProfileHeader({ profile, loading }: ProfileHeaderProps) {
               )}
             </div>
           </div>
-        </div>
-      </div>
-      <div className='border-t'>
-        <div className='divide-border/60 grid grid-cols-3 divide-x'>
-          {stats.map((item) => (
-            <div key={item.label} className='min-w-0 px-3 py-3 sm:px-5 sm:py-4'>
-              <div className='flex items-center gap-2'>
-                <item.icon className='text-muted-foreground/60 size-3.5 shrink-0' />
-                <div className='text-muted-foreground truncate text-xs font-medium tracking-wider uppercase'>
-                  {item.label}
-                </div>
-              </div>
+          </div>
 
-              <div className='text-foreground mt-1.5 truncate font-mono text-lg font-bold tracking-tight tabular-nums sm:mt-2 sm:text-2xl'>
-                {item.value}
+          <div className='flex w-full items-center justify-between gap-3 rounded-lg border p-2.5 lg:w-[min(24rem,34vw)] lg:self-center'>
+            <div className='flex min-w-0 items-center gap-2.5'>
+              <div className='bg-muted shrink-0 rounded-md p-2'>
+                <Mail className='h-4 w-4' />
               </div>
-              <div className='text-muted-foreground/60 mt-1 hidden text-xs md:block'>
-                {item.description}
+              <div className='min-w-0'>
+                <div className='flex items-center gap-1.5'>
+                  <p className='text-sm font-medium'>{t('Email')}</p>
+                  {profile.email && (
+                    <StatusBadge
+                      label={t('Bound')}
+                      variant='success'
+                      copyable={false}
+                    />
+                  )}
+                </div>
+                <p className='text-muted-foreground truncate text-xs'>
+                  {profile.email || t('Not bound')}
+                </p>
               </div>
             </div>
-          ))}
+            <Button
+              variant='outline'
+              size='sm'
+              className='h-7 shrink-0 px-2.5 text-xs'
+              onClick={() => setEmailDialogOpen(true)}
+            >
+              {profile.email ? t('Change') : t('Bind')}
+            </Button>
+          </div>
         </div>
       </div>
+      <EmailBindDialog
+        open={emailDialogOpen}
+        onOpenChange={setEmailDialogOpen}
+        currentEmail={profile.email}
+        onSuccess={onProfileUpdate}
+      />
     </div>
   )
 }

@@ -334,7 +334,7 @@ function BalanceCell({ channel }: { channel: Channel }) {
 
   return (
     <TooltipProvider>
-      <div className='-ml-1.5 flex items-center gap-1'>
+      <div className='flex min-w-0 items-center gap-1.5 whitespace-nowrap'>
         <Tooltip>
           <TooltipTrigger
             render={
@@ -344,7 +344,7 @@ function BalanceCell({ channel }: { channel: Channel }) {
                 size='sm'
                 copyable={false}
                 showDot={false}
-                className='cursor-help'
+                className='cursor-help font-mono'
               />
             }
           />
@@ -373,7 +373,7 @@ function BalanceCell({ channel }: { channel: Channel }) {
                 size='sm'
                 copyable={false}
                 showDot={false}
-                className='cursor-pointer'
+                className='cursor-pointer font-mono'
                 onClick={handleClickUpdate}
               />
             }
@@ -430,12 +430,22 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
     {
       id: 'select',
       header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          indeterminate={table.getIsSomePageRowsSelected()}
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label='Select all'
-        />
+        <div
+          className='flex h-full min-h-8 w-full cursor-pointer items-center justify-center'
+          onClick={() =>
+            table.toggleAllPageRowsSelected(!table.getIsAllPageRowsSelected())
+          }
+        >
+          <Checkbox
+            checked={table.getIsAllPageRowsSelected()}
+            indeterminate={table.getIsSomePageRowsSelected()}
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            onClick={(event) => event.stopPropagation()}
+            aria-label='Select all'
+          />
+        </div>
       ),
       cell: ({ row }) => {
         const isTagRow = isTagAggregateRow(row.original)
@@ -446,11 +456,17 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
         }
 
         return (
-          <Checkbox
-            checked={row.getIsSelected()}
-            onCheckedChange={(value) => row.toggleSelected(!!value)}
-            aria-label='Select row'
-          />
+          <div
+            className='flex h-full min-h-8 w-full cursor-pointer items-center justify-center'
+            onClick={() => row.toggleSelected(!row.getIsSelected())}
+          >
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              onClick={(event) => event.stopPropagation()}
+              aria-label='Select row'
+            />
+          </div>
         )
       },
       enableSorting: false,
@@ -622,7 +638,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
             : undefined
 
         return (
-          <div className='flex min-w-0 max-w-full items-center gap-2 overflow-hidden'>
+          <div className='flex max-w-full min-w-0 items-center gap-2 overflow-hidden'>
             {isMultiKey && (
               <TooltipProvider delay={100}>
                 <Tooltip>
@@ -641,7 +657,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
               <Tooltip>
                 <TooltipTrigger
                   render={
-                    <div className='min-w-0 max-w-full overflow-hidden' />
+                    <div className='max-w-full min-w-0 overflow-hidden' />
                   }
                 >
                   <ProviderBadge
@@ -649,7 +665,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
                     label={typeName}
                     copyable={false}
                     showDot={false}
-                    className='min-w-0 max-w-full overflow-hidden'
+                    className='max-w-full min-w-0 overflow-hidden'
                   />
                 </TooltipTrigger>
                 <TooltipContent side='top'>{typeName}</TooltipContent>
@@ -895,7 +911,14 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
         if (!tag)
           return <span className='text-muted-foreground text-xs'>-</span>
 
-        return <StatusBadge label={tag} autoColor={tag} size='sm' className='-ml-1.5' />
+        return (
+          <StatusBadge
+            label={tag}
+            autoColor={tag}
+            size='sm'
+            className='-ml-1.5'
+          />
+        )
       },
       size: 120,
       enableSorting: false,
@@ -925,7 +948,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
       accessorKey: 'balance',
       header: t('Used / Remaining'),
       cell: ({ row }) => <BalanceCell channel={row.original} />,
-      size: 180,
+      size: 210,
     },
 
     // Response Time column
