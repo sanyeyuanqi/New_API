@@ -43,6 +43,10 @@ import {
 import { Dialog } from '@/components/dialog'
 import type { CreemProduct } from '@/features/wallet/types'
 import { safeNumberFieldProps } from '../utils/numeric-field'
+import {
+  paymentActionButtonClassName,
+  paymentSecondaryButtonClassName,
+} from './payment-button-styles'
 
 const creemProductDialogSchema = z.object({
   name: z.string().min(1, 'Product name is required'),
@@ -127,11 +131,16 @@ export function CreemProductDialog({
           <Button
             type='button'
             variant='outline'
+            className={paymentSecondaryButtonClassName}
             onClick={() => onOpenChange(false)}
           >
             {t('Cancel')}
           </Button>
-          <Button type='submit' form={CREEM_PRODUCT_FORM_ID}>
+          <Button
+            type='submit'
+            form={CREEM_PRODUCT_FORM_ID}
+            className={paymentActionButtonClassName}
+          >
             {isEditMode ? t('Update') : t('Add')}
           </Button>
         </>

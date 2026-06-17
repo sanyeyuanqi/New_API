@@ -51,9 +51,16 @@ export function ProviderTable(props: ProviderTableProps) {
         <p className='text-muted-foreground text-sm'>
           {t('Manage custom OAuth providers for user authentication')}
         </p>
-        <Button size='sm' onClick={props.onCreate}>
-          <Plus className='mr-1.5 h-4 w-4' />
-          {t('Add Provider')}
+        <Button
+          size='sm'
+          variant='outline'
+          className='h-8 rounded-lg border-stone-300 bg-stone-100/80 px-2.5 pr-3.5 font-medium text-stone-950 shadow-[0_1px_2px_rgba(28,25,23,0.06)] hover:border-stone-400 hover:bg-stone-200/70 dark:border-stone-700 dark:bg-stone-900/60 dark:text-stone-100 dark:hover:bg-stone-800/80'
+          onClick={props.onCreate}
+        >
+          <span className='flex size-5 items-center justify-center rounded-md border border-stone-400/70 bg-stone-200/50 text-stone-950 dark:border-stone-600 dark:bg-stone-800/70 dark:text-stone-100'>
+            <Plus className='size-3.5 stroke-[2.2]' />
+          </span>
+          <span>{t('Add Provider')}</span>
         </Button>
       </div>
 
@@ -104,7 +111,8 @@ export function ProviderTable(props: ProviderTableProps) {
           {
             id: 'client-id',
             header: t('Client ID'),
-            cellClassName: 'text-muted-foreground max-w-[120px] truncate font-mono',
+            cellClassName:
+              'text-muted-foreground max-w-[120px] truncate font-mono',
             cell: (provider) => provider.client_id,
           },
           {

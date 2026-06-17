@@ -21,7 +21,15 @@ import * as z from 'zod'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Code2, Eye, ShieldAlert } from 'lucide-react'
+import {
+  Banknote,
+  Code2,
+  CreditCard,
+  Eye,
+  ShieldAlert,
+  Store,
+  WalletCards,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -43,11 +51,12 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
-import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { RiskAcknowledgementDialog } from '@/components/risk-acknowledgement-dialog'
 import { confirmPaymentCompliance } from '../api'
 import {
+  SettingsControlGroup,
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -59,6 +68,10 @@ import { safeNumberFieldProps } from '../utils/numeric-field'
 import { AmountDiscountVisualEditor } from './amount-discount-visual-editor'
 import { AmountOptionsVisualEditor } from './amount-options-visual-editor'
 import { CreemProductsVisualEditor } from './creem-products-visual-editor'
+import {
+  paymentSecondaryButtonClassName,
+  paymentSecondaryIconClassName,
+} from './payment-button-styles'
 import { PaymentMethodsVisualEditor } from './payment-methods-visual-editor'
 import {
   formatJsonForEditor,
@@ -185,6 +198,42 @@ type PaymentSettingsSectionProps = {
   waffoPancakeProvisionedProductID?: string
   complianceDefaults: PaymentComplianceDefaults
 }
+
+type PaymentSettingsBlockProps = {
+  title: React.ReactNode
+  description: React.ReactNode
+  icon: React.ReactNode
+  children: React.ReactNode
+}
+
+function PaymentSettingsBlock({
+  title,
+  description,
+  icon,
+  children,
+}: PaymentSettingsBlockProps) {
+  return (
+    <SettingsControlGroup className='bg-background/60 w-full min-w-0 space-y-4 rounded-xl p-3 shadow-xs sm:p-4'>
+      <div className='flex min-w-0 items-start gap-3'>
+        <div className='bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg'>
+          {icon}
+        </div>
+        <div className='min-w-0'>
+          <h3 className='text-sm font-semibold sm:text-base'>{title}</h3>
+          <p className='text-muted-foreground text-xs sm:text-sm'>
+            {description}
+          </p>
+        </div>
+      </div>
+      <div className='grid min-w-0 gap-3'>{children}</div>
+    </SettingsControlGroup>
+  )
+}
+
+const paymentFieldCardClassName =
+  'min-w-0 rounded-lg border bg-background/80 p-3 shadow-xs'
+
+const paymentModeButtonClassName = `${paymentSecondaryButtonClassName} w-full text-xs sm:w-auto`
 
 function parseWaffoPayMethods(value: string): PayMethod[] {
   try {
@@ -857,20 +906,17 @@ export function PaymentSettingsSection({
             isSaving={updateOption.isPending || isSubmitting}
             saveLabel='Save all settings'
           />
-          <div className='space-y-4'>
-            <div>
-              <h3 className='text-lg font-medium'>{t('General Settings')}</h3>
-              <p className='text-muted-foreground text-sm'>
-                {t('Shared configuration for all payment gateways')}
-              </p>
-            </div>
-
-            <div className='grid gap-6 md:grid-cols-2'>
+          <PaymentSettingsBlock
+            title={t('General Settings')}
+            description={t('Shared configuration for all payment gateways')}
+            icon={<WalletCards className='size-4' />}
+          >
+            <div className='grid gap-3 md:grid-cols-2'>
               <FormField
                 control={form.control}
                 name='Price'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('Price (local currency / USD)')}</FormLabel>
                     <FormControl>
                       <Input
@@ -894,7 +940,7 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='MinTopUp'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('Minimum top-up (USD)')}</FormLabel>
                     <FormControl>
                       <Input
@@ -917,7 +963,7 @@ export function PaymentSettingsSection({
               control={form.control}
               name='PayMethods'
               render={({ field }) => (
-                <FormItem>
+                <FormItem className={paymentFieldCardClassName}>
                   <div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
                     <FormLabel>{t('Payment methods')}</FormLabel>
                     <Button
@@ -927,16 +973,20 @@ export function PaymentSettingsSection({
                       onClick={() =>
                         setPayMethodsVisualMode(!payMethodsVisualMode)
                       }
-                      className='w-full sm:w-auto'
+                      className={paymentModeButtonClassName}
                     >
                       {payMethodsVisualMode ? (
                         <>
-                          <Code2 className='mr-2 h-3 w-3' />
+                          <span className={paymentSecondaryIconClassName}>
+                            <Code2 className='size-3.5' />
+                          </span>
                           {t('JSON Editor')}
                         </>
                       ) : (
                         <>
-                          <Eye className='mr-2 h-3 w-3' />
+                          <span className={paymentSecondaryIconClassName}>
+                            <Eye className='size-3.5' />
+                          </span>
                           {t('Visual Editor')}
                         </>
                       )}
@@ -969,12 +1019,12 @@ export function PaymentSettingsSection({
               )}
             />
 
-            <div className='grid gap-6 md:grid-cols-2 md:items-start'>
+            <div className='grid gap-3 md:grid-cols-2 md:items-start'>
               <FormField
                 control={form.control}
                 name='AmountOptions'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
                       <FormLabel>{t('Top-up amount options')}</FormLabel>
                       <Button
@@ -984,16 +1034,20 @@ export function PaymentSettingsSection({
                         onClick={() =>
                           setAmountOptionsVisualMode(!amountOptionsVisualMode)
                         }
-                        className='w-full sm:w-auto'
+                        className={paymentModeButtonClassName}
                       >
                         {amountOptionsVisualMode ? (
                           <>
-                            <Code2 className='mr-2 h-3 w-3' />
+                            <span className={paymentSecondaryIconClassName}>
+                              <Code2 className='size-3.5' />
+                            </span>
                             {t('JSON Editor')}
                           </>
                         ) : (
                           <>
-                            <Eye className='mr-2 h-3 w-3' />
+                            <span className={paymentSecondaryIconClassName}>
+                              <Eye className='size-3.5' />
+                            </span>
                             {t('Visual Editor')}
                           </>
                         )}
@@ -1028,7 +1082,7 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='AmountDiscount'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
                       <FormLabel>{t('Amount discount')}</FormLabel>
                       <Button
@@ -1038,16 +1092,20 @@ export function PaymentSettingsSection({
                         onClick={() =>
                           setAmountDiscountVisualMode(!amountDiscountVisualMode)
                         }
-                        className='w-full sm:w-auto'
+                        className={paymentModeButtonClassName}
                       >
                         {amountDiscountVisualMode ? (
                           <>
-                            <Code2 className='mr-2 h-3 w-3' />
+                            <span className={paymentSecondaryIconClassName}>
+                              <Code2 className='size-3.5' />
+                            </span>
                             {t('JSON Editor')}
                           </>
                         ) : (
                           <>
-                            <Eye className='mr-2 h-3 w-3' />
+                            <span className={paymentSecondaryIconClassName}>
+                              <Eye className='size-3.5' />
+                            </span>
                             {t('Visual Editor')}
                           </>
                         )}
@@ -1078,24 +1136,21 @@ export function PaymentSettingsSection({
                 )}
               />
             </div>
-          </div>
+          </PaymentSettingsBlock>
 
-          <Separator />
+          <Separator className='opacity-0' />
 
-          <div className='space-y-4'>
-            <div>
-              <h3 className='text-lg font-medium'>{t('Epay Gateway')}</h3>
-              <p className='text-muted-foreground text-sm'>
-                {t('Configuration for Epay payment integration')}
-              </p>
-            </div>
-
-            <div className='grid gap-6 md:grid-cols-2'>
+          <PaymentSettingsBlock
+            title={t('Epay Gateway')}
+            description={t('Configuration for Epay payment integration')}
+            icon={<CreditCard className='size-4' />}
+          >
+            <div className='grid gap-3 md:grid-cols-2'>
               <FormField
                 control={form.control}
                 name='PayAddress'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('Epay endpoint')}</FormLabel>
                     <FormControl>
                       <Input
@@ -1116,7 +1171,7 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='CustomCallbackAddress'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('Callback address')}</FormLabel>
                     <FormControl>
                       <Input
@@ -1136,12 +1191,12 @@ export function PaymentSettingsSection({
               />
             </div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
+            <div className='grid gap-3 md:grid-cols-2'>
               <FormField
                 control={form.control}
                 name='EpayId'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('Epay merchant ID')}</FormLabel>
                     <FormControl>
                       <Input
@@ -1160,7 +1215,7 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='EpayKey'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('Epay secret key')}</FormLabel>
                     <FormControl>
                       <Input
@@ -1179,19 +1234,16 @@ export function PaymentSettingsSection({
                 )}
               />
             </div>
-          </div>
+          </PaymentSettingsBlock>
 
-          <Separator />
+          <Separator className='opacity-0' />
 
-          <div className='space-y-4'>
-            <div>
-              <h3 className='text-lg font-medium'>{t('Stripe Gateway')}</h3>
-              <p className='text-muted-foreground text-sm'>
-                {t('Configuration for Stripe payment integration')}
-              </p>
-            </div>
-
-            <div className='rounded-md bg-blue-50 p-4 text-sm text-blue-900 dark:bg-blue-950 dark:text-blue-100'>
+          <PaymentSettingsBlock
+            title={t('Stripe Gateway')}
+            description={t('Configuration for Stripe payment integration')}
+            icon={<Banknote className='size-4' />}
+          >
+            <div className='rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-100'>
               <p className='mb-2 font-medium'>{t('Webhook Configuration:')}</p>
               <ul className='list-inside list-disc space-y-1'>
                 <li>
@@ -1224,12 +1276,12 @@ export function PaymentSettingsSection({
               </ul>
             </div>
 
-            <div className='grid gap-6 md:grid-cols-3'>
+            <div className='grid gap-3 md:grid-cols-3'>
               <FormField
                 control={form.control}
                 name='StripeApiSecret'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('API secret')}</FormLabel>
                     <FormControl>
                       <Input
@@ -1252,7 +1304,7 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='StripeWebhookSecret'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('Webhook secret')}</FormLabel>
                     <FormControl>
                       <Input
@@ -1277,7 +1329,7 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='StripePriceId'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('Price ID')}</FormLabel>
                     <FormControl>
                       <Input
@@ -1295,12 +1347,12 @@ export function PaymentSettingsSection({
               />
             </div>
 
-            <div className='grid gap-6 md:grid-cols-3'>
+            <div className='grid gap-3 md:grid-cols-3'>
               <FormField
                 control={form.control}
                 name='StripeUnitPrice'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>
                       {t('Unit price (local currency / USD)')}
                     </FormLabel>
@@ -1324,7 +1376,7 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='StripeMinTopUp'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('Minimum top-up (USD)')}</FormLabel>
                     <FormControl>
                       <Input
@@ -1346,7 +1398,7 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='StripePromotionCodesEnabled'
                 render={({ field }) => (
-                  <SettingsSwitchItem>
+                  <SettingsSwitchItem className={paymentFieldCardClassName}>
                     <SettingsSwitchContent>
                       <FormLabel>{t('Promotion codes')}</FormLabel>
                       <FormDescription>
@@ -1354,7 +1406,7 @@ export function PaymentSettingsSection({
                       </FormDescription>
                     </SettingsSwitchContent>
                     <FormControl>
-                      <Switch
+                      <SettingsEnableDisableButton
                         checked={field.value}
                         onCheckedChange={field.onChange}
                       />
@@ -1363,19 +1415,16 @@ export function PaymentSettingsSection({
                 )}
               />
             </div>
-          </div>
+          </PaymentSettingsBlock>
 
-          <Separator />
+          <Separator className='opacity-0' />
 
-          <div className='space-y-4'>
-            <div>
-              <h3 className='text-lg font-medium'>{t('Creem Gateway')}</h3>
-              <p className='text-muted-foreground text-sm'>
-                {t('Configuration for Creem payment integration')}
-              </p>
-            </div>
-
-            <div className='rounded-md bg-blue-50 p-4 text-sm text-blue-900 dark:bg-blue-950 dark:text-blue-100'>
+          <PaymentSettingsBlock
+            title={t('Creem Gateway')}
+            description={t('Configuration for Creem payment integration')}
+            icon={<Store className='size-4' />}
+          >
+            <div className='rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-100'>
               <p className='mb-2 font-medium'>{t('Webhook Configuration:')}</p>
               <ul className='list-inside list-disc space-y-1'>
                 <li>
@@ -1388,12 +1437,12 @@ export function PaymentSettingsSection({
               </ul>
             </div>
 
-            <div className='grid gap-6 md:grid-cols-2'>
+            <div className='grid gap-3 md:grid-cols-2'>
               <FormField
                 control={form.control}
                 name='CreemApiKey'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('API Key')}</FormLabel>
                     <FormControl>
                       <Input
@@ -1416,7 +1465,7 @@ export function PaymentSettingsSection({
                 control={form.control}
                 name='CreemWebhookSecret'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={paymentFieldCardClassName}>
                     <FormLabel>{t('Webhook Secret')}</FormLabel>
                     <FormControl>
                       <Input
@@ -1442,7 +1491,7 @@ export function PaymentSettingsSection({
               control={form.control}
               name='CreemTestMode'
               render={({ field }) => (
-                <SettingsSwitchItem>
+                <SettingsSwitchItem className={paymentFieldCardClassName}>
                   <SettingsSwitchContent>
                     <FormLabel>{t('Test Mode')}</FormLabel>
                     <FormDescription>
@@ -1450,7 +1499,7 @@ export function PaymentSettingsSection({
                     </FormDescription>
                   </SettingsSwitchContent>
                   <FormControl>
-                    <Switch
+                    <SettingsEnableDisableButton
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
@@ -1463,7 +1512,7 @@ export function PaymentSettingsSection({
               control={form.control}
               name='CreemProducts'
               render={({ field }) => (
-                <FormItem>
+                <FormItem className={paymentFieldCardClassName}>
                   <div className='mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
                     <FormLabel>{t('Products')}</FormLabel>
                     <Button
@@ -1473,16 +1522,20 @@ export function PaymentSettingsSection({
                       onClick={() =>
                         setCreemProductsVisualMode(!creemProductsVisualMode)
                       }
-                      className='w-full sm:w-auto'
+                      className={paymentModeButtonClassName}
                     >
                       {creemProductsVisualMode ? (
                         <>
-                          <Code2 className='mr-2 h-3 w-3' />
+                          <span className={paymentSecondaryIconClassName}>
+                            <Code2 className='size-3.5' />
+                          </span>
                           {t('JSON Editor')}
                         </>
                       ) : (
                         <>
-                          <Eye className='mr-2 h-3 w-3' />
+                          <span className={paymentSecondaryIconClassName}>
+                            <Eye className='size-3.5' />
+                          </span>
                           {t('Visual Editor')}
                         </>
                       )}
@@ -1510,9 +1563,9 @@ export function PaymentSettingsSection({
                 </FormItem>
               )}
             />
-          </div>
+          </PaymentSettingsBlock>
 
-          <Separator />
+          <Separator className='opacity-0' />
 
           <WaffoPancakeSettingsSection
             defaultValues={waffoPancakeDefaultValues}
@@ -1523,7 +1576,7 @@ export function PaymentSettingsSection({
             onSelectedBindingChange={setWaffoPancakeSelection}
           />
 
-          <Separator />
+          <Separator className='opacity-0' />
 
           <WaffoSettingsSection
             values={waffoValues}

@@ -42,11 +42,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Switch } from '@/components/ui/switch'
 import { DateTimePicker } from '@/components/datetime-picker'
 import { deleteLogsBefore } from '../api'
 import {
   SettingsControlGroup,
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -189,7 +189,7 @@ export function LogSettingsSection({
                   </FormDescription>
                 </SettingsSwitchContent>
                 <FormControl>
-                  <Switch
+                  <SettingsEnableDisableButton
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />

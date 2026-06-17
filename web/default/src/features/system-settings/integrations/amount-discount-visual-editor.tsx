@@ -28,6 +28,10 @@ import {
   AmountDiscountDialog,
   type AmountDiscountData,
 } from './amount-discount-dialog'
+import {
+  paymentActionButtonClassName,
+  paymentButtonIconClassName,
+} from './payment-button-styles'
 
 type AmountDiscountVisualEditorProps = {
   value: string
@@ -124,9 +128,11 @@ export function AmountDiscountVisualEditor({
             handleAdd()
           }}
           size='sm'
-          className='w-full sm:w-auto'
+          className={`${paymentActionButtonClassName} w-full text-xs sm:w-auto`}
         >
-          <Plus className='h-4 w-4 sm:mr-2' />
+          <span className={paymentButtonIconClassName}>
+            <Plus className='size-3.5' />
+          </span>
           <span className='sm:inline'>{t('Add discount tier')}</span>
         </Button>
       </div>
@@ -149,9 +155,7 @@ export function AmountDiscountVisualEditor({
                 id: 'amount',
                 header: t('Recharge Amount'),
                 cell: (discount) => (
-                  <span className='font-mono text-sm'>
-                    ${discount.amount}
-                  </span>
+                  <span className='font-mono text-sm'>${discount.amount}</span>
                 ),
               },
               {

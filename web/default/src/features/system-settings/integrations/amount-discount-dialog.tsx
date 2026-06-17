@@ -33,6 +33,10 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Dialog } from '@/components/dialog'
+import {
+  paymentActionButtonClassName,
+  paymentSecondaryButtonClassName,
+} from './payment-button-styles'
 
 const createAmountDiscountDialogSchema = (t: (key: string) => string) =>
   z.object({
@@ -125,11 +129,16 @@ export function AmountDiscountDialog({
           <Button
             type='button'
             variant='outline'
+            className={paymentSecondaryButtonClassName}
             onClick={() => onOpenChange(false)}
           >
             {t('Cancel')}
           </Button>
-          <Button type='submit' form={AMOUNT_DISCOUNT_FORM_ID}>
+          <Button
+            type='submit'
+            form={AMOUNT_DISCOUNT_FORM_ID}
+            className={paymentActionButtonClassName}
+          >
             {isEditMode ? t('Update') : t('Add')}
           </Button>
         </>

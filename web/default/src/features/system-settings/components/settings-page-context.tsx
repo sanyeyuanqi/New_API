@@ -119,28 +119,35 @@ export function SettingsPageFormActions(props: SettingsPageFormActionsProps) {
 
   return (
     <SettingsPageActionsPortal>
-      {props.onReset && (
+      <div className='flex items-center justify-end gap-2'>
+        {props.onReset && (
+          <Button
+            type='button'
+            size='sm'
+            variant={props.resetVariant ?? 'outline'}
+            className='text-muted-foreground hover:text-foreground bg-background/95 h-8 rounded-full px-3 shadow-sm ring-1 ring-black/5 backdrop-blur dark:ring-white/10'
+            onClick={props.onReset}
+            disabled={props.isResetDisabled || props.isSaving}
+          >
+            <RotateCcw data-icon='inline-start' />
+            <span>{t(props.resetLabel ?? 'Reset')}</span>
+          </Button>
+        )}
         <Button
+          ref={props.saveButtonRef}
           type='button'
           size='sm'
-          variant={props.resetVariant ?? 'outline'}
-          onClick={props.onReset}
-          disabled={props.isResetDisabled || props.isSaving}
+          variant='outline'
+          className='h-8 rounded-lg border-stone-300 bg-stone-100/80 px-2.5 pr-3.5 font-medium text-stone-950 shadow-[0_1px_2px_rgba(28,25,23,0.06)] hover:border-stone-400 hover:bg-stone-200/70 dark:border-stone-700 dark:bg-stone-900/60 dark:text-stone-100 dark:hover:bg-stone-800/80'
+          onClick={props.onSave}
+          disabled={props.isSaving || props.isSaveDisabled}
         >
-          <RotateCcw data-icon='inline-start' />
-          <span>{t(props.resetLabel ?? 'Reset')}</span>
+          <span className='flex size-5 items-center justify-center rounded-md border border-stone-400/70 bg-stone-200/50 text-stone-950 dark:border-stone-600 dark:bg-stone-800/70 dark:text-stone-100'>
+            <Save className='size-3.5 stroke-[2.2]' />
+          </span>
+          <span>{t(saveLabel)}</span>
         </Button>
-      )}
-      <Button
-        ref={props.saveButtonRef}
-        type='button'
-        size='sm'
-        onClick={props.onSave}
-        disabled={props.isSaving || props.isSaveDisabled}
-      >
-        <Save data-icon='inline-start' />
-        <span>{t(saveLabel)}</span>
-      </Button>
+      </div>
     </SettingsPageActionsPortal>
   )
 }

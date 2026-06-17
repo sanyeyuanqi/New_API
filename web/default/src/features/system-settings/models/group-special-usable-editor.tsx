@@ -49,6 +49,10 @@ const OP_APPEND = 'append' as const
 const sectionCardClassName =
   'relative shadow-sm ring-0 before:pointer-events-none before:absolute before:inset-0 before:rounded-xl before:border before:border-border/90'
 const sectionHeaderClassName = 'border-b bg-muted/20'
+const actionButtonClassName =
+  'h-8 rounded-lg border-stone-300 bg-stone-100/80 px-2.5 pr-3.5 font-medium text-stone-950 shadow-[0_1px_2px_rgba(28,25,23,0.06)] hover:border-stone-400 hover:bg-stone-200/70 dark:border-stone-700 dark:bg-stone-900/60 dark:text-stone-100 dark:hover:bg-stone-800/80'
+const actionIconClassName =
+  'flex size-5 items-center justify-center rounded-md border border-stone-400/70 bg-stone-200/50 text-stone-950 dark:border-stone-600 dark:bg-stone-800/70 dark:text-stone-100'
 
 type OpType = typeof OP_ADD | typeof OP_REMOVE | typeof OP_APPEND
 
@@ -442,9 +446,16 @@ export function GroupSpecialUsableRulesEditor(
                 }
               }}
             />
-            <Button variant='outline' size='sm' onClick={addNewGroup}>
-              <Plus className='mr-1 h-4 w-4' />
-              {t('Add group rules')}
+            <Button
+              variant='outline'
+              size='sm'
+              className={actionButtonClassName}
+              onClick={addNewGroup}
+            >
+              <span className={actionIconClassName}>
+                <Plus className='size-3.5 stroke-[2.2]' />
+              </span>
+              <span>{t('Add group rules')}</span>
             </Button>
           </div>
         </div>

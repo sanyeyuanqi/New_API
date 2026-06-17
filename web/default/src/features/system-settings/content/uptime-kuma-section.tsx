@@ -267,6 +267,7 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
             checked={isEnabled}
             onCheckedChange={handleToggleEnabled}
             label={t('Enabled')}
+            controlVariant='button'
             className='border-b-0 py-0'
           />
         </div>
@@ -307,8 +308,7 @@ export function UptimeKumaSection({ enabled, data }: UptimeKumaSectionProps) {
             {
               id: 'url',
               header: t('Uptime Kuma URL'),
-              cellClassName:
-                'text-primary max-w-xs truncate font-mono text-sm',
+              cellClassName: 'text-primary max-w-xs truncate font-mono text-sm',
               cell: (group) => group.url,
             },
             {

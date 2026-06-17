@@ -32,6 +32,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import {
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -120,7 +121,7 @@ export function SystemBehaviorSection({
                   </FormDescription>
                 </SettingsSwitchContent>
                 <FormControl>
-                  <Switch
+                  <SettingsEnableDisableButton
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />
@@ -141,7 +142,7 @@ export function SystemBehaviorSection({
                   </FormDescription>
                 </SettingsSwitchContent>
                 <FormControl>
-                  <Switch
+                  <SettingsEnableDisableButton
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />

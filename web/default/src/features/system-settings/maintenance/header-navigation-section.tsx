@@ -32,6 +32,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import {
   SettingsControlChildren,
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsControlGroup,
@@ -217,34 +218,41 @@ export function HeaderNavigationSection({
             resetLabel='Reset to default'
             saveLabel='Save navigation'
           />
-          <div className='grid gap-4 md:grid-cols-2'>
-            {simpleModules.map((module) => (
-              <FormField
-                key={module.key}
-                control={form.control}
-                name={module.key}
-                render={({ field }) => (
-                  <SettingsSwitchItem>
-                    <SettingsSwitchContent>
-                      <FormLabel>{module.title}</FormLabel>
-                      <FormDescription>{module.description}</FormDescription>
-                    </SettingsSwitchContent>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </SettingsSwitchItem>
-                )}
-              />
-            ))}
-          </div>
+          <div className='flex min-w-0 flex-col gap-4'>
+            <SettingsControlGroup className='w-full min-w-0'>
+              <SettingsControlChildren className='ml-0 flex flex-wrap gap-3 border-l-0 pl-0'>
+                {simpleModules.map((module) => (
+                  <FormField
+                    key={module.key}
+                    control={form.control}
+                    name={module.key}
+                    render={({ field }) => (
+                      <SettingsSwitchItem className='bg-background/70 min-h-20 min-w-[180px] flex-[1_1_220px] rounded-lg border px-3 py-3 shadow-xs last:border-b xl:max-w-[280px]'>
+                        <SettingsSwitchContent>
+                          <FormLabel>{module.title}</FormLabel>
+                          <FormDescription>
+                            {module.description}
+                          </FormDescription>
+                        </SettingsSwitchContent>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </SettingsSwitchItem>
+                    )}
+                  />
+                ))}
+              </SettingsControlChildren>
+            </SettingsControlGroup>
 
-          <div className='grid gap-4 lg:grid-cols-2'>
             {accessModules.map((module) => (
-              <SettingsControlGroup key={module.enabledKey}>
+              <SettingsControlGroup
+                key={module.enabledKey}
+                className='w-full min-w-0'
+              >
                 <FormField
                   control={form.control}
                   name={module.enabledKey}
@@ -255,9 +263,11 @@ export function HeaderNavigationSection({
                         <FormDescription>{module.description}</FormDescription>
                       </SettingsSwitchContent>
                       <FormControl>
-                        <Switch
+                        <SettingsEnableDisableButton
                           checked={field.value}
                           onCheckedChange={field.onChange}
+                          enableLabel={t('Disabled')}
+                          disableLabel={t('Enabled')}
                         />
                       </FormControl>
                       <FormMessage />
@@ -265,12 +275,12 @@ export function HeaderNavigationSection({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name={module.requireAuthKey}
-                  render={({ field }) => (
-                    <SettingsControlChildren>
-                      <SettingsSwitchItem className='border-b-0 py-2'>
+                <SettingsControlChildren className='flex flex-wrap gap-3'>
+                  <FormField
+                    control={form.control}
+                    name={module.requireAuthKey}
+                    render={({ field }) => (
+                      <SettingsSwitchItem className='bg-background/70 min-h-20 min-w-[220px] flex-[1_1_260px] rounded-lg border px-3 py-3 shadow-xs last:border-b xl:max-w-[360px]'>
                         <SettingsSwitchContent>
                           <FormLabel>{module.requireAuthTitle}</FormLabel>
                           <FormDescription>
@@ -286,9 +296,9 @@ export function HeaderNavigationSection({
                         </FormControl>
                         <FormMessage />
                       </SettingsSwitchItem>
-                    </SettingsControlChildren>
-                  )}
-                />
+                    )}
+                  />
+                </SettingsControlChildren>
               </SettingsControlGroup>
             ))}
           </div>

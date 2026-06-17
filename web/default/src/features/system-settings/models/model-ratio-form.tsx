@@ -126,6 +126,18 @@ const modelJsonFields: Array<{
   },
 ]
 
+const actionButtonClassName =
+  'h-8 rounded-lg border-stone-300 bg-stone-100/80 px-2.5 pr-3.5 font-medium text-stone-950 shadow-[0_1px_2px_rgba(28,25,23,0.06)] hover:border-stone-400 hover:bg-stone-200/70 dark:border-stone-700 dark:bg-stone-900/60 dark:text-stone-100 dark:hover:bg-stone-800/80'
+
+const actionIconClassName =
+  'flex size-5 items-center justify-center rounded-md border border-stone-400/70 bg-stone-200/50 text-stone-950 dark:border-stone-600 dark:bg-stone-800/70 dark:text-stone-100'
+
+const destructiveActionButtonClassName =
+  'h-8 rounded-lg border-red-200 bg-red-50/80 px-2.5 pr-3.5 font-medium text-red-700 shadow-[0_1px_2px_rgba(127,29,29,0.06)] hover:border-red-300 hover:bg-red-100 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-300 dark:hover:bg-red-950/50'
+
+const destructiveActionIconClassName =
+  'flex size-5 items-center justify-center rounded-md border border-red-300/80 bg-red-100/70 text-red-700 dark:border-red-800 dark:bg-red-950/70 dark:text-red-300'
+
 function ModelJsonTextareaField(props: {
   form: UseFormReturn<ModelFormValues>
   name: ModelJsonFieldName
@@ -195,35 +207,51 @@ export const ModelRatioForm = memo(function ModelRatioForm({
       <div className='flex flex-wrap justify-end gap-2'>
         <Button
           type='button'
-          variant='destructive'
+          variant='outline'
           size='sm'
+          className={destructiveActionButtonClassName}
           onClick={onReset}
           disabled={isResetting}
         >
-          <RotateCcw data-icon='inline-start' />
-          {t('Reset prices')}
+          <span className={destructiveActionIconClassName}>
+            <RotateCcw className='size-3.5 stroke-[2.2]' />
+          </span>
+          <span>{t('Reset prices')}</span>
         </Button>
         {editMode === 'json' && (
           <Button
             type='button'
             size='sm'
+            variant='outline'
+            className={actionButtonClassName}
             onClick={handleSave}
             disabled={isSaving}
           >
-            <Save data-icon='inline-start' />
-            {isSaving ? t('Saving...') : t('Save model prices')}
+            <span className={actionIconClassName}>
+              <Save className='size-3.5 stroke-[2.2]' />
+            </span>
+            <span>{isSaving ? t('Saving...') : t('Save model prices')}</span>
           </Button>
         )}
-        <Button variant='outline' size='sm' onClick={toggleEditMode}>
+        <Button
+          variant='outline'
+          size='sm'
+          className={actionButtonClassName}
+          onClick={toggleEditMode}
+        >
           {editMode === 'visual' ? (
             <>
-              <Code2 className='mr-2 h-4 w-4' />
-              {t('Switch to JSON')}
+              <span className={actionIconClassName}>
+                <Code2 className='size-3.5 stroke-[2.2]' />
+              </span>
+              <span>{t('Switch to JSON')}</span>
             </>
           ) : (
             <>
-              <Eye className='mr-2 h-4 w-4' />
-              {t('Switch to Visual')}
+              <span className={actionIconClassName}>
+                <Eye className='size-3.5 stroke-[2.2]' />
+              </span>
+              <span>{t('Switch to Visual')}</span>
             </>
           )}
         </Button>
@@ -273,12 +301,16 @@ export const ModelRatioForm = memo(function ModelRatioForm({
               render={({ field }) => (
                 <SettingsSwitchItem>
                   <SettingsSwitchContent>
-                    <FormLabel>{t('Expose ratio API')}</FormLabel>
-                    <FormDescription>
-                      {t(
-                        'Allow clients to query configured ratios via `/api/ratio`.'
-                      )}
-                    </FormDescription>
+                    <FormLabel>
+                      {t('Expose ratio API')}
+                      <span className='text-muted-foreground font-normal'>
+                        （
+                        {t(
+                          'Allow clients to query configured ratios via `/api/ratio`.'
+                        )}
+                        ）
+                      </span>
+                    </FormLabel>
                   </SettingsSwitchContent>
                   <FormControl>
                     <Switch
@@ -310,12 +342,16 @@ export const ModelRatioForm = memo(function ModelRatioForm({
               render={({ field }) => (
                 <SettingsSwitchItem>
                   <SettingsSwitchContent>
-                    <FormLabel>{t('Expose ratio API')}</FormLabel>
-                    <FormDescription>
-                      {t(
-                        'Allow clients to query configured ratios via `/api/ratio`.'
-                      )}
-                    </FormDescription>
+                    <FormLabel>
+                      {t('Expose ratio API')}
+                      <span className='text-muted-foreground font-normal'>
+                        （
+                        {t(
+                          'Allow clients to query configured ratios via `/api/ratio`.'
+                        )}
+                        ）
+                      </span>
+                    </FormLabel>
                   </SettingsSwitchContent>
                   <FormControl>
                     <Switch

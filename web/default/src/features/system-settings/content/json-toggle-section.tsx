@@ -30,10 +30,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { SettingsAccordion } from '../components/settings-accordion'
 import {
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -181,7 +181,7 @@ export function JsonToggleSection({
                   )}
                 </SettingsSwitchContent>
                 <FormControl>
-                  <Switch
+                  <SettingsEnableDisableButton
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />

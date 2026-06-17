@@ -34,6 +34,10 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Dialog } from '@/components/dialog'
+import {
+  paymentActionButtonClassName,
+  paymentSecondaryButtonClassName,
+} from './payment-button-styles'
 
 const createPaymentMethodDialogSchema = (t: (key: string) => string) =>
   z.object({
@@ -177,11 +181,16 @@ export function PaymentMethodDialog({
           <Button
             type='button'
             variant='outline'
+            className={paymentSecondaryButtonClassName}
             onClick={() => onOpenChange(false)}
           >
             {t('Cancel')}
           </Button>
-          <Button type='submit' form={PAYMENT_METHOD_FORM_ID}>
+          <Button
+            type='submit'
+            form={PAYMENT_METHOD_FORM_ID}
+            className={paymentActionButtonClassName}
+          >
             {isEditMode ? t('Update') : t('Add')}
           </Button>
         </>

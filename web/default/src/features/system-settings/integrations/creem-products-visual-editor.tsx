@@ -32,6 +32,10 @@ import {
   CreemProductDialog,
   type CreemProductData,
 } from './creem-product-dialog'
+import {
+  paymentActionButtonClassName,
+  paymentButtonIconClassName,
+} from './payment-button-styles'
 
 type CreemProductsVisualEditorProps = {
   value: string
@@ -160,9 +164,11 @@ export function CreemProductsVisualEditor({
             e.stopPropagation()
             handleAdd()
           }}
-          className='flex-1 sm:flex-none'
+          className={`${paymentActionButtonClassName} flex-1 text-xs sm:flex-none`}
         >
-          <Plus className='h-4 w-4 sm:mr-2' />
+          <span className={paymentButtonIconClassName}>
+            <Plus className='size-3.5' />
+          </span>
           <span className='sm:inline'>{t('Add product')}</span>
         </Button>
       </div>

@@ -35,11 +35,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
-import {
-  SettingsForm,
-  SettingsFormGrid,
-  SettingsFormGridItem,
-} from '../components/settings-form-layout'
+import { SettingsForm } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
 import { useSettingsForm } from '../hooks/use-settings-form'
@@ -149,9 +145,9 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
     <>
       <FormNavigationGuard when={isDirty} />
 
-      <SettingsSection title={t('System Information')} className='max-w-6xl'>
+      <SettingsSection title={t('System Information')} className='w-full'>
         <Form {...form}>
-          <SettingsForm onSubmit={handleSubmit}>
+          <SettingsForm className='w-full' onSubmit={handleSubmit}>
             <SettingsPageFormActions
               onSave={handleSubmit}
               onReset={handleReset}
@@ -159,152 +155,136 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
               isResetDisabled={!isDirty}
             />
             <FormDirtyIndicator isDirty={isDirty} />
-            <SettingsFormGrid className='lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]'>
-              <FormField
-                control={form.control}
-                name='SystemName'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('System Name')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={t('New API')} {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      {t('The name displayed across the application')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='ServerAddress'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Server Address')}</FormLabel>
-                    <FormControl>
-                      <Input placeholder='https://yourdomain.com' {...field} />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'The public URL of your server, used for OAuth callbacks, webhooks, and other external integrations'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='Logo'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Logo URL')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder={t('https://example.com/logo.png')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('URL to your logo image (optional)')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='Footer'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Footer')}</FormLabel>
-                    <FormControl>
-                      <SystemInfoTextarea
-                        placeholder={t(
-                          '© 2025 Your Company. All rights reserved.'
-                        )}
-                        variant='short'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Footer text displayed at the bottom of pages')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name='About'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('About')}</FormLabel>
-                    <FormControl>
-                      <SystemInfoTextarea
-                        placeholder={t(
-                          'Enter HTML code (e.g., <p>About us...</p>) or a URL (e.g., https://example.com) to embed as iframe'
-                        )}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'Supports HTML markup or iframe embedding. Enter HTML code directly, or provide a complete URL to automatically embed it as an iframe.'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <SettingsFormGridItem span='full'>
+            <div
+              data-settings-form-span='full'
+              className='flex w-full min-w-0 flex-col gap-6'
+            >
+              <div className='flex w-full min-w-0 flex-wrap gap-6'>
                 <FormField
                   control={form.control}
-                  name='HomePageContent'
+                  name='SystemName'
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Home Page Content')}</FormLabel>
+                    <FormItem className='min-w-[260px] flex-[1_1_320px] xl:max-w-[520px]'>
+                      <FormLabel>{t('System Name')}</FormLabel>
                       <FormControl>
-                        <Textarea
-                          className='[field-sizing:fixed] h-64 max-h-[60vh] min-h-40 resize-y overflow-auto font-mono text-xs leading-5'
-                          placeholder={t('Welcome to our New API...')}
+                        <Input placeholder={t('New API')} {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        {t('The name displayed across the application')}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='ServerAddress'
+                  render={({ field }) => (
+                    <FormItem className='min-w-[260px] flex-[1_1_320px] xl:max-w-[520px]'>
+                      <FormLabel>{t('Server Address')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder='https://yourdomain.com'
                           {...field}
                         />
                       </FormControl>
                       <FormDescription>
                         {t(
-                          'Content displayed on the home page (supports Markdown)'
+                          'The public URL of your server, used for OAuth callbacks, webhooks, and other external integrations'
                         )}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </SettingsFormGridItem>
+
+                <FormField
+                  control={form.control}
+                  name='Logo'
+                  render={({ field }) => (
+                    <FormItem className='min-w-[260px] flex-[1_1_320px] xl:max-w-[520px]'>
+                      <FormLabel>{t('Logo URL')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={t('https://example.com/logo.png')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t('URL to your logo image (optional)')}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className='flex w-full min-w-0 flex-wrap gap-6'>
+                <FormField
+                  control={form.control}
+                  name='Footer'
+                  render={({ field }) => (
+                    <FormItem className='min-w-[320px] flex-[1_1_480px] md:max-w-[calc(50%-0.75rem)]'>
+                      <FormLabel>{t('Footer')}</FormLabel>
+                      <FormControl>
+                        <SystemInfoTextarea
+                          className='h-56'
+                          placeholder={t(
+                            '© 2025 Your Company. All rights reserved.'
+                          )}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t('Footer text displayed at the bottom of pages')}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='About'
+                  render={({ field }) => (
+                    <FormItem className='min-w-[320px] flex-[1_1_480px] md:max-w-[calc(50%-0.75rem)]'>
+                      <FormLabel>{t('About')}</FormLabel>
+                      <FormControl>
+                        <SystemInfoTextarea
+                          placeholder={t(
+                            'Enter HTML code (e.g., <p>About us...</p>) or a URL (e.g., https://example.com) to embed as iframe'
+                          )}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          'Supports HTML markup or iframe embedding. Enter HTML code directly, or provide a complete URL to automatically embed it as an iframe.'
+                        )}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
-                name='legal.user_agreement'
+                name='HomePageContent'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('User Agreement')}</FormLabel>
+                  <FormItem className='w-full min-w-0'>
+                    <FormLabel>{t('Home Page Content')}</FormLabel>
                     <FormControl>
-                      <SystemInfoTextarea
-                        placeholder={t(
-                          'Provide Markdown, HTML, or an external URL for the user agreement'
-                        )}
+                      <Textarea
+                        className='[field-sizing:fixed] h-64 max-h-[60vh] min-h-40 w-full resize-y overflow-auto font-mono text-xs leading-5'
+                        placeholder={t('Welcome to our New API...')}
                         {...field}
                       />
                     </FormControl>
                     <FormDescription>
                       {t(
-                        'Leave empty to disable the agreement requirement. Supports Markdown, HTML, or a full URL to redirect users.'
+                        'Content displayed on the home page (supports Markdown)'
                       )}
                     </FormDescription>
                     <FormMessage />
@@ -312,30 +292,56 @@ export function SystemInfoSection({ defaultValues }: SystemInfoSectionProps) {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name='legal.privacy_policy'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Privacy Policy')}</FormLabel>
-                    <FormControl>
-                      <SystemInfoTextarea
-                        placeholder={t(
-                          'Provide Markdown, HTML, or an external URL for the privacy policy'
+              <div className='flex w-full min-w-0 flex-wrap gap-6'>
+                <FormField
+                  control={form.control}
+                  name='legal.user_agreement'
+                  render={({ field }) => (
+                    <FormItem className='min-w-[320px] flex-[1_1_480px] md:max-w-[calc(50%-0.75rem)]'>
+                      <FormLabel>{t('User Agreement')}</FormLabel>
+                      <FormControl>
+                        <SystemInfoTextarea
+                          placeholder={t(
+                            'Provide Markdown, HTML, or an external URL for the user agreement'
+                          )}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          'Leave empty to disable the agreement requirement. Supports Markdown, HTML, or a full URL to redirect users.'
                         )}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t(
-                        'Leave empty to disable the privacy policy requirement. Supports Markdown, HTML, or a full URL to redirect users.'
-                      )}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </SettingsFormGrid>
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name='legal.privacy_policy'
+                  render={({ field }) => (
+                    <FormItem className='min-w-[320px] flex-[1_1_480px] md:max-w-[calc(50%-0.75rem)]'>
+                      <FormLabel>{t('Privacy Policy')}</FormLabel>
+                      <FormControl>
+                        <SystemInfoTextarea
+                          placeholder={t(
+                            'Provide Markdown, HTML, or an external URL for the privacy policy'
+                          )}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          'Leave empty to disable the privacy policy requirement. Supports Markdown, HTML, or a full URL to redirect users.'
+                        )}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
           </SettingsForm>
         </Form>
       </SettingsSection>

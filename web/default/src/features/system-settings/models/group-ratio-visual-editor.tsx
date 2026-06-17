@@ -69,6 +69,21 @@ type GroupOverride = {
 const sectionCardClassName =
   'relative shadow-sm ring-0 before:pointer-events-none before:absolute before:inset-0 before:rounded-xl before:border before:border-border/90'
 const sectionHeaderClassName = 'border-b bg-muted/20'
+const actionButtonClassName =
+  'h-8 rounded-lg border-stone-300 bg-stone-100/80 px-2.5 pr-3.5 font-medium text-stone-950 shadow-[0_1px_2px_rgba(28,25,23,0.06)] hover:border-stone-400 hover:bg-stone-200/70 dark:border-stone-700 dark:bg-stone-900/60 dark:text-stone-100 dark:hover:bg-stone-800/80'
+const actionIconClassName =
+  'flex size-5 items-center justify-center rounded-md border border-stone-400/70 bg-stone-200/50 text-stone-950 dark:border-stone-600 dark:bg-stone-800/70 dark:text-stone-100'
+const dialogCardClassName =
+  'rounded-2xl border-stone-200/80 bg-stone-50/95 shadow-[0_18px_50px_rgba(28,25,23,0.12)] dark:border-stone-800/80 dark:bg-stone-950/95'
+const dialogBodyClassName = 'space-y-4'
+const dialogFooterClassName =
+  'items-center justify-center border-t border-stone-200/80 bg-stone-100/55 sm:justify-center dark:border-stone-800/80 dark:bg-stone-900/55'
+const dialogFieldCardClassName =
+  'space-y-4 rounded-xl border border-stone-200/90 bg-stone-100/55 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)] dark:border-stone-800 dark:bg-stone-900/70'
+const dialogCancelButtonClassName =
+  'h-8 rounded-lg border-stone-300 bg-stone-50/80 px-4 font-medium text-stone-700 shadow-[0_1px_2px_rgba(28,25,23,0.04)] hover:border-stone-400 hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-200 dark:hover:bg-stone-800'
+const dialogSubmitButtonClassName =
+  'h-8 rounded-lg border-stone-900 bg-stone-950 px-4 font-medium text-stone-50 shadow-[0_6px_14px_rgba(28,25,23,0.18)] hover:bg-stone-800 dark:border-stone-200 dark:bg-stone-100 dark:text-stone-950 dark:hover:bg-stone-200'
 
 let groupPricingIdCounter = 0
 function createGroupPricingId() {
@@ -405,20 +420,28 @@ export const GroupRatioVisualEditor = memo(function GroupRatioVisualEditor({
       {/* Topup Group Ratios */}
       <Card className={sectionCardClassName}>
         <CardHeader className={sectionHeaderClassName}>
-          <CardTitle>{t('Top-up group ratios')}</CardTitle>
-          <CardDescription>
-            {t('Multipliers for recharge pricing based on user groups.')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className='space-y-4'>
+          <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
+            <div>
+              <CardTitle>{t('Top-up group ratios')}</CardTitle>
+              <CardDescription>
+                {t('Multipliers for recharge pricing based on user groups.')}
+              </CardDescription>
+            </div>
             <Button
               onClick={() => handleSimpleAdd('topupGroupRatio')}
               size='sm'
+              variant='outline'
+              className={actionButtonClassName}
             >
-              <Plus className='mr-2 h-4 w-4' />
-              {t('Add group')}
+              <span className={actionIconClassName}>
+                <Plus className='size-3.5 stroke-[2.2]' />
+              </span>
+              <span>{t('Add group')}</span>
             </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className='space-y-4'>
             {topupRatioList.length > 0 && (
               <StaticDataTable
                 data={topupRatioList}
@@ -473,19 +496,30 @@ export const GroupRatioVisualEditor = memo(function GroupRatioVisualEditor({
       {/* Inter-group ratio overrides */}
       <Card className={sectionCardClassName}>
         <CardHeader className={sectionHeaderClassName}>
-          <CardTitle>{t('Inter-group ratio overrides')}</CardTitle>
-          <CardDescription>
-            {t(
-              'Custom multipliers when specific user groups use specific token groups. Example: VIP users get 0.9x rate when using "edit_this" group tokens.'
-            )}
-          </CardDescription>
+          <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
+            <div>
+              <CardTitle>{t('Inter-group ratio overrides')}</CardTitle>
+              <CardDescription>
+                {t(
+                  'Custom multipliers when specific user groups use specific token groups. Example: VIP users get 0.9x rate when using "edit_this" group tokens.'
+                )}
+              </CardDescription>
+            </div>
+            <Button
+              onClick={handleUserGroupAdd}
+              size='sm'
+              variant='outline'
+              className={actionButtonClassName}
+            >
+              <span className={actionIconClassName}>
+                <Plus className='size-3.5 stroke-[2.2]' />
+              </span>
+              <span>{t('Add user group')}</span>
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className='space-y-4'>
-            <Button onClick={handleUserGroupAdd} size='sm'>
-              <Plus className='mr-2 h-4 w-4' />
-              {t('Add user group')}
-            </Button>
             {groupGroupRatioList.length > 0 && (
               <div className='space-y-3'>
                 {groupGroupRatioList.map((userGroupData) => (
@@ -598,19 +632,30 @@ export const GroupRatioVisualEditor = memo(function GroupRatioVisualEditor({
       {/* Auto Groups */}
       <Card className={sectionCardClassName}>
         <CardHeader className={sectionHeaderClassName}>
-          <CardTitle>{t('Auto assignment order')}</CardTitle>
-          <CardDescription>
-            {t(
-              'Priority order for automatic group assignment. New tokens rotate through this list.'
-            )}
-          </CardDescription>
+          <div className='flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between'>
+            <div>
+              <CardTitle>{t('Auto assignment order')}</CardTitle>
+              <CardDescription>
+                {t(
+                  'Priority order for automatic group assignment. New tokens rotate through this list.'
+                )}
+              </CardDescription>
+            </div>
+            <Button
+              onClick={handleAutoGroupAdd}
+              size='sm'
+              variant='outline'
+              className={actionButtonClassName}
+            >
+              <span className={actionIconClassName}>
+                <Plus className='size-3.5 stroke-[2.2]' />
+              </span>
+              <span>{t('Add group')}</span>
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className='space-y-4'>
-            <Button onClick={handleAutoGroupAdd} size='sm'>
-              <Plus className='mr-2 h-4 w-4' />
-              {t('Add group')}
-            </Button>
             {autoGroupsList.length > 0 && (
               <div className='space-y-2'>
                 {autoGroupsList.map((group, index) => (
@@ -669,20 +714,28 @@ export const GroupRatioVisualEditor = memo(function GroupRatioVisualEditor({
         title={t('Add auto group')}
         description={t('Add a group identifier to the auto assignment list.')}
         contentHeight='auto'
-        bodyClassName='space-y-4'
+        contentClassName={dialogCardClassName}
+        bodyClassName={dialogBodyClassName}
+        footerClassName={dialogFooterClassName}
         footer={
           <>
             <Button
               variant='outline'
+              className={dialogCancelButtonClassName}
               onClick={() => setAutoGroupDialogOpen(false)}
             >
               {t('Cancel')}
             </Button>
-            <Button onClick={handleAutoGroupSave}>{t('Add')}</Button>
+            <Button
+              className={dialogSubmitButtonClassName}
+              onClick={handleAutoGroupSave}
+            >
+              {t('Add')}
+            </Button>
           </>
         }
       >
-        <div className='space-y-4 py-4'>
+        <div className={dialogFieldCardClassName}>
           <div className='space-y-2'>
             <Label>{t('Group identifier')}</Label>
             <Input
@@ -703,20 +756,28 @@ export const GroupRatioVisualEditor = memo(function GroupRatioVisualEditor({
           'Create a new user group to configure ratio overrides for.'
         )}
         contentHeight='auto'
-        bodyClassName='space-y-4'
+        contentClassName={dialogCardClassName}
+        bodyClassName={dialogBodyClassName}
+        footerClassName={dialogFooterClassName}
         footer={
           <>
             <Button
               variant='outline'
+              className={dialogCancelButtonClassName}
               onClick={() => setUserGroupDialogOpen(false)}
             >
               {t('Cancel')}
             </Button>
-            <Button onClick={handleUserGroupSave}>{t('Add')}</Button>
+            <Button
+              className={dialogSubmitButtonClassName}
+              onClick={handleUserGroupSave}
+            >
+              {t('Add')}
+            </Button>
           </>
         }
       >
-        <div className='space-y-4 py-4'>
+        <div className={dialogFieldCardClassName}>
           <div className='space-y-2'>
             <Label>{t('User group name')}</Label>
             <Input
@@ -843,9 +904,16 @@ function GroupPricingTable({
               )}
             </CardDescription>
           </div>
-          <Button onClick={addRow} size='sm' className='sm:self-start'>
-            <Plus className='mr-2 h-4 w-4' />
-            {t('Add group')}
+          <Button
+            onClick={addRow}
+            size='sm'
+            variant='outline'
+            className={actionButtonClassName}
+          >
+            <span className={actionIconClassName}>
+              <Plus className='size-3.5 stroke-[2.2]' />
+            </span>
+            <span>{t('Add group')}</span>
           </Button>
         </div>
       </CardHeader>
@@ -1009,19 +1077,25 @@ function SimpleGroupDialog({
       }
       description={t('Configure the ratio for this group.')}
       contentHeight='auto'
-      bodyClassName='space-y-4'
+      contentClassName={dialogCardClassName}
+      bodyClassName={dialogBodyClassName}
+      footerClassName={dialogFooterClassName}
       footer={
         <>
-          <Button variant='outline' onClick={() => onOpenChange(false)}>
+          <Button
+            variant='outline'
+            className={dialogCancelButtonClassName}
+            onClick={() => onOpenChange(false)}
+          >
             {t('Cancel')}
           </Button>
-          <Button onClick={handleSave}>
+          <Button className={dialogSubmitButtonClassName} onClick={handleSave}>
             {editData ? t('Update') : t('Add')}
           </Button>
         </>
       }
     >
-      <div className='space-y-4 py-4'>
+      <div className={dialogFieldCardClassName}>
         <div className='space-y-2'>
           <Label>{t('Group name')}</Label>
           <Input
@@ -1106,19 +1180,25 @@ function GroupOverrideDialog({
             )
       }
       contentHeight='auto'
-      bodyClassName='space-y-4'
+      contentClassName={dialogCardClassName}
+      bodyClassName={dialogBodyClassName}
+      footerClassName={dialogFooterClassName}
       footer={
         <>
-          <Button variant='outline' onClick={() => onOpenChange(false)}>
+          <Button
+            variant='outline'
+            className={dialogCancelButtonClassName}
+            onClick={() => onOpenChange(false)}
+          >
             {t('Cancel')}
           </Button>
-          <Button onClick={handleSave}>
+          <Button className={dialogSubmitButtonClassName} onClick={handleSave}>
             {editData ? t('Update') : t('Add')}
           </Button>
         </>
       }
     >
-      <div className='space-y-4 py-4'>
+      <div className={dialogFieldCardClassName}>
         <div className='space-y-2'>
           <Label>{t('Target group')}</Label>
           <Input

@@ -31,6 +31,7 @@ import {
   NotepadTextIcon,
   CodeSquareIcon,
   GraduationCapIcon,
+  Trash2Icon,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -64,6 +65,8 @@ interface PlaygroundInputProps {
   groups: GroupOption[]
   groupValue: string
   onGroupChange: (value: string) => void
+  onClearLocalMessages?: () => void
+  hasMessages?: boolean
 }
 
 const suggestions = [
@@ -87,6 +90,8 @@ export function PlaygroundInput({
   groups,
   groupValue,
   onGroupChange,
+  onClearLocalMessages,
+  hasMessages = false,
 }: PlaygroundInputProps) {
   const { t } = useTranslation()
   const [text, setText] = useState('')
@@ -112,21 +117,21 @@ export function PlaygroundInput({
   }
 
   return (
-    <div className='grid shrink-0 gap-4 px-1 md:pb-4'>
+    <div className='grid shrink-0 gap-2.5 md:gap-4 md:pb-4'>
       <PromptInput groupClassName='rounded-xl' onSubmit={handleSubmit}>
         <PromptInputTextarea
           autoComplete='off'
           autoCorrect='off'
           autoCapitalize='off'
           spellCheck={false}
-          className='px-5 md:text-base'
+          className='px-4 md:px-5 md:text-base'
           disabled={disabled}
           onChange={(event) => setText(event.target.value)}
           placeholder={t('Ask anything')}
           value={text}
         />
 
-        <PromptInputFooter className='p-2.5'>
+        <PromptInputFooter className='flex-wrap gap-2 p-2.5'>
           <PromptInputTools>
             <DropdownMenu>
               <DropdownMenuTrigger
@@ -182,7 +187,7 @@ export function PlaygroundInput({
             </PromptInputButton>
           </PromptInputTools>
 
-          <div className='flex items-center gap-1.5 md:gap-2'>
+          <div className='ml-auto flex min-w-0 items-center gap-1 md:gap-2'>
             <ModelGroupSelector
               selectedModel={modelValue}
               models={models}
@@ -219,25 +224,38 @@ export function PlaygroundInput({
         </PromptInputFooter>
       </PromptInput>
 
-      <Suggestions>
-        {suggestions.map(({ icon: Icon, labelKey, color }) => {
-          const label = t(labelKey)
+      <div className='min-w-0 overflow-hidden'>
+        <Suggestions className='gap-1.5 px-0.5 pb-0.5 md:gap-2 md:px-0'>
+          {suggestions.map(({ icon: Icon, labelKey, color }) => {
+            const label = t(labelKey)
 
-          return (
+            return (
+              <Suggestion
+                className={`h-7 shrink-0 px-3 text-xs font-normal sm:h-8 sm:text-sm ${
+                  labelKey === 'More' ? 'hidden sm:flex' : ''
+                }`}
+                key={labelKey}
+                onClick={() => handleSuggestionClick(label)}
+                suggestion={label}
+              >
+                {Icon && <Icon size={16} style={{ color }} />}
+                {label}
+              </Suggestion>
+            )
+          })}
+          {onClearLocalMessages ? (
             <Suggestion
-              className={`text-xs font-normal sm:text-sm ${
-                labelKey === 'More' ? 'hidden sm:flex' : ''
-              }`}
-              key={labelKey}
-              onClick={() => handleSuggestionClick(label)}
-              suggestion={label}
+              className='text-destructive hover:bg-destructive/10 hover:text-destructive h-7 shrink-0 px-3 text-xs font-normal sm:h-8 sm:text-sm'
+              disabled={!hasMessages}
+              onClick={onClearLocalMessages}
+              suggestion={t('Clear')}
             >
-              {Icon && <Icon size={16} style={{ color }} />}
-              {label}
+              <Trash2Icon size={16} />
+              {t('Clear')}
             </Suggestion>
-          )
-        })}
-      </Suggestions>
+          ) : null}
+        </Suggestions>
+      </div>
     </div>
   )
 }

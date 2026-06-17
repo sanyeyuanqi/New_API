@@ -18,7 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { memo, useCallback, useState } from 'react'
 import { type UseFormReturn } from 'react-hook-form'
-import { Code2, Eye, HelpCircle } from 'lucide-react'
+import { Code2, Eye, HelpCircle, Save } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import {
   Accordion,
@@ -75,6 +75,12 @@ type GroupRatioFormProps = {
   isSaving: boolean
 }
 
+const actionButtonClassName =
+  'h-8 rounded-lg border-stone-300 bg-stone-100/80 px-2.5 pr-3.5 font-medium text-stone-950 shadow-[0_1px_2px_rgba(28,25,23,0.06)] hover:border-stone-400 hover:bg-stone-200/70 dark:border-stone-700 dark:bg-stone-900/60 dark:text-stone-100 dark:hover:bg-stone-800/80'
+
+const actionIconClassName =
+  'flex size-5 items-center justify-center rounded-md border border-stone-400/70 bg-stone-200/50 text-stone-950 dark:border-stone-600 dark:bg-stone-800/70 dark:text-stone-100'
+
 export const GroupRatioForm = memo(function GroupRatioForm({
   form,
   onSave,
@@ -100,37 +106,55 @@ export const GroupRatioForm = memo(function GroupRatioForm({
 
   return (
     <div className='space-y-6'>
-      <div className='flex flex-wrap justify-end gap-2'>
-        <Button variant='outline' size='sm' onClick={() => setGuideOpen(true)}>
-          <HelpCircle className='mr-2 h-4 w-4' />
-          {t('Usage guide')}
-        </Button>
-        <Button variant='outline' size='sm' onClick={toggleEditMode}>
-          {editMode === 'visual' ? (
-            <>
-              <Code2 className='mr-2 h-4 w-4' />
-              {t('Switch to JSON')}
-            </>
-          ) : (
-            <>
-              <Eye className='mr-2 h-4 w-4' />
-              {t('Switch to Visual')}
-            </>
-          )}
-        </Button>
-      </div>
-
       <GroupPricingGuide open={guideOpen} onOpenChange={setGuideOpen} />
 
       <Form {...form}>
         <SettingsPageActionsPortal>
           <Button
+            variant='outline'
+            size='sm'
+            className={actionButtonClassName}
+            onClick={() => setGuideOpen(true)}
+          >
+            <span className={actionIconClassName}>
+              <HelpCircle className='size-3.5 stroke-[2.2]' />
+            </span>
+            <span>{t('Usage guide')}</span>
+          </Button>
+          <Button
+            variant='outline'
+            size='sm'
+            className={actionButtonClassName}
+            onClick={toggleEditMode}
+          >
+            {editMode === 'visual' ? (
+              <>
+                <span className={actionIconClassName}>
+                  <Code2 className='size-3.5 stroke-[2.2]' />
+                </span>
+                <span>{t('Switch to JSON')}</span>
+              </>
+            ) : (
+              <>
+                <span className={actionIconClassName}>
+                  <Eye className='size-3.5 stroke-[2.2]' />
+                </span>
+                <span>{t('Switch to Visual')}</span>
+              </>
+            )}
+          </Button>
+          <Button
             type='button'
             size='sm'
+            variant='outline'
+            className={actionButtonClassName}
             onClick={form.handleSubmit(onSave)}
             disabled={isSaving}
           >
-            {isSaving ? t('Saving...') : t('Save group ratios')}
+            <span className={actionIconClassName}>
+              <Save className='size-3.5 stroke-[2.2]' />
+            </span>
+            <span>{isSaving ? t('Saving...') : t('Save group ratios')}</span>
           </Button>
         </SettingsPageActionsPortal>
         {editMode === 'visual' ? (

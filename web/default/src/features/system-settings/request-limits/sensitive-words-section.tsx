@@ -30,9 +30,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -102,7 +102,7 @@ export function SensitiveWordsSection({
                     </FormDescription>
                   </SettingsSwitchContent>
                   <FormControl>
-                    <Switch
+                    <SettingsEnableDisableButton
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
@@ -125,7 +125,7 @@ export function SensitiveWordsSection({
                     </FormDescription>
                   </SettingsSwitchContent>
                   <FormControl>
-                    <Switch
+                    <SettingsEnableDisableButton
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />

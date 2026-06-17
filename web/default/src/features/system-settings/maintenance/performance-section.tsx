@@ -58,9 +58,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
-import { Switch } from '@/components/ui/switch'
 import { StatusBadge } from '@/components/status-badge'
 import {
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -421,7 +421,7 @@ export function PerformanceSection(props: Props) {
                     <FormLabel>{t('Enable Disk Cache')}</FormLabel>
                   </SettingsSwitchContent>
                   <FormControl>
-                    <Switch
+                    <SettingsEnableDisableButton
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
@@ -539,7 +539,7 @@ export function PerformanceSection(props: Props) {
                     <FormLabel>{t('Enable Performance Monitoring')}</FormLabel>
                   </SettingsSwitchContent>
                   <FormControl>
-                    <Switch
+                    <SettingsEnableDisableButton
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
@@ -631,7 +631,7 @@ export function PerformanceSection(props: Props) {
                     </FormLabel>
                   </SettingsSwitchContent>
                   <FormControl>
-                    <Switch
+                    <SettingsEnableDisableButton
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />

@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import * as React from 'react'
 import type { SetStateAction } from 'react'
+import { Store } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -31,6 +32,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { SettingsControlGroup } from '../components/settings-form-layout'
+import {
+  paymentActionButtonClassName,
+  paymentButtonIconClassName,
+} from './payment-button-styles'
 import { removeTrailingSlash } from './utils'
 import {
   type CatalogStore,
@@ -67,6 +73,9 @@ const PANCAKE_DASHBOARD_URL = 'https://pancake.waffo.ai/merchant/dashboard'
 const DEFAULT_NEW_STORE_NAME = 'new-api-store'
 const DEFAULT_NEW_PRODUCT_NAME = 'new-api-charge-product'
 const DEFAULT_NEW_PAIR_NAME = `${DEFAULT_NEW_STORE_NAME} + ${DEFAULT_NEW_PRODUCT_NAME}`
+
+const pancakeFieldCardClassName =
+  'min-w-0 rounded-lg border bg-background/80 p-3 shadow-xs'
 
 export function WaffoPancakeSettingsSection({
   defaultValues,
@@ -372,18 +381,25 @@ export function WaffoPancakeSettingsSection({
   }
 
   return (
-    <div className='space-y-4 pt-4'>
-      <div>
-        <h3 className='text-lg font-medium'>{t('Waffo Pancake MoR')}</h3>
-        <p className='text-muted-foreground text-sm'>
-          {t(
-            'Start collecting payments globally without registering a company. Built for indie developers, OPC sole proprietorships, and startups. Waffo Pancake acts as your Merchant of Record, taking on the compliance burden of global payment collection — consumption tax, invoicing, subscription management, refunds, and chargebacks. Solo developers can launch fast and stay focused on product instead of compliance. Onboard in minutes — one prompt to a full integration.'
-          )}
-        </p>
+    <SettingsControlGroup className='bg-background/60 w-full min-w-0 space-y-4 rounded-xl p-3 shadow-xs sm:p-4'>
+      <div className='flex min-w-0 items-start gap-3'>
+        <div className='bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg'>
+          <Store className='size-4' />
+        </div>
+        <div className='min-w-0'>
+          <h3 className='text-sm font-semibold sm:text-base'>
+            {t('Waffo Pancake MoR')}
+          </h3>
+          <p className='text-muted-foreground text-xs sm:text-sm'>
+            {t(
+              'Start collecting payments globally without registering a company. Built for indie developers, OPC sole proprietorships, and startups. Waffo Pancake acts as your Merchant of Record, taking on the compliance burden of global payment collection — consumption tax, invoicing, subscription management, refunds, and chargebacks. Solo developers can launch fast and stay focused on product instead of compliance. Onboard in minutes — one prompt to a full integration.'
+            )}
+          </p>
+        </div>
       </div>
       <div className='grid min-w-0 gap-x-5 gap-y-4 lg:grid-cols-2'>
         {/* Blue box — webhook configuration only. */}
-        <div className='rounded-md bg-blue-50 p-4 text-sm text-blue-900 lg:col-span-2 dark:bg-blue-950 dark:text-blue-100'>
+        <div className='rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900 lg:col-span-2 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-100'>
           <p className='mb-2 font-medium'>{t('Webhook Configuration:')}</p>
           <ul className='list-inside list-disc space-y-1'>
             <li>
@@ -417,7 +433,7 @@ export function WaffoPancakeSettingsSection({
           </ul>
         </div>
 
-        <div className='grid gap-1.5'>
+        <div className={`grid gap-1.5 ${pancakeFieldCardClassName}`}>
           <Label>{t('Merchant ID')}</Label>
           <Input
             placeholder='MER_xxx'
@@ -429,7 +445,7 @@ export function WaffoPancakeSettingsSection({
           />
         </div>
 
-        <div className='grid gap-1.5'>
+        <div className={`grid gap-1.5 ${pancakeFieldCardClassName}`}>
           <Label>{t('API Private Key')}</Label>
           <Textarea
             rows={4}
@@ -458,7 +474,9 @@ export function WaffoPancakeSettingsSection({
           The two paths are split by an "or" divider so the operator never has
           to wonder which field belongs to which intent.
         */}
-        <div className='space-y-4 pt-2 lg:col-span-2'>
+        <div
+          className={`${pancakeFieldCardClassName} space-y-4 pt-3 lg:col-span-2`}
+        >
           <div>
             <h4 className='font-medium'>
               {t('Bind a Pancake store + product')}
@@ -472,7 +490,7 @@ export function WaffoPancakeSettingsSection({
               for. Subscriptions reuse the same Store but get their own
               per-plan product, configured in the Subscriptions admin.
             */}
-          <div className='rounded-md border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-100'>
+          <div className='rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-900 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-100'>
             <p className='mb-1 font-medium'>
               {t('Why only one store + product?')}
             </p>
@@ -498,7 +516,7 @@ export function WaffoPancakeSettingsSection({
           {/* Create section — first, since creating auto-fills the pick-existing dropdowns below. */}
           <div className='space-y-1.5'>
             <Label>{t('Payment return URL')}</Label>
-            <div className='flex gap-2'>
+            <div className='flex flex-col gap-2 sm:flex-row'>
               <Input
                 placeholder='https://example.com/console/topup'
                 value={returnURL}
@@ -512,11 +530,14 @@ export function WaffoPancakeSettingsSection({
                 variant='outline'
                 onClick={handleCreatePair}
                 disabled={creatingPair || verifying || !credsReady}
-                className='shrink-0'
+                className={`${paymentActionButtonClassName} shrink-0 text-xs`}
               >
-                {creatingPair
-                  ? t('Creating...')
-                  : `+ ${t('Create')} ${DEFAULT_NEW_PAIR_NAME}`}
+                <span className={paymentButtonIconClassName}>+</span>
+                <span>
+                  {creatingPair
+                    ? t('Creating...')
+                    : `${t('Create')} ${DEFAULT_NEW_PAIR_NAME}`}
+                </span>
               </Button>
             </div>
             <p className='text-muted-foreground text-xs'>
@@ -536,8 +557,8 @@ export function WaffoPancakeSettingsSection({
                 <div className='flex-1 border-t' />
               </div>
 
-              <div className='grid grid-cols-2 gap-3'>
-                <div className='grid gap-1.5'>
+              <div className='grid gap-3 sm:grid-cols-2'>
+                <div className='bg-background/70 grid gap-1.5 rounded-lg border p-3'>
                   <Label>{t('Store')}</Label>
                   <Select
                     items={storeSelectItems}
@@ -563,7 +584,7 @@ export function WaffoPancakeSettingsSection({
                   </Select>
                 </div>
 
-                <div className='grid gap-1.5'>
+                <div className='bg-background/70 grid gap-1.5 rounded-lg border p-3'>
                   <Label>{t('Product')}</Label>
                   <Select
                     items={productSelectItems}
@@ -616,6 +637,6 @@ export function WaffoPancakeSettingsSection({
           </div>
         </div>
       </div>
-    </div>
+    </SettingsControlGroup>
   )
 }

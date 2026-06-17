@@ -94,6 +94,12 @@ export type ModelRatioVisualEditorHandle = {
 
 const STORAGE_KEY = 'model-ratio-column-visibility'
 
+const actionButtonClassName =
+  'h-8 rounded-lg border-stone-300 bg-stone-100/80 px-2.5 pr-3.5 font-medium text-stone-950 shadow-[0_1px_2px_rgba(28,25,23,0.06)] hover:border-stone-400 hover:bg-stone-200/70 dark:border-stone-700 dark:bg-stone-900/60 dark:text-stone-100 dark:hover:bg-stone-800/80'
+
+const actionIconClassName =
+  'flex size-5 items-center justify-center rounded-md border border-stone-400/70 bg-stone-200/50 text-stone-950 dark:border-stone-600 dark:bg-stone-800/70 dark:text-stone-100'
+
 const ModelRatioVisualEditorComponent = forwardRef<
   ModelRatioVisualEditorHandle,
   ModelRatioVisualEditorProps
@@ -648,9 +654,15 @@ const ModelRatioVisualEditorComponent = forwardRef<
               },
             ]}
             preActions={
-              <Button onClick={handleAdd}>
-                <Plus data-icon='inline-start' />
-                {t('Add model')}
+              <Button
+                variant='outline'
+                className={actionButtonClassName}
+                onClick={handleAdd}
+              >
+                <span className={actionIconClassName}>
+                  <Plus className='size-3.5 stroke-[2.2]' />
+                </span>
+                <span>{t('Add model')}</span>
               </Button>
             }
           />
@@ -734,9 +746,15 @@ const ModelRatioVisualEditorComponent = forwardRef<
                   'Use the full-width table to scan prices, then select a row to edit it here.'
                 )}
               </p>
-              <Button variant='outline' onClick={handleAdd}>
-                <Plus data-icon='inline-start' />
-                {t('Add model')}
+              <Button
+                variant='outline'
+                className={actionButtonClassName}
+                onClick={handleAdd}
+              >
+                <span className={actionIconClassName}>
+                  <Plus className='size-3.5 stroke-[2.2]' />
+                </span>
+                <span>{t('Add model')}</span>
               </Button>
             </div>
           )}
@@ -744,11 +762,21 @@ const ModelRatioVisualEditorComponent = forwardRef<
       </div>
 
       <DataTableBulkActions table={table} entityName={t('model')}>
-        <Button size='sm' disabled={!editData} onClick={handleBatchCopy}>
-          <Copy data-icon='inline-start' />
-          {editData
-            ? t('Copy {{name}} pricing', { name: editData.name })
-            : t('Open a source model first')}
+        <Button
+          size='sm'
+          variant='outline'
+          className={actionButtonClassName}
+          disabled={!editData}
+          onClick={handleBatchCopy}
+        >
+          <span className={actionIconClassName}>
+            <Copy className='size-3.5 stroke-[2.2]' />
+          </span>
+          <span>
+            {editData
+              ? t('Copy {{name}} pricing', { name: editData.name })
+              : t('Open a source model first')}
+          </span>
         </Button>
       </DataTableBulkActions>
 

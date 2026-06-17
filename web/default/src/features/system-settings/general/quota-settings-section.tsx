@@ -23,6 +23,14 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import {
   Form,
   FormControl,
   FormDescription,
@@ -32,16 +40,9 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
-import {
-  SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
-  SettingsFormGrid,
-  SettingsFormGridItem,
-} from '../components/settings-form-layout'
+import { SettingsEnableDisableButton } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
 import { useSettingsForm } from '../hooks/use-settings-form'
@@ -67,6 +68,12 @@ type QuotaSettingsSectionProps = {
   defaultValues: QuotaFormValues
   complianceConfirmed?: boolean
 }
+
+const quotaFieldCardClassName =
+  'min-w-[280px] max-w-[520px] flex-1 rounded-lg border border-zinc-200/80 bg-background/80 p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] dark:border-zinc-800 dark:bg-zinc-950/40'
+
+const linkFieldCardClassName =
+  'min-w-[320px] max-w-[720px] flex-1 rounded-lg border border-zinc-200/80 bg-background/80 p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] dark:border-zinc-800 dark:bg-zinc-950/40'
 
 export function QuotaSettingsSection({
   defaultValues,
@@ -115,176 +122,208 @@ export function QuotaSettingsSection({
       ) : null}
 
       <Form {...form}>
-        <SettingsForm onSubmit={handleSubmit}>
+        <form
+          className='grid min-w-0 gap-4 xl:grid-cols-2'
+          onSubmit={handleSubmit}
+        >
           <SettingsPageFormActions
             onSave={handleSubmit}
             isSaving={updateOption.isPending || isSubmitting}
           />
           <FormDirtyIndicator isDirty={isDirty} />
-          <SettingsFormGrid>
-            <FormField
-              control={form.control}
-              name='QuotaForNewUser'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('New User Quota')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      value={field.value ?? ''}
-                      onChange={handleNumberChange(field.onChange)}
-                      name={field.name}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Initial quota given to new users')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            <FormField
-              control={form.control}
-              name='PreConsumedQuota'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Pre-Consumed Quota')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      value={field.value ?? ''}
-                      onChange={handleNumberChange(field.onChange)}
-                      name={field.name}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Quota consumed before charging users')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <Card className='rounded-lg border-zinc-200/80 bg-zinc-50/50 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/20'>
+            <CardHeader className='border-b'>
+              <CardTitle>{t('Quota Allocation')}</CardTitle>
+              <CardDescription>
+                {t('Set the initial and pre-consumed quota amounts.')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='flex flex-wrap items-start gap-3'>
+              <FormField
+                control={form.control}
+                name='QuotaForNewUser'
+                render={({ field }) => (
+                  <FormItem className={quotaFieldCardClassName}>
+                    <FormLabel>{t('New User Quota')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='number'
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field.onChange)}
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t('Initial quota given to new users')}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='QuotaForInviter'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Inviter Reward')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      value={field.value ?? ''}
-                      onChange={handleNumberChange(field.onChange)}
-                      name={field.name}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Quota given to users who invite others')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              <FormField
+                control={form.control}
+                name='PreConsumedQuota'
+                render={({ field }) => (
+                  <FormItem className={quotaFieldCardClassName}>
+                    <FormLabel>{t('Pre-Consumed Quota')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='number'
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field.onChange)}
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t('Quota consumed before charging users')}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
 
-            <FormField
-              control={form.control}
-              name='QuotaForInvitee'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Invitee Reward')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='number'
-                      value={field.value ?? ''}
-                      onChange={handleNumberChange(field.onChange)}
-                      name={field.name}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Quota given to invited users')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <Card className='rounded-lg border-zinc-200/80 bg-zinc-50/50 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/20'>
+            <CardHeader className='border-b'>
+              <CardTitle>{t('Invitation Rewards')}</CardTitle>
+              <CardDescription>
+                {t('Configure quota rewards for referral relationships.')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='flex flex-wrap items-start gap-3'>
+              <FormField
+                control={form.control}
+                name='QuotaForInviter'
+                render={({ field }) => (
+                  <FormItem className={quotaFieldCardClassName}>
+                    <FormLabel>{t('Inviter Reward')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='number'
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field.onChange)}
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t('Quota given to users who invite others')}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <SettingsFormGridItem span='full'>
+              <FormField
+                control={form.control}
+                name='QuotaForInvitee'
+                render={({ field }) => (
+                  <FormItem className={quotaFieldCardClassName}>
+                    <FormLabel>{t('Invitee Reward')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='number'
+                        value={field.value ?? ''}
+                        onChange={handleNumberChange(field.onChange)}
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t('Quota given to invited users')}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className='rounded-lg border-zinc-200/80 bg-zinc-50/60 shadow-sm xl:col-span-2 dark:border-zinc-800 dark:bg-zinc-900/30'>
+            <CardHeader>
+              <CardTitle>{t('Pre-Consume for Free Models')}</CardTitle>
+              <CardDescription>
+                {t(
+                  'When enabled, zero-cost models also pre-consume quota before final settlement.'
+                )}
+              </CardDescription>
               <FormField
                 control={form.control}
                 name='quota_setting.enable_free_model_pre_consume'
                 render={({ field }) => (
-                  <SettingsSwitchItem>
-                    <SettingsSwitchContent>
-                      <FormLabel>{t('Pre-Consume for Free Models')}</FormLabel>
-                      <FormDescription>
-                        {t(
-                          'When enabled, zero-cost models also pre-consume quota before final settlement.'
-                        )}
-                      </FormDescription>
-                    </SettingsSwitchContent>
+                  <CardAction className='self-center'>
                     <FormControl>
-                      <Switch
+                      <SettingsEnableDisableButton
                         checked={field.value}
                         onCheckedChange={field.onChange}
                         disabled={updateOption.isPending}
                       />
                     </FormControl>
-                  </SettingsSwitchItem>
+                  </CardAction>
                 )}
               />
-            </SettingsFormGridItem>
+            </CardHeader>
+          </Card>
 
-            <FormField
-              control={form.control}
-              name='TopUpLink'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Top-Up Link')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t('https://example.com/topup')}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('External link for users to purchase quota')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <Card className='rounded-lg border-zinc-200/80 bg-zinc-50/50 shadow-sm xl:col-span-2 dark:border-zinc-800 dark:bg-zinc-900/20'>
+            <CardHeader className='border-b'>
+              <CardTitle>{t('External Links')}</CardTitle>
+              <CardDescription>
+                {t('Configure purchase and documentation destinations.')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='flex flex-wrap items-start gap-3'>
+              <FormField
+                control={form.control}
+                name='TopUpLink'
+                render={({ field }) => (
+                  <FormItem className={linkFieldCardClassName}>
+                    <FormLabel>{t('Top-Up Link')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t('https://example.com/topup')}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t('External link for users to purchase quota')}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name='general_setting.docs_link'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Documentation Link')}</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder={t('https://docs.example.com')}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    {t('Link to your documentation site')}
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </SettingsFormGrid>
-        </SettingsForm>
+              <FormField
+                control={form.control}
+                name='general_setting.docs_link'
+                render={({ field }) => (
+                  <FormItem className={linkFieldCardClassName}>
+                    <FormLabel>{t('Documentation Link')}</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder={t('https://docs.example.com')}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t('Link to your documentation site')}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+        </form>
       </Form>
     </SettingsSection>
   )

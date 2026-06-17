@@ -30,8 +30,8 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import {
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -178,7 +178,7 @@ export function WorkerSettingsSection({
                   </FormDescription>
                 </SettingsSwitchContent>
                 <FormControl>
-                  <Switch
+                  <SettingsEnableDisableButton
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />

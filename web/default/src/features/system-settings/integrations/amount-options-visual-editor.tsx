@@ -25,6 +25,10 @@ import { Label } from '@/components/ui/label'
 import { StatusBadge } from '@/components/status-badge'
 import { safeJsonParseWithValidation } from '../utils/json-parser'
 import { isArray } from '../utils/json-validators'
+import {
+  paymentActionButtonClassName,
+  paymentButtonIconClassName,
+} from './payment-button-styles'
 
 type AmountOptionsVisualEditorProps = {
   value: string
@@ -155,9 +159,11 @@ export function AmountOptionsVisualEditor({
             handleAdd()
           }}
           disabled={!newAmount || parseFloat(newAmount) <= 0}
-          className='w-full sm:w-auto'
+          className={`${paymentActionButtonClassName} w-full text-xs sm:w-auto`}
         >
-          <Plus className='h-4 w-4 sm:mr-2' />
+          <span className={paymentButtonIconClassName}>
+            <Plus className='size-3.5' />
+          </span>
           <span className='sm:inline'>{t('Add')}</span>
         </Button>
       </div>

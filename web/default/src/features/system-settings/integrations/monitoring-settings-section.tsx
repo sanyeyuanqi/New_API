@@ -33,9 +33,9 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -270,7 +270,7 @@ export function MonitoringSettingsSection({
                     </FormDescription>
                   </SettingsSwitchContent>
                   <FormControl>
-                    <Switch
+                    <SettingsEnableDisableButton
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
@@ -365,7 +365,7 @@ export function MonitoringSettingsSection({
                     </FormDescription>
                   </SettingsSwitchContent>
                   <FormControl>
-                    <Switch
+                    <SettingsEnableDisableButton
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
@@ -386,7 +386,7 @@ export function MonitoringSettingsSection({
                     </FormDescription>
                   </SettingsSwitchContent>
                   <FormControl>
-                    <Switch
+                    <SettingsEnableDisableButton
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />

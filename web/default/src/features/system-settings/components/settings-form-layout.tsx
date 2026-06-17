@@ -17,7 +17,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { ComponentProps, ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 import { FormItem } from '@/components/ui/form'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
@@ -41,6 +43,14 @@ type SettingsSwitchFieldProps = SettingsSwitchRowProps & {
   label: ReactNode
   description?: ReactNode
   disabled?: boolean
+  controlVariant?: 'switch' | 'button'
+}
+type SettingsEnableDisableButtonProps = {
+  checked: boolean
+  onCheckedChange: (checked: boolean) => void
+  disabled?: boolean
+  enableLabel?: string
+  disableLabel?: string
 }
 
 const settingsSwitchRowClassName =
@@ -107,6 +117,7 @@ export function SettingsSwitchField({
   label,
   description,
   disabled,
+  controlVariant = 'switch',
   className,
   ...props
 }: SettingsSwitchFieldProps) {
@@ -118,12 +129,50 @@ export function SettingsSwitchField({
           <p className='text-muted-foreground text-xs'>{description}</p>
         ) : null}
       </SettingsSwitchContent>
-      <Switch
-        checked={checked}
-        onCheckedChange={onCheckedChange}
-        disabled={disabled}
-      />
+      {controlVariant === 'button' ? (
+        <SettingsEnableDisableButton
+          checked={checked}
+          onCheckedChange={onCheckedChange}
+          disabled={disabled}
+        />
+      ) : (
+        <Switch
+          checked={checked}
+          onCheckedChange={onCheckedChange}
+          disabled={disabled}
+        />
+      )}
     </SettingsSwitchRow>
+  )
+}
+
+export function SettingsEnableDisableButton({
+  checked,
+  onCheckedChange,
+  disabled,
+  enableLabel,
+  disableLabel,
+}: SettingsEnableDisableButtonProps) {
+  const { t } = useTranslation()
+
+  return (
+    <Button
+      type='button'
+      variant='outline'
+      size='sm'
+      className={cn(
+        'h-8 min-w-20 shrink-0 rounded-full px-4 font-semibold shadow-sm transition-all',
+        checked
+          ? 'border-emerald-200 bg-emerald-50 text-emerald-700 ring-1 ring-emerald-500/10 hover:bg-emerald-100 hover:text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300 dark:ring-emerald-400/10 dark:hover:bg-emerald-950/70'
+          : 'border-zinc-200 bg-zinc-50 text-zinc-500 ring-1 ring-black/5 hover:bg-zinc-100 hover:text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-400 dark:ring-white/10 dark:hover:bg-zinc-900 dark:hover:text-zinc-200'
+      )}
+      disabled={disabled}
+      onClick={() => onCheckedChange(!checked)}
+    >
+      {checked
+        ? (disableLabel ?? t('Enabled'))
+        : (enableLabel ?? t('Disabled'))}
+    </Button>
   )
 }
 

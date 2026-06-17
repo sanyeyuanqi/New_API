@@ -35,9 +35,9 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import { testDeploymentConnectionWithKey } from '@/features/models/api'
 import {
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -156,7 +156,7 @@ export function IoNetDeploymentSettingsSection({
                   </FormDescription>
                 </SettingsSwitchContent>
                 <FormControl>
-                  <Switch
+                  <SettingsEnableDisableButton
                     checked={field.value}
                     onCheckedChange={(v) => field.onChange(v)}
                     disabled={updateOption.isPending || isSubmitting}

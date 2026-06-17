@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { type ChangeEvent, useRef, type SetStateAction, useState } from 'react'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Landmark, Plus, Pencil, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -28,7 +28,15 @@ import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { StaticDataTable } from '@/components/data-table'
 import { Dialog } from '@/components/dialog'
-import { SettingsSwitchField } from '../components/settings-form-layout'
+import {
+  SettingsControlGroup,
+  SettingsSwitchField,
+} from '../components/settings-form-layout'
+import {
+  paymentActionButtonClassName,
+  paymentButtonIconClassName,
+  paymentSecondaryButtonClassName,
+} from './payment-button-styles'
 
 export interface WaffoSettingsValues {
   WaffoEnabled: boolean
@@ -66,6 +74,9 @@ interface Props {
   payMethods: PayMethod[]
   onPayMethodsChange: (value: SetStateAction<PayMethod[]>) => void
 }
+
+const waffoFieldCardClassName =
+  'min-w-0 rounded-lg border bg-background/80 p-3 shadow-xs'
 
 export function WaffoSettingsSection({
   values,
@@ -140,16 +151,21 @@ export function WaffoSettingsSection({
 
   return (
     <>
-      <div className='space-y-4 pt-4'>
-        <div>
-          <h3 className='text-lg font-medium'>
-            {t('Waffo Aggregator Gateway')}
-          </h3>
-          <p className='text-muted-foreground text-sm'>
-            {t(
-              'Payment aggregator mode — onboard with your own registered company (offshore entity). Built for Enterprise.'
-            )}
-          </p>
+      <SettingsControlGroup className='bg-background/60 w-full min-w-0 space-y-4 rounded-xl p-3 shadow-xs sm:p-4'>
+        <div className='flex min-w-0 items-start gap-3'>
+          <div className='bg-muted text-muted-foreground flex size-8 shrink-0 items-center justify-center rounded-lg'>
+            <Landmark className='size-4' />
+          </div>
+          <div className='min-w-0'>
+            <h3 className='text-sm font-semibold sm:text-base'>
+              {t('Waffo Aggregator Gateway')}
+            </h3>
+            <p className='text-muted-foreground text-xs sm:text-sm'>
+              {t(
+                'Payment aggregator mode — onboard with your own registered company (offshore entity). Built for Enterprise.'
+              )}
+            </p>
+          </div>
         </div>
         <Alert>
           <AlertDescription className='text-xs'>
@@ -159,23 +175,23 @@ export function WaffoSettingsSection({
           </AlertDescription>
         </Alert>
 
-        <div className='grid gap-4 sm:grid-cols-2'>
+        <div className='grid gap-3 sm:grid-cols-2'>
           <SettingsSwitchField
             checked={values.WaffoEnabled}
             onCheckedChange={(v) => onValueChange('WaffoEnabled', v)}
             label={t('Enable Waffo')}
-            className='border-b-0 py-0'
+            className={waffoFieldCardClassName}
           />
           <SettingsSwitchField
             checked={values.WaffoSandbox}
             onCheckedChange={(v) => onValueChange('WaffoSandbox', v)}
             label={t('Sandbox mode')}
-            className='border-b-0 py-0'
+            className={waffoFieldCardClassName}
           />
         </div>
 
-        <div className='grid grid-cols-2 gap-4'>
-          <div className='grid gap-1.5'>
+        <div className='grid gap-3 sm:grid-cols-2'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('API Key (Production)')}</Label>
             <Input
               type='password'
@@ -185,7 +201,7 @@ export function WaffoSettingsSection({
               }
             />
           </div>
-          <div className='grid gap-1.5'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('API Key (Sandbox)')}</Label>
             <Input
               type='password'
@@ -197,7 +213,7 @@ export function WaffoSettingsSection({
           </div>
         </div>
 
-        <div className='grid gap-1.5'>
+        <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
           <Label>{t('Merchant ID')}</Label>
           <Input
             value={values.WaffoMerchantId}
@@ -207,8 +223,8 @@ export function WaffoSettingsSection({
           />
         </div>
 
-        <div className='grid grid-cols-2 gap-4'>
-          <div className='grid gap-1.5'>
+        <div className='grid gap-3 sm:grid-cols-2'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('RSA Private Key (Production)')}</Label>
             <Textarea
               rows={3}
@@ -219,7 +235,7 @@ export function WaffoSettingsSection({
               className='font-mono text-xs'
             />
           </div>
-          <div className='grid gap-1.5'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('RSA Private Key (Sandbox)')}</Label>
             <Textarea
               rows={3}
@@ -232,8 +248,8 @@ export function WaffoSettingsSection({
           </div>
         </div>
 
-        <div className='grid grid-cols-2 gap-4'>
-          <div className='grid gap-1.5'>
+        <div className='grid gap-3 sm:grid-cols-2'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('Waffo Public Key (Production)')}</Label>
             <Textarea
               rows={3}
@@ -244,7 +260,7 @@ export function WaffoSettingsSection({
               className='font-mono text-xs'
             />
           </div>
-          <div className='grid gap-1.5'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('Waffo Public Key (Sandbox)')}</Label>
             <Textarea
               rows={3}
@@ -257,12 +273,12 @@ export function WaffoSettingsSection({
           </div>
         </div>
 
-        <div className='grid grid-cols-3 gap-4'>
-          <div className='grid gap-1.5'>
+        <div className='grid gap-3 md:grid-cols-3'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('Currency')}</Label>
             <Input value={values.WaffoCurrency} disabled />
           </div>
-          <div className='grid gap-1.5'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('Unit price (USD)')}</Label>
             <Input
               type='number'
@@ -277,7 +293,7 @@ export function WaffoSettingsSection({
               }
             />
           </div>
-          <div className='grid gap-1.5'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('Minimum top-up quantity')}</Label>
             <Input
               type='number'
@@ -293,8 +309,8 @@ export function WaffoSettingsSection({
           </div>
         </div>
 
-        <div className='grid grid-cols-2 gap-4'>
-          <div className='grid gap-1.5'>
+        <div className='grid gap-3 sm:grid-cols-2'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('Callback notification URL')}</Label>
             <Input
               placeholder='https://example.com/api/waffo/webhook'
@@ -304,7 +320,7 @@ export function WaffoSettingsSection({
               }
             />
           </div>
-          <div className='grid gap-1.5'>
+          <div className={`grid gap-1.5 ${waffoFieldCardClassName}`}>
             <Label>{t('Payment return URL')}</Label>
             <Input
               placeholder='https://example.com/console/topup'
@@ -320,8 +336,15 @@ export function WaffoSettingsSection({
 
         <div className='flex items-center justify-between'>
           <h4 className='font-medium'>{t('Payment Methods')}</h4>
-          <Button type='button' variant='outline' size='sm' onClick={openAdd}>
-            <Plus className='mr-1 h-3 w-3' />
+          <Button
+            type='button'
+            size='sm'
+            onClick={openAdd}
+            className={`${paymentActionButtonClassName} text-xs`}
+          >
+            <span className={paymentButtonIconClassName}>
+              <Plus className='size-3.5' />
+            </span>
             {t('Add payment method')}
           </Button>
         </div>
@@ -394,7 +417,7 @@ export function WaffoSettingsSection({
             },
           ]}
         />
-      </div>
+      </SettingsControlGroup>
 
       <Dialog
         open={methodDialogOpen}
@@ -409,11 +432,16 @@ export function WaffoSettingsSection({
             <Button
               type='button'
               variant='outline'
+              className={paymentSecondaryButtonClassName}
               onClick={() => setMethodDialogOpen(false)}
             >
               {t('Cancel')}
             </Button>
-            <Button type='button' onClick={saveMethod}>
+            <Button
+              type='button'
+              onClick={saveMethod}
+              className={paymentActionButtonClassName}
+            >
               {t('Confirm')}
             </Button>
           </>
@@ -453,6 +481,7 @@ export function WaffoSettingsSection({
               <Button
                 type='button'
                 variant='outline'
+                className={paymentSecondaryButtonClassName}
                 onClick={() => iconFileInputRef.current?.click()}
               >
                 {t('Upload')}
@@ -461,6 +490,7 @@ export function WaffoSettingsSection({
                 <Button
                   type='button'
                   variant='outline'
+                  className={paymentSecondaryButtonClassName}
                   onClick={() =>
                     setMethodForm((previous) => ({
                       ...previous,

@@ -47,9 +47,9 @@ export function getMessageContentStyles() {
     'whitespace-pre-wrap',
     'sm:leading-7',
     // Cap user bubble width so it does not look like a banner
-    'group-[.is-user]:max-w-[85%]',
-    'sm:group-[.is-user]:max-w-[62ch]',
-    'md:group-[.is-user]:max-w-[68ch]',
-    'lg:group-[.is-user]:max-w-[72ch]',
+    'group-[.is-user]:max-w-[90%]',
+    'sm:group-[.is-user]:max-w-[66ch]',
+    'md:group-[.is-user]:max-w-[72ch]',
+    'lg:group-[.is-user]:max-w-[78ch]',
   ].join(' ')
 }

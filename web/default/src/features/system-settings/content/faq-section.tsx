@@ -258,6 +258,7 @@ export function FAQSection({ enabled, data }: FAQSectionProps) {
             checked={isEnabled}
             onCheckedChange={handleToggleEnabled}
             label={t('Enabled')}
+            controlVariant='button'
             className='border-b-0 py-0'
           />
         </div>

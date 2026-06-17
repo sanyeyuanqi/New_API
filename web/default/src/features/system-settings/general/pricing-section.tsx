@@ -24,7 +24,6 @@ import { DEFAULT_CURRENCY_CONFIG } from '@/stores/system-config-store'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -39,14 +38,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
-import {
-  SettingsForm,
-  SettingsSwitchContent,
-  SettingsSwitchItem,
-} from '../components/settings-form-layout'
+import { SettingsEnableDisableButton } from '../components/settings-form-layout'
 import { SettingsPageFormActions } from '../components/settings-page-context'
 import { SettingsSection } from '../components/settings-section'
 import { useSettingsForm } from '../hooks/use-settings-form'
@@ -99,6 +93,9 @@ type PricingSectionProps = {
   defaultValues: PricingFormValues
 }
 
+const pricingFieldCardClassName =
+  'min-w-[280px] max-w-[560px] flex-1 rounded-lg border border-zinc-200/80 bg-background/80 p-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)] dark:border-zinc-800 dark:bg-zinc-950/40'
+
 export function PricingSection({ defaultValues }: PricingSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
@@ -148,7 +145,10 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
 
       <SettingsSection title={t('Pricing & Display')}>
         <Form {...form}>
-          <SettingsForm onSubmit={handleSubmit}>
+          <form
+            className='flex min-w-0 flex-wrap items-start gap-3'
+            onSubmit={handleSubmit}
+          >
             <SettingsPageFormActions
               onSave={handleSubmit}
               onReset={handleReset}
@@ -161,8 +161,13 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
                 control={form.control}
                 name='QuotaPerUnit'
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Quota Per Unit')}</FormLabel>
+                  <FormItem className={pricingFieldCardClassName}>
+                    <FormLabel>
+                      {t('Quota Per Unit')}
+                      <span className='text-muted-foreground font-normal'>
+                        （{t('Number of tokens per unit quota')}）
+                      </span>
+                    </FormLabel>
                     <FormControl>
                       <Input
                         type='number'
@@ -174,9 +179,6 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
                         ref={field.ref}
                       />
                     </FormControl>
-                    <FormDescription>
-                      {t('Number of tokens per unit quota')}
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -187,8 +189,13 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
               control={form.control}
               name='general_setting.quota_display_type'
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('Display Mode')}</FormLabel>
+                <FormItem className={pricingFieldCardClassName}>
+                  <FormLabel>
+                    {t('Display Mode')}
+                    <span className='text-muted-foreground font-normal'>
+                      （{t('Choose how quota values are shown to users')}）
+                    </span>
+                  </FormLabel>
                   <Select
                     items={[
                       { value: 'USD', label: t('USD') },
@@ -219,9 +226,6 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
                       </SelectGroup>
                     </SelectContent>
                   </Select>
-                  <FormDescription>
-                    {t('Choose how quota values are shown to users')}
-                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -232,13 +236,20 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
                 control={form.control}
                 name='USDExchangeRate'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className={pricingFieldCardClassName}>
                     <FormLabel>
                       {displayType === 'CNY'
                         ? t('CNY per USD')
                         : displayType === 'USD'
                           ? t('USD Exchange Rate')
                           : t('USD Exchange Rate')}
+                      <span className='text-muted-foreground font-normal'>
+                        （
+                        {t(
+                          'Real exchange rate between USD and your payment gateway currency'
+                        )}
+                        ）
+                      </span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -247,11 +258,6 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
                         {...safeNumberFieldProps(field)}
                       />
                     </FormControl>
-                    <FormDescription>
-                      {t(
-                        'Real exchange rate between USD and your payment gateway currency'
-                      )}
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -259,13 +265,18 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
             )}
 
             {displayType === 'CUSTOM' && (
-              <div className='grid gap-4 sm:grid-cols-2'>
+              <>
                 <FormField
                   control={form.control}
                   name='general_setting.custom_currency_symbol'
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Custom Currency Symbol')}</FormLabel>
+                    <FormItem className={pricingFieldCardClassName}>
+                      <FormLabel>
+                        {t('Custom Currency Symbol')}
+                        <span className='text-muted-foreground font-normal'>
+                          （{t('Prefix used when displaying prices')}）
+                        </span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type='text'
@@ -278,9 +289,6 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
                           placeholder={t('e.g. ¥ or HK$')}
                         />
                       </FormControl>
-                      <FormDescription>
-                        {t('Prefix used when displaying prices')}
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -289,8 +297,17 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
                   control={form.control}
                   name='general_setting.custom_currency_exchange_rate'
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Units per USD')}</FormLabel>
+                    <FormItem className={pricingFieldCardClassName}>
+                      <FormLabel>
+                        {t('Units per USD')}
+                        <span className='text-muted-foreground font-normal'>
+                          （
+                          {t(
+                            'Conversion rate from USD to your custom currency'
+                          )}
+                          ）
+                        </span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type='number'
@@ -309,14 +326,11 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
                           placeholder={t('e.g. 8 means 1 USD = 8 units')}
                         />
                       </FormControl>
-                      <FormDescription>
-                        {t('Conversion rate from USD to your custom currency')}
-                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
+              </>
             )}
 
             {showDisplayInCurrencyOption && (
@@ -324,24 +338,30 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
                 control={form.control}
                 name='DisplayInCurrencyEnabled'
                 render={({ field }) => (
-                  <SettingsSwitchItem>
-                    <SettingsSwitchContent>
-                      <FormLabel>{t('Display in Currency')}</FormLabel>
-                      <FormDescription>
-                        {displayType === 'TOKENS'
-                          ? t(
-                              'Tokens-only mode will show raw quota values regardless of this toggle.'
-                            )
-                          : t('Show prices in currency instead of quota.')}
-                      </FormDescription>
-                    </SettingsSwitchContent>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                  </SettingsSwitchItem>
+                  <FormItem className={pricingFieldCardClassName}>
+                    <div className='flex items-center justify-between gap-4'>
+                      <div className='min-w-0 space-y-1'>
+                        <FormLabel>
+                          {t('Display in Currency')}
+                          <span className='text-muted-foreground font-normal'>
+                            （
+                            {displayType === 'TOKENS'
+                              ? t(
+                                  'Tokens-only mode will show raw quota values regardless of this toggle.'
+                                )
+                              : t('Show prices in currency instead of quota.')}
+                            ）
+                          </span>
+                        </FormLabel>
+                      </div>
+                      <FormControl>
+                        <SettingsEnableDisableButton
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </div>
+                  </FormItem>
                 )}
               />
             )}
@@ -350,23 +370,27 @@ export function PricingSection({ defaultValues }: PricingSectionProps) {
               control={form.control}
               name='DisplayTokenStatEnabled'
               render={({ field }) => (
-                <SettingsSwitchItem>
-                  <SettingsSwitchContent>
-                    <FormLabel>{t('Display Token Statistics')}</FormLabel>
-                    <FormDescription>
-                      {t('Show token usage statistics in the UI')}
-                    </FormDescription>
-                  </SettingsSwitchContent>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </SettingsSwitchItem>
+                <FormItem className={pricingFieldCardClassName}>
+                  <div className='flex items-center justify-between gap-4'>
+                    <div className='min-w-0 space-y-1'>
+                      <FormLabel>
+                        {t('Display Token Statistics')}
+                        <span className='text-muted-foreground font-normal'>
+                          （{t('Show token usage statistics in the UI')}）
+                        </span>
+                      </FormLabel>
+                    </div>
+                    <FormControl>
+                      <SettingsEnableDisableButton
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </div>
+                </FormItem>
               )}
             />
-          </SettingsForm>
+          </form>
         </Form>
       </SettingsSection>
     </>

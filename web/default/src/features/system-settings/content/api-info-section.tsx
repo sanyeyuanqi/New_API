@@ -295,6 +295,7 @@ export function ApiInfoSection({ enabled, data }: ApiInfoSectionProps) {
             checked={isEnabled}
             onCheckedChange={handleToggleEnabled}
             label={t('Enabled')}
+            controlVariant='button'
             className='border-b-0 py-0'
           />
         </div>

@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useStickToBottomContext } from 'use-stick-to-bottom'
 import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -71,6 +72,20 @@ interface PlaygroundChatProps {
   onSaveEditAndSubmit?: (newContent: string) => void
 }
 
+function ScrollToLatestMessage({ messageCount }: { messageCount: number }) {
+  const { scrollToBottom } = useStickToBottomContext()
+
+  useEffect(() => {
+    if (messageCount === 0) return
+
+    requestAnimationFrame(() => {
+      scrollToBottom()
+    })
+  }, [messageCount, scrollToBottom])
+
+  return null
+}
+
 export function PlaygroundChat({
   messages,
   assistantName = 'AI',
@@ -109,6 +124,7 @@ export function PlaygroundChat({
   )
   return (
     <Conversation>
+      <ScrollToLatestMessage messageCount={messages.length} />
       {/* Remove outer padding; apply padding to inner centered container to align with input */}
       <ConversationContent className='p-0'>
         <div className='mx-auto w-full max-w-4xl px-4 py-4'>
@@ -255,7 +271,7 @@ export function PlaygroundChat({
                                       <>
                                         {isUser ? (
                                           <div className='flex max-w-full flex-col items-end'>
-                                            <div className='text-muted-foreground mb-1 max-w-[85%] truncate pr-1 text-right text-xs font-medium sm:max-w-[62ch] md:max-w-[68ch] lg:max-w-[72ch]'>
+                                            <div className='text-muted-foreground mb-1 max-w-[90%] truncate pr-1 text-right text-xs font-medium sm:max-w-[66ch] md:max-w-[72ch] lg:max-w-[78ch]'>
                                               {username}
                                             </div>
                                             <MessageContent
@@ -279,7 +295,7 @@ export function PlaygroundChat({
                                                   message.isReasoningStreaming
                                                 }
                                               >
-                                                <div className='flex max-w-[85%] items-center gap-2 pl-1 sm:max-w-[62ch] md:max-w-[68ch] lg:max-w-[72ch]'>
+                                                <div className='flex max-w-[92%] items-center gap-2 pl-1 sm:max-w-[66ch] md:max-w-[72ch] lg:max-w-[78ch]'>
                                                   <div className='text-muted-foreground truncate text-left text-xs font-medium'>
                                                     {messageAssistantName}
                                                   </div>
@@ -291,7 +307,7 @@ export function PlaygroundChat({
                                               </Reasoning>
                                             )}
                                             {!showReasoning && (
-                                              <div className='text-muted-foreground mb-1 max-w-[85%] truncate pl-1 text-left text-xs font-medium sm:max-w-[62ch] md:max-w-[68ch] lg:max-w-[72ch]'>
+                                              <div className='text-muted-foreground mb-1 max-w-[92%] truncate pl-1 text-left text-xs font-medium sm:max-w-[66ch] md:max-w-[72ch] lg:max-w-[78ch]'>
                                                 {messageAssistantName}
                                               </div>
                                             )}
@@ -300,7 +316,7 @@ export function PlaygroundChat({
                                                 variant='flat'
                                                 className={cn(
                                                   getMessageContentStyles(),
-                                                  'group-[.is-assistant]:w-fit group-[.is-assistant]:max-w-[88%] group-[.is-assistant]:rounded-[10px] group-[.is-assistant]:border group-[.is-assistant]:border-border/70 group-[.is-assistant]:bg-muted/45 group-[.is-assistant]:px-4 group-[.is-assistant]:py-2.5 group-[.is-assistant]:font-sans group-[.is-assistant]:shadow-sm sm:group-[.is-assistant]:max-w-[58ch] md:group-[.is-assistant]:max-w-[64ch] dark:group-[.is-assistant]:bg-muted/60'
+                                                  'group-[.is-assistant]:border-border/70 group-[.is-assistant]:bg-muted/45 dark:group-[.is-assistant]:bg-muted/60 group-[.is-assistant]:w-fit group-[.is-assistant]:max-w-[92%] group-[.is-assistant]:rounded-[10px] group-[.is-assistant]:border group-[.is-assistant]:px-4 group-[.is-assistant]:py-2.5 group-[.is-assistant]:font-sans group-[.is-assistant]:shadow-sm sm:group-[.is-assistant]:max-w-[66ch] md:group-[.is-assistant]:max-w-[72ch] lg:group-[.is-assistant]:max-w-[78ch]'
                                                 )}
                                               >
                                                 <Response>

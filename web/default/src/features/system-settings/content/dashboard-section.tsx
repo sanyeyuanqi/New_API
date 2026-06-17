@@ -39,8 +39,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import {
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -111,7 +111,7 @@ export function DashboardSection({ defaultValues }: DashboardSectionProps) {
                   <FormLabel>{t('Enable Data Dashboard')}</FormLabel>
                 </SettingsSwitchContent>
                 <FormControl>
-                  <Switch
+                  <SettingsEnableDisableButton
                     checked={field.value}
                     onCheckedChange={field.onChange}
                   />

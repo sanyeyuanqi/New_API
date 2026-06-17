@@ -39,6 +39,7 @@ export function Playground() {
     setModels,
     setGroups,
     updateConfig,
+    clearMessages,
   } = usePlaygroundState()
 
   const { sendChat, stopGeneration, isGenerating } = useChatHandler({
@@ -193,6 +194,14 @@ export function Playground() {
     updateMessages(newMessages)
   }
 
+  const handleClearLocalMessages = () => {
+    if (isGenerating) {
+      stopGeneration()
+    }
+    clearMessages()
+    toast.success(t('Cleared'))
+  }
+
   return (
     <div className='relative flex size-full flex-col overflow-hidden'>
       {/* Full-width scroll container: scrolling works even over side whitespace */}
@@ -213,7 +222,7 @@ export function Playground() {
       </div>
 
       {/* Input area: center content and constrain to the same container width */}
-      <div className='mx-auto w-full max-w-4xl'>
+      <div className='mx-auto w-full max-w-4xl px-3 pb-3 md:px-0 md:pb-0'>
         <PlaygroundInput
           disabled={isGenerating}
           groups={groups}
@@ -225,6 +234,8 @@ export function Playground() {
           onGroupChange={(value) => updateConfig('group', value)}
           onModelChange={(value) => updateConfig('model', value)}
           onStop={stopGeneration}
+          onClearLocalMessages={handleClearLocalMessages}
+          hasMessages={messages.length > 0}
           onSubmit={handleSendMessage}
         />
       </div>

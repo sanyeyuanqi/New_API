@@ -26,11 +26,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import {
-  StaticDataTable,
-} from '@/components/data-table'
+import { StaticDataTable } from '@/components/data-table'
 import { safeJsonParseWithValidation } from '../utils/json-parser'
 import { isArray } from '../utils/json-validators'
+import {
+  paymentActionButtonClassName,
+  paymentButtonIconClassName,
+  paymentSecondaryButtonClassName,
+  paymentSecondaryIconClassName,
+} from './payment-button-styles'
 import {
   PaymentMethodDialog,
   type PaymentMethodData,
@@ -228,10 +232,15 @@ export function PaymentMethodsVisualEditor({
           <Popover>
             <PopoverTrigger
               render={
-                <Button variant='outline' className='flex-1 sm:flex-none' />
+                <Button
+                  variant='outline'
+                  className={`${paymentSecondaryButtonClassName} flex-1 text-xs sm:flex-none`}
+                />
               }
             >
-              <Lightbulb className='h-4 w-4 sm:mr-2' />
+              <span className={paymentSecondaryIconClassName}>
+                <Lightbulb className='size-3.5' />
+              </span>
               <span className='sm:inline'>{t('Templates')}</span>
             </PopoverTrigger>
             <PopoverContent className='w-60'>
@@ -252,7 +261,9 @@ export function PaymentMethodsVisualEditor({
                         handleInsertTemplate(item.template)
                       }}
                     >
-                      <Plus className='mr-2 h-3 w-3' />
+                      <span className={paymentSecondaryIconClassName}>
+                        <Plus className='size-3.5' />
+                      </span>
                       {item.name}
                     </Button>
                   ))}
@@ -267,9 +278,11 @@ export function PaymentMethodsVisualEditor({
               e.stopPropagation()
               handleAdd()
             }}
-            className='flex-1 sm:flex-none'
+            className={`${paymentActionButtonClassName} flex-1 text-xs sm:flex-none`}
           >
-            <Plus className='h-4 w-4 sm:mr-2' />
+            <span className={paymentButtonIconClassName}>
+              <Plus className='size-3.5' />
+            </span>
             <span className='sm:inline'>{t('Add method')}</span>
           </Button>
         </div>

@@ -30,9 +30,11 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import {
+  SettingsControlChildren,
+  SettingsControlGroup,
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -104,6 +106,43 @@ export function BasicAuthSection({ defaultValues }: BasicAuthSectionProps) {
     }
   }
 
+  const authOptions: Array<{
+    name: keyof Omit<BasicAuthFormValues, 'EmailDomainWhitelist'>
+    title: string
+    description: string
+  }> = [
+    {
+      name: 'PasswordLoginEnabled',
+      title: t('Password Login'),
+      description: t('Allow users to log in with password'),
+    },
+    {
+      name: 'RegisterEnabled',
+      title: t('Registration Enabled'),
+      description: t('Allow new users to register'),
+    },
+    {
+      name: 'PasswordRegisterEnabled',
+      title: t('Password Registration'),
+      description: t('Allow registration with password'),
+    },
+    {
+      name: 'EmailVerificationEnabled',
+      title: t('Email Verification'),
+      description: t('Require email verification for new accounts'),
+    },
+    {
+      name: 'EmailDomainRestrictionEnabled',
+      title: t('Email Domain Restriction'),
+      description: t('Only allow specific email domains'),
+    },
+    {
+      name: 'EmailAliasRestrictionEnabled',
+      title: t('Email Alias Restriction'),
+      description: t('Block email aliases (e.g., user+alias@domain.com)'),
+    },
+  ]
+
   return (
     <SettingsSection title={t('Basic Authentication')}>
       <Form {...form}>
@@ -112,131 +151,31 @@ export function BasicAuthSection({ defaultValues }: BasicAuthSectionProps) {
             onSave={form.handleSubmit(onSubmit)}
             isSaving={updateOption.isPending}
           />
-          <FormField
-            control={form.control}
-            name='PasswordLoginEnabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Password Login')}</FormLabel>
-                  <FormDescription>
-                    {t('Allow users to log in with password')}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name='RegisterEnabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Registration Enabled')}</FormLabel>
-                  <FormDescription>
-                    {t('Allow new users to register')}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name='PasswordRegisterEnabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Password Registration')}</FormLabel>
-                  <FormDescription>
-                    {t('Allow registration with password')}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name='EmailVerificationEnabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Email Verification')}</FormLabel>
-                  <FormDescription>
-                    {t('Require email verification for new accounts')}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name='EmailDomainRestrictionEnabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Email Domain Restriction')}</FormLabel>
-                  <FormDescription>
-                    {t('Only allow specific email domains')}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name='EmailAliasRestrictionEnabled'
-            render={({ field }) => (
-              <SettingsSwitchItem>
-                <SettingsSwitchContent>
-                  <FormLabel>{t('Email Alias Restriction')}</FormLabel>
-                  <FormDescription>
-                    {t('Block email aliases (e.g., user+alias@domain.com)')}
-                  </FormDescription>
-                </SettingsSwitchContent>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
-              </SettingsSwitchItem>
-            )}
-          />
+          <SettingsControlGroup className='w-full min-w-0'>
+            <SettingsControlChildren className='ml-0 flex flex-wrap gap-3 border-l-0 pl-0'>
+              {authOptions.map((item) => (
+                <FormField
+                  key={item.name}
+                  control={form.control}
+                  name={item.name}
+                  render={({ field }) => (
+                    <SettingsSwitchItem className='bg-background/70 min-h-20 min-w-[220px] flex-[1_1_260px] rounded-lg border px-3 py-3 shadow-xs last:border-b xl:max-w-[360px]'>
+                      <SettingsSwitchContent>
+                        <FormLabel>{item.title}</FormLabel>
+                        <FormDescription>{item.description}</FormDescription>
+                      </SettingsSwitchContent>
+                      <FormControl>
+                        <SettingsEnableDisableButton
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                    </SettingsSwitchItem>
+                  )}
+                />
+              ))}
+            </SettingsControlChildren>
+          </SettingsControlGroup>
 
           <FormField
             control={form.control}

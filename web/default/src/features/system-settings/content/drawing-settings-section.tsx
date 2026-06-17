@@ -29,8 +29,10 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Switch } from '@/components/ui/switch'
 import {
+  SettingsControlChildren,
+  SettingsControlGroup,
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -136,30 +138,32 @@ export function DrawingSettingsSection({
             isSaving={updateOption.isPending}
             saveLabel='Save drawing settings'
           />
-          <div className='space-y-4'>
-            {switches.map((item) => (
-              <FormField
-                key={item.name}
-                control={form.control}
-                name={item.name}
-                render={({ field }) => (
-                  <SettingsSwitchItem>
-                    <SettingsSwitchContent>
-                      <FormLabel>{item.label}</FormLabel>
-                      <FormDescription>{item.description}</FormDescription>
-                    </SettingsSwitchContent>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </SettingsSwitchItem>
-                )}
-              />
-            ))}
-          </div>
+          <SettingsControlGroup className='w-full min-w-0'>
+            <SettingsControlChildren className='ml-0 grid gap-3 border-l-0 pl-0 sm:grid-cols-2 xl:grid-cols-3'>
+              {switches.map((item) => (
+                <FormField
+                  key={item.name}
+                  control={form.control}
+                  name={item.name}
+                  render={({ field }) => (
+                    <SettingsSwitchItem className='bg-background/70 min-h-28 rounded-lg border px-3 py-3 shadow-xs last:border-b'>
+                      <SettingsSwitchContent className='pr-2'>
+                        <FormLabel>{item.label}</FormLabel>
+                        <FormDescription>{item.description}</FormDescription>
+                      </SettingsSwitchContent>
+                      <FormControl>
+                        <SettingsEnableDisableButton
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </SettingsSwitchItem>
+                  )}
+                />
+              ))}
+            </SettingsControlChildren>
+          </SettingsControlGroup>
         </SettingsForm>
       </Form>
     </SettingsSection>

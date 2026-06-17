@@ -16,7 +16,14 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type BaseSyntheticEvent,
+} from 'react'
 import * as z from 'zod'
 import axios from 'axios'
 import { useForm } from 'react-hook-form'
@@ -33,11 +40,19 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { FormDirtyIndicator } from '../components/form-dirty-indicator'
 import { FormNavigationGuard } from '../components/form-navigation-guard'
 import {
+  SettingsEnableDisableButton,
   SettingsForm,
   SettingsSwitchContent,
   SettingsSwitchItem,
@@ -113,7 +128,21 @@ type FlatOAuthDefaults = {
 }
 
 const oauthTabContentClassName =
-  'grid min-w-0 gap-x-5 gap-y-6 lg:grid-cols-2 [&>[data-slot=form-item]]:min-w-0 lg:[&>[data-slot=form-item]:has([data-slot=switch])]:col-span-2'
+  'mt-4 grid min-w-0 grid-cols-1 gap-3 rounded-xl border bg-background p-3 md:grid-cols-2 2xl:grid-cols-3 [&>[data-slot=form-item]]:min-h-24 [&>[data-slot=form-item]]:min-w-0 [&>[data-slot=form-item]]:rounded-lg [&>[data-slot=form-item]]:border [&>[data-slot=form-item]]:bg-background [&>[data-slot=form-item]]:px-3 [&>[data-slot=form-item]]:py-3 [&>[data-slot=form-item]]:shadow-xs max-sm:[&>[data-slot=form-item]:has(button)]:flex-col max-sm:[&>[data-slot=form-item]:has(button)]:items-start max-sm:[&>[data-slot=form-item]:has(button)]:gap-3 max-sm:[&>[data-slot=form-item]:has(button)_button]:self-start'
+
+const oauthTabTriggerClassName =
+  'h-10 min-w-0 rounded-lg border bg-background px-4 shadow-xs data-active:border-foreground/15 data-active:bg-background data-active:shadow-sm'
+
+const oauthProviderKeys = [
+  'github',
+  'discord',
+  'oidc',
+  'telegram',
+  'linuxdo',
+  'wechat',
+] as const
+
+type OAuthProviderKey = (typeof oauthProviderKeys)[number]
 
 const buildFormDefaults = (defaults: FlatOAuthDefaults): OAuthFormValues => ({
   GitHubOAuthEnabled: defaults.GitHubOAuthEnabled,
@@ -180,7 +209,19 @@ type OAuthSectionProps = {
 export function OAuthSection(props: OAuthSectionProps) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
-  const [activeTab, setActiveTab] = useState('github')
+  const [activeTab, setActiveTab] = useState<OAuthProviderKey>('github')
+
+  const oauthProviderOptions = useMemo(
+    () => [
+      { value: 'github', label: t('GitHub') },
+      { value: 'discord', label: t('Discord') },
+      { value: 'oidc', label: t('OIDC') },
+      { value: 'telegram', label: t('Telegram') },
+      { value: 'linuxdo', label: t('LinuxDO') },
+      { value: 'wechat', label: t('WeChat') },
+    ],
+    [t]
+  )
 
   const formDefaults = useMemo(
     () => buildFormDefaults(props.defaultValues),
@@ -205,78 +246,88 @@ export function OAuthSection(props: OAuthSectionProps) {
     form.reset(buildFormDefaults(props.defaultValues))
   }, [props.defaultValues, form])
 
-  const onSubmit = async (values: OAuthFormValues) => {
-    let finalValues = values
+  const onSubmit = useCallback(
+    async (values: OAuthFormValues) => {
+      let finalValues = values
 
-    if (values.oidc.well_known && values.oidc.well_known.trim() !== '') {
-      const wellKnown = values.oidc.well_known.trim()
-      if (
-        !wellKnown.startsWith('http://') &&
-        !wellKnown.startsWith('https://')
-      ) {
-        toast.error(t('Well-Known URL must start with http:// or https://'))
-        return
-      }
-
-      try {
-        const res = await axios.create().get(wellKnown)
-        const authEndpoint = res.data['authorization_endpoint'] || ''
-        const tokenEndpoint = res.data['token_endpoint'] || ''
-        const userInfoEndpoint = res.data['userinfo_endpoint'] || ''
-
-        finalValues = {
-          ...values,
-          oidc: {
-            ...values.oidc,
-            authorization_endpoint: authEndpoint,
-            token_endpoint: tokenEndpoint,
-            user_info_endpoint: userInfoEndpoint,
-          },
+      if (values.oidc.well_known && values.oidc.well_known.trim() !== '') {
+        const wellKnown = values.oidc.well_known.trim()
+        if (
+          !wellKnown.startsWith('http://') &&
+          !wellKnown.startsWith('https://')
+        ) {
+          toast.error(t('Well-Known URL must start with http:// or https://'))
+          return
         }
 
-        form.setValue('oidc.authorization_endpoint', authEndpoint)
-        form.setValue('oidc.token_endpoint', tokenEndpoint)
-        form.setValue('oidc.user_info_endpoint', userInfoEndpoint)
+        try {
+          const res = await axios.create().get(wellKnown)
+          const authEndpoint = res.data['authorization_endpoint'] || ''
+          const tokenEndpoint = res.data['token_endpoint'] || ''
+          const userInfoEndpoint = res.data['userinfo_endpoint'] || ''
 
-        toast.success(t('OIDC configuration fetched successfully'))
-      } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err)
-        toast.error(
-          t(
-            'Failed to fetch OIDC configuration. Please check the URL and network status'
+          finalValues = {
+            ...values,
+            oidc: {
+              ...values.oidc,
+              authorization_endpoint: authEndpoint,
+              token_endpoint: tokenEndpoint,
+              user_info_endpoint: userInfoEndpoint,
+            },
+          }
+
+          form.setValue('oidc.authorization_endpoint', authEndpoint)
+          form.setValue('oidc.token_endpoint', tokenEndpoint)
+          form.setValue('oidc.user_info_endpoint', userInfoEndpoint)
+
+          toast.success(t('OIDC configuration fetched successfully'))
+        } catch (err) {
+          // eslint-disable-next-line no-console
+          console.error(err)
+          toast.error(
+            t(
+              'Failed to fetch OIDC configuration. Please check the URL and network status'
+            )
           )
-        )
+          return
+        }
+      }
+
+      const normalized = normalizeFormValues(finalValues)
+      const changedKeys = (
+        Object.keys(normalized) as Array<keyof FlatOAuthDefaults>
+      ).filter((key) => normalized[key] !== baselineRef.current[key])
+
+      if (changedKeys.length === 0) {
+        toast.info(t('No changes to save'))
         return
       }
-    }
 
-    const normalized = normalizeFormValues(finalValues)
-    const changedKeys = (
-      Object.keys(normalized) as Array<keyof FlatOAuthDefaults>
-    ).filter((key) => normalized[key] !== baselineRef.current[key])
+      for (const key of changedKeys) {
+        await updateOption.mutateAsync({
+          key,
+          value: normalized[key],
+        })
+      }
 
-    if (changedKeys.length === 0) {
-      toast.info(t('No changes to save'))
-      return
-    }
-
-    for (const key of changedKeys) {
-      await updateOption.mutateAsync({
-        key,
-        value: normalized[key],
-      })
-    }
-
-    baselineRef.current = normalized
-    baselineSerializedRef.current = JSON.stringify(normalized)
-    form.reset(buildFormDefaults(normalized))
-  }
+      baselineRef.current = normalized
+      baselineSerializedRef.current = JSON.stringify(normalized)
+      form.reset(buildFormDefaults(normalized))
+    },
+    [form, t, updateOption]
+  )
 
   const handleReset = () => {
     form.reset(buildFormDefaults(baselineRef.current))
     toast.success(t('Form reset to saved values'))
   }
+
+  const handleFormSubmit = useCallback(
+    (event?: BaseSyntheticEvent) => {
+      void form.handleSubmit(onSubmit)(event)
+    },
+    [form, onSubmit]
+  )
 
   return (
     <>
@@ -284,23 +335,53 @@ export function OAuthSection(props: OAuthSectionProps) {
 
       <SettingsSection title={t('OAuth Integrations')}>
         <Form {...form}>
-          <SettingsForm onSubmit={form.handleSubmit(onSubmit)}>
+          <SettingsForm onSubmit={handleFormSubmit}>
             <SettingsPageFormActions
-              onSave={form.handleSubmit(onSubmit)}
+              onSave={() => handleFormSubmit()}
               onReset={handleReset}
               isSaving={updateOption.isPending}
               isResetDisabled={!form.formState.isDirty}
             />
             <FormDirtyIndicator isDirty={form.formState.isDirty} />
 
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className='grid w-full grid-cols-6'>
-                <TabsTrigger value='github'>{t('GitHub')}</TabsTrigger>
-                <TabsTrigger value='discord'>{t('Discord')}</TabsTrigger>
-                <TabsTrigger value='oidc'>{t('OIDC')}</TabsTrigger>
-                <TabsTrigger value='telegram'>{t('Telegram')}</TabsTrigger>
-                <TabsTrigger value='linuxdo'>{t('LinuxDO')}</TabsTrigger>
-                <TabsTrigger value='wechat'>{t('WeChat')}</TabsTrigger>
+            <Tabs
+              value={activeTab}
+              onValueChange={(value) => setActiveTab(value as OAuthProviderKey)}
+              className='min-w-0'
+            >
+              <div className='sm:hidden'>
+                <Select
+                  items={oauthProviderOptions}
+                  value={activeTab}
+                  onValueChange={(value) =>
+                    setActiveTab(value as OAuthProviderKey)
+                  }
+                >
+                  <SelectTrigger className='h-10 w-full rounded-lg bg-background shadow-xs'>
+                    <SelectValue placeholder={t('Select OAuth Provider')} />
+                  </SelectTrigger>
+                  <SelectContent alignItemWithTrigger={false}>
+                    <SelectGroup>
+                      {oauthProviderOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <TabsList className='hidden h-auto w-full grid-cols-3 gap-2 rounded-none bg-transparent p-0 sm:grid xl:grid-cols-6'>
+                {oauthProviderOptions.map((option) => (
+                  <TabsTrigger
+                    key={option.value}
+                    value={option.value}
+                    className={oauthTabTriggerClassName}
+                  >
+                    {option.label}
+                  </TabsTrigger>
+                ))}
               </TabsList>
 
               <TabsContent value='github' className={oauthTabContentClassName}>
@@ -316,7 +397,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                         </FormDescription>
                       </SettingsSwitchContent>
                       <FormControl>
-                        <Switch
+                        <SettingsEnableDisableButton
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
@@ -388,7 +469,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                         </FormDescription>
                       </SettingsSwitchContent>
                       <FormControl>
-                        <Switch
+                        <SettingsEnableDisableButton
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
@@ -460,7 +541,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                         </FormDescription>
                       </SettingsSwitchContent>
                       <FormControl>
-                        <Switch
+                        <SettingsEnableDisableButton
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
@@ -640,7 +721,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                         </FormDescription>
                       </SettingsSwitchContent>
                       <FormControl>
-                        <Switch
+                        <SettingsEnableDisableButton
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
@@ -712,7 +793,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                         </FormDescription>
                       </SettingsSwitchContent>
                       <FormControl>
-                        <Switch
+                        <SettingsEnableDisableButton
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
@@ -811,7 +892,7 @@ export function OAuthSection(props: OAuthSectionProps) {
                         </FormDescription>
                       </SettingsSwitchContent>
                       <FormControl>
-                        <Switch
+                        <SettingsEnableDisableButton
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
