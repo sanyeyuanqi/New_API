@@ -102,6 +102,14 @@ export type DataTableToolbarProps<TData> = {
    */
   preActions?: ReactNode
   /**
+   * Custom action buttons rendered immediately BEFORE the built-in View button.
+   */
+  beforeViewActions?: ReactNode
+  /**
+   * Custom action buttons rendered AFTER the built-in View button.
+   */
+  postActions?: ReactNode
+  /**
    * Explicit "Search" / "Apply" callback. When provided the toolbar
    * shows a primary Search button. Filters are committed only on click
    * (form-mode workflow).
@@ -350,7 +358,9 @@ export function DataTableToolbar<TData>(props: DataTableToolbarProps<TData>) {
             {props.preActions}
             {resetButton}
             {searchButton}
+            {props.beforeViewActions}
             {viewOptionsNode}
+            {props.postActions}
           </div>
         </div>
       </div>
@@ -373,7 +383,9 @@ export function DataTableToolbar<TData>(props: DataTableToolbarProps<TData>) {
         {props.preActions}
         {resetButton}
         {searchButton}
+        {props.beforeViewActions}
         {viewOptionsNode}
+        {props.postActions}
         {expandToggle}
       </div>
     </div>

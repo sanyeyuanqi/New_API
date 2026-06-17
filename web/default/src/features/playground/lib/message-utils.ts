@@ -70,10 +70,11 @@ export function createUserMessage(content: string): Message {
 /**
  * Create a loading assistant message
  */
-export function createLoadingAssistantMessage(): Message {
+export function createLoadingAssistantMessage(modelName?: string): Message {
   return {
     key: nanoid(),
     from: MESSAGE_ROLES.ASSISTANT,
+    modelName,
     versions: [createMessageVersion('')],
     reasoning: undefined,
     isReasoningComplete: false,

@@ -17,7 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useEffect, useState } from 'react'
-import { LayoutDashboard } from 'lucide-react'
+import {
+  ChevronDown,
+  ChevronUp,
+  LayoutDashboard,
+  Power,
+  PowerOff,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { useAuthStore } from '@/stores/auth-store'
@@ -49,6 +55,7 @@ type SectionDef = {
 export function SidebarModulesCard() {
   const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const [config, setConfig] = useState<SidebarModulesConfig>({})
   const currentUser = useAuthStore((s) => s.auth.user)
   const setUser = useAuthStore((s) => s.auth.setUser)
@@ -202,79 +209,113 @@ export function SidebarModulesCard() {
   return (
     <Card className='gap-0 overflow-hidden py-0'>
       <CardHeader className='border-b p-3 !pb-3 sm:p-5 sm:!pb-5'>
-        <div className='flex items-center gap-3'>
-          <div className='bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-9 sm:w-9'>
-            <LayoutDashboard className='h-4 w-4' />
+        <div className='flex items-center justify-between gap-3'>
+          <div className='flex min-w-0 items-center gap-3'>
+            <div className='bg-muted flex h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:h-9 sm:w-9'>
+              <LayoutDashboard className='h-4 w-4' />
+            </div>
+            <div className='min-w-0'>
+              <CardTitle className='text-lg tracking-tight sm:text-xl'>
+                {t('Sidebar Personal Settings')}
+              </CardTitle>
+              <CardDescription className='text-xs sm:text-sm'>
+                {t('Customize sidebar display content')}
+              </CardDescription>
+            </div>
           </div>
-          <div className='min-w-0'>
-            <CardTitle className='text-lg tracking-tight sm:text-xl'>
-              {t('Sidebar Personal Settings')}
-            </CardTitle>
-            <CardDescription className='text-xs sm:text-sm'>
-              {t('Customize sidebar display content')}
-            </CardDescription>
-          </div>
+          <Button
+            type='button'
+            variant='outline'
+            size='sm'
+            className='h-8 shrink-0 gap-1.5 rounded-full px-3'
+            onClick={() => setExpanded((prev) => !prev)}
+          >
+            {expanded ? (
+              <ChevronUp className='h-3.5 w-3.5' />
+            ) : (
+              <ChevronDown className='h-3.5 w-3.5' />
+            )}
+            {expanded ? t('Collapse') : t('Expand')}
+          </Button>
         </div>
       </CardHeader>
-      <CardContent className='space-y-4 p-3 sm:space-y-5 sm:p-5'>
-        {sectionDefs.map((section) => {
-          const sectionEnabled = config[section.key]?.enabled !== false
-          return (
-            <div
-              key={section.key}
-              className='bg-background/60 rounded-xl border p-3'
-            >
-              <div className='flex items-start justify-between gap-3'>
-                <div className='min-w-0'>
-                  <p className='text-sm font-medium'>{section.title}</p>
-                  <p className='text-muted-foreground text-xs'>
-                    {section.description}
-                  </p>
-                </div>
-                <Switch
-                  checked={sectionEnabled}
-                  onCheckedChange={(v) => toggleSection(section.key, v)}
-                />
-              </div>
-              <div className='mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-1'>
-                {section.modules.map((mod) => (
-                  <div
-                    key={mod.key}
-                    className={`flex min-h-16 items-center justify-between rounded-lg border p-3 transition-opacity ${
-                      sectionEnabled ? '' : 'opacity-50'
-                    }`}
-                  >
-                    <div className='mr-2 min-w-0'>
-                      <p className='truncate text-sm font-medium'>
-                        {mod.title}
-                      </p>
-                      <p className='text-muted-foreground truncate text-xs'>
-                        {mod.description}
-                      </p>
-                    </div>
-                    <Switch
-                      checked={config[section.key]?.[mod.key] !== false}
-                      onCheckedChange={(v) =>
-                        toggleModule(section.key, mod.key, v)
-                      }
-                      disabled={!sectionEnabled}
-                    />
+      {expanded && (
+        <CardContent className='space-y-4 p-3 sm:space-y-5 sm:p-5'>
+          {sectionDefs.map((section) => {
+            const sectionEnabled = config[section.key]?.enabled !== false
+            return (
+              <div
+                key={section.key}
+                className='bg-background/60 rounded-xl border p-3'
+              >
+                <div className='flex items-start justify-between gap-3'>
+                  <div className='min-w-0'>
+                    <p className='text-sm font-medium'>{section.title}</p>
+                    <p className='text-muted-foreground text-xs'>
+                      {section.description}
+                    </p>
                   </div>
-                ))}
+                  <Button
+                    type='button'
+                    variant={sectionEnabled ? 'outline' : 'default'}
+                    size='sm'
+                    className='h-8 shrink-0 gap-1.5 rounded-full px-3'
+                    onClick={() => toggleSection(section.key, !sectionEnabled)}
+                  >
+                    {sectionEnabled ? (
+                      <PowerOff className='h-3.5 w-3.5' />
+                    ) : (
+                      <Power className='h-3.5 w-3.5' />
+                    )}
+                    {sectionEnabled ? t('Disable') : t('Enable')}
+                  </Button>
+                </div>
+                <div
+                  className='mt-3 grid gap-2'
+                  style={{
+                    gridTemplateColumns:
+                      'repeat(auto-fit, minmax(180px, 1fr))',
+                  }}
+                >
+                  {section.modules.map((mod) => (
+                    <div
+                      key={mod.key}
+                      className={`flex min-h-16 items-center justify-between rounded-lg border p-3 transition-opacity ${
+                        sectionEnabled ? '' : 'opacity-50'
+                      }`}
+                    >
+                      <div className='mr-2 min-w-0'>
+                        <p className='truncate text-sm font-medium'>
+                          {mod.title}
+                        </p>
+                        <p className='text-muted-foreground truncate text-xs'>
+                          {mod.description}
+                        </p>
+                      </div>
+                      <Switch
+                        checked={config[section.key]?.[mod.key] !== false}
+                        onCheckedChange={(v) =>
+                          toggleModule(section.key, mod.key, v)
+                        }
+                        disabled={!sectionEnabled}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
 
-        <div className='flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end'>
-          <Button variant='outline' onClick={handleReset}>
-            {t('Reset to Default')}
-          </Button>
-          <Button onClick={handleSave} disabled={loading}>
-            {loading ? t('Saving...') : t('Save Changes')}
-          </Button>
-        </div>
-      </CardContent>
+          <div className='flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end'>
+            <Button variant='outline' onClick={handleReset}>
+              {t('Reset to Default')}
+            </Button>
+            <Button onClick={handleSave} disabled={loading}>
+              {loading ? t('Saving...') : t('Save Changes')}
+            </Button>
+          </div>
+        </CardContent>
+      )}
     </Card>
   )
 }

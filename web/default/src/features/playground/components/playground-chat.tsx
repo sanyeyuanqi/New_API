@@ -17,6 +17,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -57,6 +59,7 @@ import { MessageError } from './message-error'
 
 interface PlaygroundChatProps {
   messages: MessageType[]
+  assistantName?: string
   onCopyMessage?: (message: MessageType) => void
   onRegenerateMessage?: (message: MessageType) => void
   onEditMessage?: (message: MessageType) => void
@@ -70,6 +73,7 @@ interface PlaygroundChatProps {
 
 export function PlaygroundChat({
   messages,
+  assistantName = 'AI',
   onCopyMessage,
   onRegenerateMessage,
   onEditMessage,
@@ -80,8 +84,12 @@ export function PlaygroundChat({
   onCancelEdit,
   onSaveEditAndSubmit,
 }: PlaygroundChatProps) {
+  const { t } = useTranslation()
   const [editText, setEditText] = useState('')
   const [originalText, setOriginalText] = useState('')
+  const currentUser = useAuthStore((s) => s.auth.user)
+  const username =
+    currentUser?.username || currentUser?.display_name || t('User')
 
   useEffect(() => {
     if (!editingKey) return
@@ -106,6 +114,8 @@ export function PlaygroundChat({
         <div className='mx-auto w-full max-w-4xl px-4 py-4'>
           {messages.map((message, messageIndex) => {
             const { versions = [] } = message
+            const isUser = message.from === MESSAGE_ROLES.USER
+            const messageAssistantName = message.modelName || assistantName
             const isLastAssistantMessage =
               messageIndex === messages.length - 1 &&
               message.from === MESSAGE_ROLES.ASSISTANT
@@ -114,11 +124,16 @@ export function PlaygroundChat({
                 <BranchMessages>
                   {versions.map((version, versionIndex) => (
                     <Message
-                      className='group flex-row-reverse'
+                      className={cn(isUser ? 'justify-end' : 'justify-start')}
                       from={message.from}
                       key={`${message.key}-${version.id}-${versionIndex}`}
                     >
-                      <div className='w-full min-w-0 flex-1 basis-full py-1'>
+                      <div
+                        className={cn(
+                          'w-full min-w-0 flex-1 basis-full py-1',
+                          isUser && 'flex flex-col items-end'
+                        )}
+                      >
                         {isEditing(message.key) ? (
                           <div className='space-y-2'>
                             <Textarea
@@ -215,19 +230,6 @@ export function PlaygroundChat({
                                     </Sources>
                                   )}
 
-                                  {/* Reasoning */}
-                                  {showReasoning && (
-                                    <Reasoning
-                                      defaultOpen={true}
-                                      isStreaming={message.isReasoningStreaming}
-                                    >
-                                      <ReasoningTrigger />
-                                      <ReasoningContent>
-                                        {message.reasoning!.content}
-                                      </ReasoningContent>
-                                    </Reasoning>
-                                  )}
-
                                   {/* Loader */}
                                   {showLoader && (
                                     <div className='flex items-center gap-2 py-2'>
@@ -248,16 +250,66 @@ export function PlaygroundChat({
                                       {actions}
                                     </>
                                   ) : (
-                                    showMessageContent && (
+                                    (showMessageContent ||
+                                      (!isUser && showReasoning)) && (
                                       <>
-                                        <MessageContent
-                                          variant='flat'
-                                          className={cn(
-                                            getMessageContentStyles()
-                                          )}
-                                        >
-                                          <Response>{displayContent}</Response>
-                                        </MessageContent>
+                                        {isUser ? (
+                                          <div className='flex max-w-full flex-col items-end'>
+                                            <div className='text-muted-foreground mb-1 max-w-[85%] truncate pr-1 text-right text-xs font-medium sm:max-w-[62ch] md:max-w-[68ch] lg:max-w-[72ch]'>
+                                              {username}
+                                            </div>
+                                            <MessageContent
+                                              variant='flat'
+                                              className={cn(
+                                                getMessageContentStyles()
+                                              )}
+                                            >
+                                              <Response>
+                                                {displayContent}
+                                              </Response>
+                                            </MessageContent>
+                                          </div>
+                                        ) : (
+                                          <div className='flex max-w-full flex-col items-start'>
+                                            {showReasoning && (
+                                              <Reasoning
+                                                className='mb-2'
+                                                defaultOpen={true}
+                                                isStreaming={
+                                                  message.isReasoningStreaming
+                                                }
+                                              >
+                                                <div className='flex max-w-[85%] items-center gap-2 pl-1 sm:max-w-[62ch] md:max-w-[68ch] lg:max-w-[72ch]'>
+                                                  <div className='text-muted-foreground truncate text-left text-xs font-medium'>
+                                                    {messageAssistantName}
+                                                  </div>
+                                                  <ReasoningTrigger className='w-auto shrink-0 text-xs' />
+                                                </div>
+                                                <ReasoningContent>
+                                                  {message.reasoning!.content}
+                                                </ReasoningContent>
+                                              </Reasoning>
+                                            )}
+                                            {!showReasoning && (
+                                              <div className='text-muted-foreground mb-1 max-w-[85%] truncate pl-1 text-left text-xs font-medium sm:max-w-[62ch] md:max-w-[68ch] lg:max-w-[72ch]'>
+                                                {messageAssistantName}
+                                              </div>
+                                            )}
+                                            {showMessageContent && (
+                                              <MessageContent
+                                                variant='flat'
+                                                className={cn(
+                                                  getMessageContentStyles(),
+                                                  'group-[.is-assistant]:w-fit group-[.is-assistant]:max-w-[88%] group-[.is-assistant]:rounded-[10px] group-[.is-assistant]:border group-[.is-assistant]:border-border/70 group-[.is-assistant]:bg-muted/45 group-[.is-assistant]:px-4 group-[.is-assistant]:py-2.5 group-[.is-assistant]:font-sans group-[.is-assistant]:shadow-sm sm:group-[.is-assistant]:max-w-[58ch] md:group-[.is-assistant]:max-w-[64ch] dark:group-[.is-assistant]:bg-muted/60'
+                                                )}
+                                              >
+                                                <Response>
+                                                  {displayContent}
+                                                </Response>
+                                              </MessageContent>
+                                            )}
+                                          </div>
+                                        )}
                                         {actions}
                                       </>
                                     )

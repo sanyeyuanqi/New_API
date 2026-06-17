@@ -52,7 +52,7 @@ import {
 } from '../lib'
 import { useChannels } from './channels-provider'
 
-export function ChannelsPrimaryButtons() {
+function useChannelToolbarActions() {
   const { t } = useTranslation()
   const {
     setOpen,
@@ -76,47 +76,37 @@ export function ChannelsPrimaryButtons() {
     setIdSort(checked)
   }
 
+  return {
+    t,
+    setOpen,
+    setCurrentRow,
+    enableTagMode,
+    idSort,
+    upstream,
+    queryClient,
+    showDeleteDialog,
+    setShowDeleteDialog,
+    handleTagModeToggle,
+    handleIdSortToggle,
+  }
+}
+
+export function ChannelsToolbarControls() {
+  const {
+    t,
+    enableTagMode,
+    idSort,
+    upstream,
+    queryClient,
+    showDeleteDialog,
+    setShowDeleteDialog,
+    handleTagModeToggle,
+    handleIdSortToggle,
+  } = useChannelToolbarActions()
+
   return (
     <>
       <div className='flex items-center gap-2'>
-        {/* Desktop: Toggle switches visible */}
-        <div className='hidden items-center gap-2 rounded-md border px-3 py-1.5 sm:flex'>
-          <Tags className='text-muted-foreground h-4 w-4' />
-          <Label htmlFor='tag-mode' className='cursor-pointer text-sm'>
-            {t('Tag Mode')}
-          </Label>
-          <Switch
-            id='tag-mode'
-            checked={enableTagMode}
-            onCheckedChange={handleTagModeToggle}
-          />
-        </div>
-
-        <div className='hidden items-center gap-2 rounded-md border px-3 py-1.5 sm:flex'>
-          <SortAsc className='text-muted-foreground h-4 w-4' />
-          <Label htmlFor='id-sort' className='cursor-pointer text-sm'>
-            {t('Sort by ID')}
-          </Label>
-          <Switch
-            id='id-sort'
-            checked={idSort}
-            onCheckedChange={handleIdSortToggle}
-          />
-        </div>
-
-        {/* Create Channel */}
-        <Button
-          onClick={() => {
-            setCurrentRow(null)
-            setOpen('create-channel')
-          }}
-          size='sm'
-        >
-          <Plus className='h-4 w-4' />
-          <span className='max-sm:hidden'>{t('Create Channel')}</span>
-          <span className='sm:hidden'>{t('Create')}</span>
-        </Button>
-
         {/* More Actions */}
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button variant='outline' size='sm' />}>
@@ -220,6 +210,31 @@ export function ChannelsPrimaryButtons() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* Desktop: Toggle switches visible */}
+        <div className='hidden items-center gap-2 rounded-md border px-3 py-1.5 sm:flex'>
+          <Tags className='text-muted-foreground h-4 w-4' />
+          <Label htmlFor='tag-mode' className='cursor-pointer text-sm'>
+            {t('Tag Mode')}
+          </Label>
+          <Switch
+            id='tag-mode'
+            checked={enableTagMode}
+            onCheckedChange={handleTagModeToggle}
+          />
+        </div>
+
+        <div className='hidden items-center gap-2 rounded-md border px-3 py-1.5 sm:flex'>
+          <SortAsc className='text-muted-foreground h-4 w-4' />
+          <Label htmlFor='id-sort' className='cursor-pointer text-sm'>
+            {t('Sort by ID')}
+          </Label>
+          <Switch
+            id='id-sort'
+            checked={idSort}
+            onCheckedChange={handleIdSortToggle}
+          />
+        </div>
       </div>
 
       <ConfirmDialog
@@ -237,5 +252,25 @@ export function ChannelsPrimaryButtons() {
         }}
       />
     </>
+  )
+}
+
+export function ChannelsCreateButton() {
+  const { t } = useTranslation()
+  const { setOpen, setCurrentRow } = useChannels()
+
+  return (
+    <Button
+      onClick={() => {
+        setCurrentRow(null)
+        setOpen('create-channel')
+      }}
+      size='sm'
+      className='bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20 ring-primary/10 h-8 rounded-full px-3.5 font-semibold shadow-sm ring-1'
+    >
+      <Plus className='h-4 w-4' />
+      <span className='max-sm:hidden'>{t('Create Channel')}</span>
+      <span className='sm:hidden'>{t('Create')}</span>
+    </Button>
   )
 }

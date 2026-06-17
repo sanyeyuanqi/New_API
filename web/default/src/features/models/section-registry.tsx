@@ -24,12 +24,12 @@ import { createSectionRegistry } from '@/features/system-settings/utils/section-
 const MODELS_SECTIONS = [
   {
     id: 'metadata',
-    titleKey: 'Metadata',
+    titleKey: 'Model Settings',
     build: () => null, // Content is rendered directly in the page component
   },
   {
     id: 'deployments',
-    titleKey: 'Deployments',
+    titleKey: 'Deploy Models',
     build: () => null, // Content is rendered directly in the page component
   },
 ] as const

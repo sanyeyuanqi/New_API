@@ -166,6 +166,12 @@ export type DataTablePageProps<TData> = {
   applyHeaderSize?: boolean
 
   /**
+   * When header sizes are applied, render the desktop table at its calculated
+   * content width instead of stretching columns to fill the full container.
+   */
+  fitContentTable?: boolean
+
+  /**
    * Optional skeleton key prefix for stable React keys across re-renders.
    */
   skeletonKeyPrefix?: string
@@ -341,10 +347,12 @@ function renderDesktop<TData>(
       skeletonKeyPrefix={props.skeletonKeyPrefix}
       renderRow={props.renderRow}
       applyHeaderSize={props.applyHeaderSize}
+      fitContentTable={props.fitContentTable}
       splitHeader={fixedHeight}
       tableContainerClassName={fixedHeight ? 'h-full min-h-0' : undefined}
       tableHeaderClassName={cn(
-        fixedHeight && '[background-color:color-mix(in_oklch,var(--muted)_30%,var(--background))]',
+        fixedHeight &&
+          '[background-color:color-mix(in_oklch,var(--muted)_30%,var(--background))]',
         props.tableHeaderClassName
       )}
       getColumnClassName={props.getColumnClassName}

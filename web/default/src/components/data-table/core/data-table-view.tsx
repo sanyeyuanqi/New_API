@@ -44,6 +44,28 @@ export type {
 } from './types'
 export { DataTableRow } from './data-table-row'
 
+const DATA_TABLE_VIEW_BASE_CLASS_NAME = [
+  '[&_[data-slot=table-cell]]:h-11',
+  '[&_[data-slot=table-cell]]:px-3',
+  '[&_[data-slot=table-head]]:px-3',
+  '[&_[data-slot=table-head]]:font-mono',
+  '[&_[data-slot=table-head]]:text-[13px]',
+  '[&_[data-slot=table-head]]:font-medium',
+  '[&_[data-slot=table-head]]:tabular-nums',
+  '[&_[data-slot=table-head]_*]:font-mono',
+  '[&_[data-slot=table-head]_*]:text-[13px]',
+  '[&_[data-slot=table-head]_*]:font-medium',
+  '[&_[data-slot=table-head]_*]:tabular-nums',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]]:font-mono',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]]:text-[13px]',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]]:font-medium',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]]:tabular-nums',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]_*]:font-mono',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]_*]:text-[13px]',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]_*]:font-medium',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]_*]:tabular-nums',
+].join(' ')
+
 export function DataTableView<TData>(props: DataTableViewProps<TData>) {
   const rows = props.rows ?? props.table.getRowModel().rows
   const colSpan = React.useMemo(
@@ -60,6 +82,7 @@ export function DataTableView<TData>(props: DataTableViewProps<TData>) {
     <div
       className={cn(
         'overflow-hidden rounded-lg border',
+        DATA_TABLE_VIEW_BASE_CLASS_NAME,
         props.containerClassName
       )}
       {...props.containerProps}
@@ -236,7 +259,9 @@ function getTableSizing<TData>(props: DataTableViewProps<TData>): {
 
   return {
     colgroup: <DataTableColgroup table={props.table} />,
-    style: getTableSizeStyle(props.table),
+    style: getTableSizeStyle(props.table, {
+      fitContent: props.fitContentTable,
+    }),
   }
 }
 

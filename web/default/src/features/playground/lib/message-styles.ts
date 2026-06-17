@@ -28,9 +28,14 @@ export function getMessageContentStyles() {
     'group-[.is-user]:w-fit',
     // User bubble: rounded and themed background
     'group-[.is-user]:text-foreground',
-    'group-[.is-user]:bg-secondary',
-    'dark:group-[.is-user]:bg-muted',
-    'group-[.is-user]:rounded-3xl',
+    'group-[.is-user]:border',
+    'group-[.is-user]:border-border/70',
+    'group-[.is-user]:bg-muted/45',
+    'group-[.is-user]:px-4',
+    'group-[.is-user]:py-2.5',
+    'group-[.is-user]:shadow-sm',
+    'dark:group-[.is-user]:bg-muted/60',
+    'group-[.is-user]:rounded-[10px]',
     // Assistant bubble: flat serif style (one-sided style)
     'group-[.is-assistant]:text-foreground',
     'group-[.is-assistant]:bg-transparent',

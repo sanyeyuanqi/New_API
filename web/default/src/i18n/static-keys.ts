@@ -65,6 +65,12 @@ export const STATIC_I18N_KEYS = [
   'More...',
   'Less',
 
+  // Playground suggestions
+  'Analyze data',
+  'Surprise me',
+  'Summarize text',
+  'Get advice',
+
   // Roles
   'Super Admin',
   'Admin',

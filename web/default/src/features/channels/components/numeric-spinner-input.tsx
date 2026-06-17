@@ -30,6 +30,7 @@ interface NumericSpinnerInputProps {
   disabled?: boolean
   className?: string
   label?: string
+  align?: 'left' | 'center'
 }
 
 export function NumericSpinnerInput({
@@ -41,6 +42,7 @@ export function NumericSpinnerInput({
   disabled = false,
   className,
   label,
+  align = 'center',
 }: NumericSpinnerInputProps) {
   const [localValue, setLocalValue] = useState(String(value ?? 0))
   const [editing, setEditing] = useState(false)
@@ -118,6 +120,7 @@ export function NumericSpinnerInput({
 
   const atMin = min !== undefined && Number(localValue) <= min
   const atMax = max !== undefined && Number(localValue) >= max
+  const valueAlignClassName = align === 'left' ? 'text-left' : 'text-center'
 
   return (
     <div className={cn('inline-flex items-center', className)}>
@@ -156,7 +159,10 @@ export function NumericSpinnerInput({
             onChange={handleInputChange}
             onBlur={commitValue}
             onKeyDown={handleKeyDown}
-            className='h-7 w-10 bg-transparent text-center font-mono text-sm outline-none'
+            className={cn(
+              'h-7 w-10 bg-transparent font-mono text-sm outline-none',
+              valueAlignClassName
+            )}
             autoFocus
           />
         ) : (
@@ -165,7 +171,8 @@ export function NumericSpinnerInput({
             onClick={handleStartEdit}
             disabled={disabled}
             className={cn(
-              'h-7 min-w-8 cursor-text px-1 text-center font-mono text-sm tabular-nums',
+              'h-7 min-w-8 cursor-text px-1 font-mono text-sm tabular-nums',
+              valueAlignClassName,
               disabled && 'cursor-default opacity-50'
             )}
           >

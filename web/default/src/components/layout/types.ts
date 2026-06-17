@@ -53,6 +53,7 @@ export type NavCollapsible = BaseNavItem & {
  */
 export type NavChatPresets = BaseNavItem & {
   type: 'chat-presets'
+  variant?: 'collapsible' | 'flat'
   url?: never
   items?: never
 }

@@ -16,20 +16,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { getRouteApi, useNavigate } from '@tanstack/react-router'
+import { getRouteApi } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SectionPageLayout } from '@/components/layout'
 import { listDeployments } from './api'
 import { DeploymentAccessGuard } from './components/deployment-access-guard'
 import { DeploymentsTable } from './components/deployments-table'
 import { CreateDeploymentDrawer } from './components/dialogs/create-deployment-drawer'
 import { ModelsDialogs } from './components/models-dialogs'
-import { ModelsPrimaryButtons } from './components/models-primary-buttons'
 import { ModelsProvider, useModels } from './components/models-provider'
 import { ModelsTable } from './components/models-table'
 import { useModelDeploymentSettings } from './hooks/use-model-deployment-settings'
@@ -37,23 +35,24 @@ import { deploymentsQueryKeys } from './lib'
 import {
   type ModelsSectionId,
   MODELS_DEFAULT_SECTION,
-  MODELS_SECTION_IDS,
 } from './section-registry'
 
 const route = getRouteApi('/_authenticated/models/$section')
 
+const PRIMARY_ACTION_BUTTON_CLASS_NAME =
+  'bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20 ring-primary/10 h-8 rounded-full px-3.5 font-semibold shadow-sm ring-1'
+
 const SECTION_META: Record<ModelsSectionId, { titleKey: string }> = {
   metadata: {
-    titleKey: 'Metadata',
+    titleKey: 'Model Settings',
   },
   deployments: {
-    titleKey: 'Deployments',
+    titleKey: 'Deploy Models',
   },
 }
 
 function ModelsContent() {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const { tabCategory, setTabCategory } = useModels()
   const params = route.useParams()
   const activeSection = (params.section ??
@@ -69,50 +68,31 @@ function ModelsContent() {
     }
   }, [activeSection, setTabCategory, tabCategory])
 
-  const handleSectionChange = useCallback(
-    (section: string) => {
-      void navigate({
-        to: '/models/$section',
-        params: { section: section as ModelsSectionId },
-      })
-    },
-    [navigate]
-  )
-
   const meta = SECTION_META[activeSection] ?? SECTION_META.metadata
 
   return (
     <>
       <SectionPageLayout fixedContent>
         <SectionPageLayout.Title>{t(meta.titleKey)}</SectionPageLayout.Title>
-        <SectionPageLayout.Actions>
-          {activeSection === 'metadata' ? (
-            <ModelsPrimaryButtons />
-          ) : (
-            <Button onClick={() => setCreateDeploymentOpen(true)} size='sm'>
+        {activeSection === 'deployments' && (
+          <SectionPageLayout.Actions>
+            <Button
+              onClick={() => setCreateDeploymentOpen(true)}
+              size='sm'
+              className={PRIMARY_ACTION_BUTTON_CLASS_NAME}
+            >
               <Plus className='h-4 w-4' />
               {t('Create deployment')}
             </Button>
-          )}
-        </SectionPageLayout.Actions>
+          </SectionPageLayout.Actions>
+        )}
         <SectionPageLayout.Content>
-          <div className='flex h-full min-h-0 flex-col gap-4'>
-            <Tabs value={activeSection} onValueChange={handleSectionChange}>
-              <TabsList className='max-w-full flex-wrap justify-start group-data-horizontal/tabs:h-auto'>
-                {MODELS_SECTION_IDS.map((section) => (
-                  <TabsTrigger key={section} value={section}>
-                    {t(SECTION_META[section].titleKey)}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-            <div className='min-h-0 flex-1'>
-              {activeSection === 'metadata' ? (
-                <ModelsTable />
-              ) : (
-                <DeploymentsSection />
-              )}
-            </div>
+          <div className='h-full min-h-0'>
+            {activeSection === 'metadata' ? (
+              <ModelsTable />
+            ) : (
+              <DeploymentsSection />
+            )}
           </div>
         </SectionPageLayout.Content>
       </SectionPageLayout>

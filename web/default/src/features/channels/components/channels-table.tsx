@@ -51,6 +51,10 @@ import {
 } from '../lib'
 import type { Channel, ChannelSortBy } from '../types'
 import { useChannelsColumns } from './channels-columns'
+import {
+  ChannelsCreateButton,
+  ChannelsToolbarControls,
+} from './channels-primary-buttons'
 import { useChannels } from './channels-provider'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 
@@ -64,6 +68,25 @@ const CHANNEL_SORTABLE_COLUMNS = new Set<ChannelSortBy>([
   'response_time',
   'test_time',
 ])
+
+const CHANNEL_TABLE_CONTENT_CLASS_NAME = [
+  '[&_[data-slot=table-head]]:font-mono',
+  '[&_[data-slot=table-head]]:text-[13px]',
+  '[&_[data-slot=table-head]]:font-medium',
+  '[&_[data-slot=table-head]]:tabular-nums',
+  '[&_[data-slot=table-head]_*]:font-mono',
+  '[&_[data-slot=table-head]_*]:text-[13px]',
+  '[&_[data-slot=table-head]_*]:font-medium',
+  '[&_[data-slot=table-head]_*]:tabular-nums',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]]:font-mono',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]]:text-[13px]',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]]:font-medium',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]]:tabular-nums',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]_*]:font-mono',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]_*]:text-[13px]',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]_*]:font-medium',
+  '[&_[data-slot=table-body]_[data-slot=table-cell]_*]:tabular-nums',
+].join(' ')
 
 function isDisabledChannelRow(channel: Channel) {
   return (
@@ -341,19 +364,19 @@ export function ChannelsTable() {
     ...groupOptions,
   ]
 
-  const getColumnClassName = (columnId: string) => {
+  const getColumnClassName = (columnId: string, kind: 'header' | 'cell') => {
     switch (columnId) {
       case 'select':
         return 'w-10 p-0'
-      case 'id':
       case 'priority':
       case 'weight':
-      case 'response_time':
-        return 'text-center'
+        return kind === 'header'
+          ? 'text-center [&>div]:justify-center [&_[data-slot=button]]:mx-auto [&_[data-slot=button]]:ms-0'
+          : 'text-center'
       case 'balance':
-        return 'font-mono'
+        return kind === 'header' ? 'text-center font-mono' : 'font-mono'
       case 'actions':
-        return 'text-right'
+        return 'text-center'
       default:
         return undefined
     }
@@ -372,7 +395,7 @@ export function ChannelsTable() {
       skeletonKeyPrefix='channel-skeleton'
       applyHeaderSize
       getColumnClassName={getColumnClassName}
-      tableClassName='[&_[data-slot=table-cell]]:h-11 [&_[data-slot=table-cell]]:px-3 [&_[data-slot=table-head]]:px-3'
+      tableClassName={`[&_[data-slot=table-cell]]:h-11 [&_[data-slot=table-cell]]:px-3 [&_[data-slot=table-head]]:px-3 ${CHANNEL_TABLE_CONTENT_CLASS_NAME}`}
       toolbarProps={{
         searchPlaceholder: t('Filter by name, ID, or key...'),
         searchDebounceMs: 500,
@@ -409,6 +432,8 @@ export function ChannelsTable() {
             singleSelect: true,
           },
         ],
+        preActions: <ChannelsToolbarControls />,
+        postActions: <ChannelsCreateButton />,
       }}
       getRowClassName={(row, { isMobile }) =>
         isDisabledChannelRow(row.original)

@@ -21,6 +21,9 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { useUsers } from './users-provider'
 
+const PRIMARY_ACTION_BUTTON_CLASS_NAME =
+  'bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20 ring-primary/10 h-8 rounded-full px-3.5 font-semibold shadow-sm ring-1'
+
 export function UsersPrimaryButtons() {
   const { t } = useTranslation()
   const { setOpen, setCurrentRow } = useUsers()
@@ -31,8 +34,12 @@ export function UsersPrimaryButtons() {
   }
 
   return (
-    <div className='flex gap-2'>
-      <Button size='sm' onClick={handleCreate}>
+    <div className='flex items-center gap-2'>
+      <Button
+        size='sm'
+        onClick={handleCreate}
+        className={PRIMARY_ACTION_BUTTON_CLASS_NAME}
+      >
         <Plus className='h-4 w-4' />
         {t('Add User')}
       </Button>

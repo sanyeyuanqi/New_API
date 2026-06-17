@@ -34,6 +34,7 @@ import { isRedemptionExpired } from '../lib'
 import type { Redemption } from '../types'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { useRedemptionsColumns } from './redemptions-columns'
+import { RedemptionsPrimaryButtons } from './redemptions-primary-buttons'
 import { useRedemptions } from './redemptions-provider'
 
 const route = getRouteApi('/_authenticated/redemption-codes/')
@@ -146,6 +147,7 @@ export function RedemptionsTable() {
             singleSelect: true,
           },
         ],
+        postActions: <RedemptionsPrimaryButtons />,
       }}
       getRowClassName={(row, { isMobile }) =>
         isDisabledRedemptionRow(row.original)

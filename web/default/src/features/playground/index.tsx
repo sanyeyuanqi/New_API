@@ -52,6 +52,11 @@ export function Playground() {
     null
   )
 
+  const assistantName =
+    models.find((model) => model.value === config.model)?.label ||
+    config.model ||
+    'AI'
+
   // Load models
   const { data: modelsData, isLoading: isLoadingModels } = useQuery({
     queryKey: ['playground-models'],
@@ -116,7 +121,7 @@ export function Playground() {
 
   const handleSendMessage = (text: string) => {
     const userMessage = createUserMessage(text)
-    const assistantMessage = createLoadingAssistantMessage()
+    const assistantMessage = createLoadingAssistantMessage(assistantName)
 
     const newMessages = [...messages, userMessage, assistantMessage]
     updateMessages(newMessages)
@@ -138,7 +143,7 @@ export function Playground() {
 
     // Remove messages after this one and regenerate
     const messagesUpToHere = messages.slice(0, messageIndex)
-    const loadingMessage = createLoadingAssistantMessage()
+    const loadingMessage = createLoadingAssistantMessage(assistantName)
     const newMessages = [...messagesUpToHere, loadingMessage]
 
     updateMessages(newMessages)
@@ -175,12 +180,12 @@ export function Playground() {
 
       const toSubmit = [
         ...updated.slice(0, index + 1),
-        createLoadingAssistantMessage(),
+        createLoadingAssistantMessage(assistantName),
       ]
       updateMessages(toSubmit)
       sendChat(toSubmit)
     },
-    [editingMessageKey, messages, updateMessages, sendChat]
+    [assistantName, editingMessageKey, messages, updateMessages, sendChat]
   )
 
   const handleDeleteMessage = (message: MessageType) => {
@@ -193,6 +198,7 @@ export function Playground() {
       {/* Full-width scroll container: scrolling works even over side whitespace */}
       <div className='flex flex-1 flex-col overflow-hidden'>
         <PlaygroundChat
+          assistantName={assistantName}
           messages={messages}
           onCopyMessage={handleCopyMessage}
           onRegenerateMessage={handleRegenerateMessage}

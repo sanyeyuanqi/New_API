@@ -77,19 +77,21 @@ export function AppSidebar() {
         </AnimatePresence>
       </SidebarContent>
 
-      <SidebarFooter className='border-sidebar-border border-t px-2 py-2'>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip='API文档'
-              render={<Link to='/docs' target='_blank' rel='noreferrer' />}
-            >
-              <BookOpen className='shrink-0' />
-              <span className='min-w-0 flex-1 truncate'>API文档</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
+      {!view && (
+        <SidebarFooter className='border-sidebar-border border-t px-2 py-2'>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip='API文档'
+                render={<Link to='/docs' target='_blank' rel='noreferrer' />}
+              >
+                <BookOpen className='shrink-0' />
+                <span className='min-w-0 flex-1 truncate'>API文档</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      )}
 
       <SidebarRail />
     </Sidebar>

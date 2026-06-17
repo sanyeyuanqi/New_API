@@ -102,7 +102,7 @@ export function Hero(props: HeroProps) {
             className='landing-animate-fade-up max-w-3xl text-[clamp(2.8rem,5.2vw,5.35rem)] leading-[0.98] font-semibold tracking-tight text-slate-950 dark:text-white'
             style={{ animationDelay: '60ms' }}
           >
-            连接全球模型，
+            连接全球模型
             <br />
             <span className='bg-gradient-to-r from-slate-950 via-cyan-600 to-emerald-500 bg-clip-text text-transparent dark:from-white dark:via-slate-300 dark:to-zinc-500'>
               统一 AI 生产力入口

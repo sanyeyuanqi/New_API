@@ -174,14 +174,18 @@ function PriorityCell({ channel }: { channel: Channel }) {
 
     return (
       <>
-        <NumericSpinnerInput
-          value={priority ?? 0}
-          onChange={(value) => {
-            setPendingValue(value)
-            setConfirmOpen(true)
-          }}
-          min={-999}
-        />
+        <div className='flex w-full justify-center'>
+          <NumericSpinnerInput
+            value={priority ?? 0}
+            className='justify-center'
+            align='center'
+            onChange={(value) => {
+              setPendingValue(value)
+              setConfirmOpen(true)
+            }}
+            min={-999}
+          />
+        </div>
         <ConfirmDialog
           open={confirmOpen}
           onOpenChange={setConfirmOpen}
@@ -201,13 +205,17 @@ function PriorityCell({ channel }: { channel: Channel }) {
 
   // Regular channel row - editable
   return (
-    <NumericSpinnerInput
-      value={priority ?? 0}
-      onChange={(value) => {
-        handleUpdateChannelField(channel.id, 'priority', value, queryClient)
-      }}
-      min={-999}
-    />
+    <div className='flex w-full justify-center'>
+      <NumericSpinnerInput
+        value={priority ?? 0}
+        className='justify-center'
+        align='center'
+        onChange={(value) => {
+          handleUpdateChannelField(channel.id, 'priority', value, queryClient)
+        }}
+        min={-999}
+      />
+    </div>
   )
 }
 
@@ -229,14 +237,18 @@ function WeightCell({ channel }: { channel: Channel }) {
 
     return (
       <>
-        <NumericSpinnerInput
-          value={weight ?? 0}
-          onChange={(value) => {
-            setPendingValue(value)
-            setConfirmOpen(true)
-          }}
-          min={0}
-        />
+        <div className='flex w-full justify-center'>
+          <NumericSpinnerInput
+            value={weight ?? 0}
+            className='justify-center'
+            align='center'
+            onChange={(value) => {
+              setPendingValue(value)
+              setConfirmOpen(true)
+            }}
+            min={0}
+          />
+        </div>
         <ConfirmDialog
           open={confirmOpen}
           onOpenChange={setConfirmOpen}
@@ -256,13 +268,17 @@ function WeightCell({ channel }: { channel: Channel }) {
 
   // Regular channel row - editable
   return (
-    <NumericSpinnerInput
-      value={weight ?? 0}
-      onChange={(value) => {
-        handleUpdateChannelField(channel.id, 'weight', value, queryClient)
-      }}
-      min={0}
-    />
+    <div className='flex w-full justify-center'>
+      <NumericSpinnerInput
+        value={weight ?? 0}
+        className='justify-center'
+        align='center'
+        onChange={(value) => {
+          handleUpdateChannelField(channel.id, 'weight', value, queryClient)
+        }}
+        min={0}
+      />
+    </div>
   )
 }
 
@@ -288,6 +304,13 @@ function BalanceCell({ channel }: { channel: Channel }) {
   const remainingDisplay = withSuffix(formatBalance(balance))
   const usedLabel = `${t('Used:')} ${usedDisplay}`
   const remainingLabel = `${t('Remaining:')} ${remainingDisplay}`
+  const valueBadgeClassName =
+    'rounded-none bg-transparent px-0 !font-mono !text-[13px] !font-medium tabular-nums shadow-none'
+  const renderQuotaValue = (value: string) => (
+    <span className='min-w-0 truncate !font-mono !text-[13px] leading-normal !font-medium tabular-nums'>
+      {value}
+    </span>
+  )
 
   // Tag row: only show cumulative used quota
   if (isTagRow) {
@@ -334,35 +357,32 @@ function BalanceCell({ channel }: { channel: Channel }) {
 
   return (
     <TooltipProvider>
-      <div className='flex min-w-0 items-center gap-1.5 whitespace-nowrap'>
+      <div className='flex min-w-0 items-center justify-start gap-2 whitespace-nowrap'>
         <Tooltip>
           <TooltipTrigger
             render={
               <StatusBadge
-                label={usedDisplay}
                 variant='neutral'
                 size='sm'
                 copyable={false}
                 showDot={false}
-                className='cursor-help font-mono'
-              />
+                className={`cursor-help font-mono ${valueBadgeClassName}`}
+              >
+                {renderQuotaValue(usedDisplay)}
+              </StatusBadge>
             }
           />
           <TooltipContent>
             <p>{usedLabel}</p>
           </TooltipContent>
         </Tooltip>
+        <span className='text-muted-foreground/70 px-0.5 font-mono text-[13px]'>
+          /
+        </span>
         <Tooltip>
           <TooltipTrigger
             render={
               <StatusBadge
-                label={
-                  isUpdating
-                    ? t('Updating...')
-                    : channel.type === 57
-                      ? t('Account Info')
-                      : remainingDisplay
-                }
                 variant={
                   channel.type === 57
                     ? 'info'
@@ -373,9 +393,17 @@ function BalanceCell({ channel }: { channel: Channel }) {
                 size='sm'
                 copyable={false}
                 showDot={false}
-                className='cursor-pointer font-mono'
+                className={`cursor-pointer font-mono ${valueBadgeClassName}`}
                 onClick={handleClickUpdate}
-              />
+              >
+                {renderQuotaValue(
+                  isUpdating
+                    ? t('Updating...')
+                    : channel.type === 57
+                      ? t('Account Info')
+                      : remainingDisplay
+                )}
+              </StatusBadge>
             }
           />
           <TooltipContent>
@@ -471,7 +499,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
       },
       enableSorting: false,
       enableHiding: false,
-      size: 40,
+      size: 44,
     },
 
     // ID column
@@ -483,7 +511,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
         const id = row.getValue('id') as number
         return <TableId value={id} />
       },
-      size: 80,
+      size: 72,
     },
 
     // Name column
@@ -594,7 +622,8 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
           </div>
         )
       },
-      minSize: 200,
+      size: 180,
+      minSize: 160,
     },
 
     // Type column
@@ -720,7 +749,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
         if (!value || value.length === 0 || value.includes('all')) return true
         return value.includes(String(row.getValue(id)))
       },
-      size: 220,
+      size: 180,
       enableSorting: false,
     },
 
@@ -897,7 +926,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
         const groupArray = parseGroupsList(group)
         return groupArray.some((g) => value.includes(g))
       },
-      size: 150,
+      size: 140,
       enableSorting: false,
     },
 
@@ -930,7 +959,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
       header: t('Priority'),
       meta: { mobileHidden: true },
       cell: ({ row }) => <PriorityCell channel={row.original} />,
-      size: 100,
+      size: 92,
     },
 
     // Weight column
@@ -939,7 +968,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
       header: t('Weight'),
       meta: { mobileHidden: true },
       cell: ({ row }) => <WeightCell channel={row.original} />,
-      size: 90,
+      size: 84,
       enableSorting: false,
     },
 
@@ -948,7 +977,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
       accessorKey: 'balance',
       header: t('Used / Remaining'),
       cell: ({ row }) => <BalanceCell channel={row.original} />,
-      size: 210,
+      size: 190,
     },
 
     // Response Time column
@@ -970,7 +999,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
           />
         )
       },
-      size: 110,
+      size: 112,
     },
 
     // Test Time column
@@ -1007,7 +1036,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
           </TooltipProvider>
         )
       },
-      size: 120,
+      size: 128,
       enableSorting: false,
     },
 
@@ -1030,7 +1059,7 @@ export function useChannelsColumns(): ColumnDef<Channel>[] {
 
         return <DataTableRowActions row={row} />
       },
-      size: 132,
+      size: 112,
       enableSorting: false,
       enableHiding: false,
       meta: { pinned: 'right' as const },

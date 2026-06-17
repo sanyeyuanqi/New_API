@@ -19,12 +19,11 @@ For commercial licensing, please contact support@quantumnous.com
 import { type ColumnDef } from '@tanstack/react-table'
 import { useTranslation } from 'react-i18next'
 import { formatQuota, formatTimestamp } from '@/lib/format'
-import { cn } from '@/lib/utils'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Progress } from '@/components/ui/progress'
 import {
   Tooltip,
   TooltipContent,
+  TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { GroupBadge } from '@/components/group-badge'
@@ -39,12 +38,6 @@ import {
 } from '../constants'
 import { type User } from '../types'
 import { DataTableRowActions } from './data-table-row-actions'
-
-function getQuotaProgressColor(percentage: number): string {
-  if (percentage <= 10) return '[&_[data-slot=progress-indicator]]:bg-rose-500'
-  if (percentage <= 30) return '[&_[data-slot=progress-indicator]]:bg-amber-500'
-  return '[&_[data-slot=progress-indicator]]:bg-emerald-500'
-}
 
 export function useUsersColumns(): ColumnDef<User>[] {
   const { t } = useTranslation()
@@ -164,63 +157,76 @@ export function useUsersColumns(): ColumnDef<User>[] {
     {
       id: 'quota',
       accessorKey: 'quota',
-      header: t('Quota'),
+      header: t('Used / Remaining'),
       cell: ({ row }) => {
         const user = row.original
         const used = user.used_quota
         const remaining = user.quota
         const total = used + remaining
-        const percentage = total > 0 ? (remaining / total) * 100 : 0
-
-        if (total === 0) {
-          return (
-            <StatusBadge
-              label={t('No Quota')}
-              variant='neutral'
-              copyable={false}
-              className='-ml-1.5'
-            />
-          )
-        }
+        const usedDisplay = formatQuota(used)
+        const remainingDisplay = formatQuota(remaining)
+        const usedLabel = `${t('Used:')} ${usedDisplay}`
+        const remainingLabel = `${t('Remaining:')} ${remainingDisplay}`
+        const valueBadgeClassName =
+          'rounded-none bg-transparent px-0 !font-mono !text-[13px] !font-medium tabular-nums shadow-none'
+        const renderQuotaValue = (value: string) => (
+          <span className='min-w-0 truncate !font-mono !text-[13px] leading-normal !font-medium tabular-nums'>
+            {value}
+          </span>
+        )
 
         return (
-          <Tooltip>
-            <TooltipTrigger
-              render={<div className='w-[150px] cursor-help space-y-1' />}
-            >
-              <div className='flex justify-between text-xs'>
-                <span className='font-medium tabular-nums'>
-                  {formatQuota(remaining)}
-                </span>
-                <span className='text-muted-foreground tabular-nums'>
-                  {formatQuota(total)}
-                </span>
-              </div>
-              <Progress
-                value={percentage}
-                className={cn('h-1.5', getQuotaProgressColor(percentage))}
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <div className='space-y-1 text-xs'>
-                <div>
-                  {t('Used:')} {formatQuota(used)}
-                </div>
-                <div>
-                  {t('Remaining:')} {formatQuota(remaining)}
-                </div>
-                <div>
-                  {t('Total:')} {formatQuota(total)}
-                </div>
-                <div>
-                  {t('Percentage:')} {percentage.toFixed(1)}%
-                </div>
-              </div>
-            </TooltipContent>
-          </Tooltip>
+          <TooltipProvider>
+            <div className='flex min-w-0 items-center justify-start gap-2 whitespace-nowrap'>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <StatusBadge
+                      variant='neutral'
+                      size='sm'
+                      copyable={false}
+                      showDot={false}
+                      className={`cursor-help font-mono ${valueBadgeClassName}`}
+                    >
+                      {renderQuotaValue(usedDisplay)}
+                    </StatusBadge>
+                  }
+                />
+                <TooltipContent>
+                  <p>{usedLabel}</p>
+                </TooltipContent>
+              </Tooltip>
+              <span className='text-muted-foreground/70 px-0.5 font-mono text-[13px]'>
+                /
+              </span>
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <StatusBadge
+                      variant='success'
+                      size='sm'
+                      copyable={false}
+                      showDot={false}
+                      className={`cursor-help font-mono ${valueBadgeClassName}`}
+                    >
+                      {renderQuotaValue(remainingDisplay)}
+                    </StatusBadge>
+                  }
+                />
+                <TooltipContent>
+                  <div className='space-y-1 text-xs'>
+                    <p>{remainingLabel}</p>
+                    <p>
+                      {t('Total:')} {formatQuota(total)}
+                    </p>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
         )
       },
-      size: 170,
+      size: 190,
     },
     {
       accessorKey: 'group',

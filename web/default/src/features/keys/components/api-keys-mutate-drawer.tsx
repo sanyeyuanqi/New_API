@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useForm, type SubmitErrorHandler } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
@@ -85,6 +85,17 @@ type ApiKeyMutateDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   currentRow?: ApiKey
+}
+
+function RequiredLabel({ children }: { children: ReactNode }) {
+  return (
+    <span className='inline-flex items-center gap-1'>
+      {children}
+      <span className='text-destructive' aria-hidden='true'>
+        *
+      </span>
+    </span>
+  )
 }
 
 export function ApiKeysMutateDrawer({
@@ -245,6 +256,9 @@ export function ApiKeysMutateDrawer({
     : t('Enter quota in {{currency}}', { currency: currencyLabel })
   const selectedGroup = form.watch('group')
   const unlimitedQuota = form.watch('unlimited_quota')
+  const sectionClassName =
+    'rounded-xl border border-border/70 bg-muted/15 p-4 pb-4 shadow-sm'
+  const mutedHintClassName = 'text-muted-foreground text-xs leading-5'
 
   return (
     <Sheet
@@ -265,20 +279,20 @@ export function ApiKeysMutateDrawer({
           </SheetTitle>
           <SheetDescription>
             {isUpdate
-              ? t('Update the API key by providing necessary info.')
-              : t('Add a new API key by providing necessary info.')}
+              ? t('Update name, quota, or access limits.')
+              : t('Fill in the required fields. Advanced limits are optional.')}
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
           <form
             id='api-key-form'
             onSubmit={form.handleSubmit(onSubmit, onInvalid)}
-            className={sideDrawerFormClassName('gap-5')}
+            className={sideDrawerFormClassName('gap-4')}
           >
-            <SideDrawerSection>
+            <SideDrawerSection className={sectionClassName}>
               <SideDrawerSectionHeader
                 title={t('Basic Information')}
-                description={t('Set API key basic information')}
+                description={t('Name the key and choose where it can be used.')}
                 icon={<KeyRound className='size-4' />}
               />
               <FormField
@@ -286,7 +300,9 @@ export function ApiKeysMutateDrawer({
                 name='name'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('Name')}</FormLabel>
+                    <FormLabel>
+                      <RequiredLabel>{t('Name')}</RequiredLabel>
+                    </FormLabel>
                     <FormControl>
                       <Input {...field} placeholder={t('Enter a name')} />
                     </FormControl>
@@ -300,7 +316,9 @@ export function ApiKeysMutateDrawer({
                 name='group'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t('Group')}</FormLabel>
+                    <FormLabel>
+                      <RequiredLabel>{t('Group')}</RequiredLabel>
+                    </FormLabel>
                     <FormControl>
                       <ApiKeyGroupCombobox
                         options={groups}
@@ -324,10 +342,8 @@ export function ApiKeysMutateDrawer({
                         <FormLabel className='text-sm'>
                           {t('Cross-group retry')}
                         </FormLabel>
-                        <FormDescription className='line-clamp-2 text-xs sm:line-clamp-none'>
-                          {t(
-                            'When enabled, if channels in the current group fail, it will try channels in the next group in order.'
-                          )}
+                        <FormDescription className={mutedHintClassName}>
+                          {t('Try another group if the current group fails.')}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -406,7 +422,9 @@ export function ApiKeysMutateDrawer({
                   name='tokenCount'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('Quantity')}</FormLabel>
+                      <FormLabel>
+                        <RequiredLabel>{t('Quantity')}</RequiredLabel>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -418,10 +436,8 @@ export function ApiKeysMutateDrawer({
                           }
                         />
                       </FormControl>
-                      <FormDescription>
-                        {t(
-                          'Create multiple API keys at once (random suffix will be added to names)'
-                        )}
+                      <FormDescription className={mutedHintClassName}>
+                        {t('Create more than one key if needed.')}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -430,10 +446,10 @@ export function ApiKeysMutateDrawer({
               )}
             </SideDrawerSection>
 
-            <SideDrawerSection>
+            <SideDrawerSection className={sectionClassName}>
               <SideDrawerSectionHeader
                 title={t('Quota Settings')}
-                description={t('Set quota amount and limits')}
+                description={t('Control how much this key can spend.')}
                 icon={<WalletCards className='size-4' />}
               />
               {!unlimitedQuota && (
@@ -442,7 +458,9 @@ export function ApiKeysMutateDrawer({
                   name='remain_quota_dollars'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{quotaLabel}</FormLabel>
+                      <FormLabel>
+                        <RequiredLabel>{quotaLabel}</RequiredLabel>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -454,12 +472,15 @@ export function ApiKeysMutateDrawer({
                           }
                         />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription className={mutedHintClassName}>
                         {tokensOnly
-                          ? t('Enter the quota amount in tokens')
-                          : t('Enter the quota amount in {{currency}}', {
-                              currency: currencyLabel,
-                            })}
+                          ? t('Calls stop after this token quota is used.')
+                          : t(
+                              'Calls stop after this {{currency}} quota is used.',
+                              {
+                                currency: currencyLabel,
+                              }
+                            )}
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -476,8 +497,8 @@ export function ApiKeysMutateDrawer({
                       <FormLabel className='text-sm'>
                         {t('Unlimited Quota')}
                       </FormLabel>
-                      <FormDescription className='text-xs'>
-                        {t('Enable unlimited quota for this API key')}
+                      <FormDescription className={mutedHintClassName}>
+                        {t('No spending limit for this key.')}
                       </FormDescription>
                     </div>
                     <FormControl>
@@ -492,7 +513,7 @@ export function ApiKeysMutateDrawer({
             </SideDrawerSection>
 
             <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
-              <SideDrawerSection>
+              <SideDrawerSection className={sectionClassName}>
                 <CollapsibleTrigger
                   render={
                     <button
@@ -504,7 +525,7 @@ export function ApiKeysMutateDrawer({
                   <SideDrawerSectionHeader
                     className='flex-1'
                     title={t('Advanced Settings')}
-                    description={t('Set API key access restrictions')}
+                    description={t('Optional model and IP restrictions.')}
                     icon={<Settings2 className='size-4' />}
                   />
                   <ChevronDown
@@ -535,8 +556,8 @@ export function ApiKeysMutateDrawer({
                               )}
                             />
                           </FormControl>
-                          <FormDescription>
-                            {t('Limit which models can be used with this key')}
+                          <FormDescription className={mutedHintClassName}>
+                            {t('Leave empty to allow all models.')}
                           </FormDescription>
                           <FormMessage />
                         </FormItem>
@@ -561,9 +582,9 @@ export function ApiKeysMutateDrawer({
                               rows={3}
                             />
                           </FormControl>
-                          <FormDescription>
+                          <FormDescription className={mutedHintClassName}>
                             {t(
-                              'Do not over-trust this feature. IP may be spoofed. Please use with nginx, CDN and other gateways.'
+                              'Leave empty to allow all IPs. Use one IP or CIDR per line.'
                             )}
                           </FormDescription>
                           <FormMessage />

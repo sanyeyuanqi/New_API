@@ -21,12 +21,12 @@ import {
   Box,
   CreditCard,
   FileText,
-  FlaskConical,
   Key,
   LayoutDashboard,
   ListTodo,
   MessageSquare,
   Radio,
+  Rocket,
   Settings,
   Ticket,
   User,
@@ -52,14 +52,11 @@ export function useSidebarData(): SidebarData {
         title: t('Chat'),
         items: [
           {
-            title: t('Playground'),
-            url: '/playground',
-            icon: FlaskConical,
-          },
-          {
             title: t('Chat'),
+            url: '/playground',
+            activeUrls: ['/chat', '/chat/0'],
+            configUrls: ['/playground', '/chat'],
             icon: MessageSquare,
-            type: 'chat-presets',
           },
         ],
       },
@@ -97,22 +94,6 @@ export function useSidebarData(): SidebarData {
         ],
       },
       {
-        id: 'personal',
-        title: t('Personal'),
-        items: [
-          {
-            title: t('Wallet'),
-            url: '/wallet',
-            icon: Wallet,
-          },
-          {
-            title: t('Profile'),
-            url: '/profile',
-            icon: User,
-          },
-        ],
-      },
-      {
         id: 'admin',
         title: t('Admin'),
         items: [
@@ -122,9 +103,14 @@ export function useSidebarData(): SidebarData {
             icon: Radio,
           },
           {
-            title: t('Models'),
+            title: t('Model Settings'),
             url: '/models/metadata',
             icon: Box,
+          },
+          {
+            title: t('Deploy Models'),
+            url: '/models/deployments',
+            icon: Rocket,
           },
           {
             title: t('Users'),
@@ -146,6 +132,22 @@ export function useSidebarData(): SidebarData {
             url: '/system-settings/site',
             activeUrls: ['/system-settings'],
             icon: Settings,
+          },
+        ],
+      },
+      {
+        id: 'personal',
+        title: t('Personal'),
+        items: [
+          {
+            title: t('Wallet'),
+            url: '/wallet',
+            icon: Wallet,
+          },
+          {
+            title: t('Profile'),
+            url: '/profile',
+            icon: User,
           },
         ],
       },

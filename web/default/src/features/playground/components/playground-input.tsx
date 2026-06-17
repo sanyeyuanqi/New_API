@@ -67,12 +67,12 @@ interface PlaygroundInputProps {
 }
 
 const suggestions = [
-  { icon: BarChartIcon, text: 'Analyze data', color: '#76d0eb' },
-  { icon: BoxIcon, text: 'Surprise me', color: '#76d0eb' },
-  { icon: NotepadTextIcon, text: 'Summarize text', color: '#ea8444' },
-  { icon: CodeSquareIcon, text: 'Code', color: '#6c71ff' },
-  { icon: GraduationCapIcon, text: 'Get advice', color: '#76d0eb' },
-  { icon: null, text: 'More' },
+  { icon: BarChartIcon, labelKey: 'Analyze data', color: '#76d0eb' },
+  { icon: BoxIcon, labelKey: 'Surprise me', color: '#76d0eb' },
+  { icon: NotepadTextIcon, labelKey: 'Summarize text', color: '#ea8444' },
+  { icon: CodeSquareIcon, labelKey: 'Code', color: '#6c71ff' },
+  { icon: GraduationCapIcon, labelKey: 'Get advice', color: '#76d0eb' },
+  { icon: null, labelKey: 'More' },
 ]
 
 export function PlaygroundInput({
@@ -220,19 +220,23 @@ export function PlaygroundInput({
       </PromptInput>
 
       <Suggestions>
-        {suggestions.map(({ icon: Icon, text, color }) => (
-          <Suggestion
-            className={`text-xs font-normal sm:text-sm ${
-              text === 'More' ? 'hidden sm:flex' : ''
-            }`}
-            key={text}
-            onClick={() => handleSuggestionClick(text)}
-            suggestion={text}
-          >
-            {Icon && <Icon size={16} style={{ color }} />}
-            {text}
-          </Suggestion>
-        ))}
+        {suggestions.map(({ icon: Icon, labelKey, color }) => {
+          const label = t(labelKey)
+
+          return (
+            <Suggestion
+              className={`text-xs font-normal sm:text-sm ${
+                labelKey === 'More' ? 'hidden sm:flex' : ''
+              }`}
+              key={labelKey}
+              onClick={() => handleSuggestionClick(label)}
+              suggestion={label}
+            >
+              {Icon && <Icon size={16} style={{ color }} />}
+              {label}
+            </Suggestion>
+          )
+        })}
       </Suggestions>
     </div>
   )

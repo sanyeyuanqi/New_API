@@ -32,6 +32,10 @@ import {
 import { modelsQueryKeys, vendorsQueryKeys } from '../lib'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { useModelsColumns } from './models-columns'
+import {
+  ModelsCreateButton,
+  ModelsToolbarControls,
+} from './models-primary-buttons'
 import { useModels } from './models-provider'
 
 const route = getRouteApi('/_authenticated/models/$section')
@@ -229,6 +233,8 @@ export function ModelsTable() {
             singleSelect: true,
           },
         ],
+        beforeViewActions: <ModelsToolbarControls />,
+        postActions: <ModelsCreateButton />,
       }}
       bulkActions={<DataTableBulkActions table={table} />}
     />

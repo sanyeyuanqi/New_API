@@ -36,14 +36,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useModels } from './models-provider'
 
-export function ModelsPrimaryButtons() {
-  const { t } = useTranslation()
-  const { setOpen, setCurrentRow } = useModels()
+const PRIMARY_ACTION_BUTTON_CLASS_NAME =
+  'bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20 ring-primary/10 h-8 rounded-full px-3.5 font-semibold shadow-sm ring-1'
 
-  const handleCreateModel = () => {
-    setCurrentRow(null)
-    setOpen('create-model')
-  }
+const MORE_ACTION_BUTTON_CLASS_NAME = 'h-8 rounded-full px-2.5'
+
+export function ModelsToolbarControls() {
+  const { t } = useTranslation()
+  const { setOpen } = useModels()
 
   const handleMissingModels = () => {
     setOpen('missing-models')
@@ -63,15 +63,17 @@ export function ModelsPrimaryButtons() {
 
   return (
     <div className='flex items-center gap-2'>
-      {/* Create Model */}
-      <Button onClick={handleCreateModel} size='sm'>
-        <Plus className='h-4 w-4' />
-        {t('Add Model')}
-      </Button>
-
       {/* More Actions */}
       <DropdownMenu>
-        <DropdownMenuTrigger render={<Button variant='outline' size='sm' />}>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant='outline'
+              size='sm'
+              className={MORE_ACTION_BUTTON_CLASS_NAME}
+            />
+          }
+        >
           <MoreHorizontal className='h-4 w-4' />
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end' className='w-56'>
@@ -106,6 +108,36 @@ export function ModelsPrimaryButtons() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+    </div>
+  )
+}
+
+export function ModelsCreateButton() {
+  const { t } = useTranslation()
+  const { setOpen, setCurrentRow } = useModels()
+
+  const handleCreateModel = () => {
+    setCurrentRow(null)
+    setOpen('create-model')
+  }
+
+  return (
+    <Button
+      onClick={handleCreateModel}
+      size='sm'
+      className={PRIMARY_ACTION_BUTTON_CLASS_NAME}
+    >
+      <Plus className='h-4 w-4' />
+      {t('Add Model')}
+    </Button>
+  )
+}
+
+export function ModelsPrimaryButtons() {
+  return (
+    <div className='flex items-center gap-2'>
+      <ModelsToolbarControls />
+      <ModelsCreateButton />
     </div>
   )
 }

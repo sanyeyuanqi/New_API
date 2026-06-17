@@ -20,7 +20,6 @@ import { useState } from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
 import { CircleAlert, Sparkles, KeyRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { getUserAvatarFallback, getUserAvatarStyle } from '@/lib/avatar'
 import { formatBillingCurrencyFromUSD } from '@/lib/currency'
 import {
   formatUseTime,
@@ -28,7 +27,6 @@ import {
   formatTimestampToDate,
 } from '@/lib/format'
 import { cn } from '@/lib/utils'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   Tooltip,
   TooltipContent,
@@ -269,39 +267,49 @@ function buildDetailSegments(
 
 export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
   const { t } = useTranslation()
-  const columns: ColumnDef<UsageLog>[] = [
-    {
-      accessorKey: 'created_at',
-      header: t('Time'),
-      cell: ({ row }) => {
-        const log = row.original
-        const timestamp = row.getValue('created_at') as number
-        const config = getLogTypeConfig(log.type)
+  const timeColumn: ColumnDef<UsageLog> = {
+    accessorKey: 'created_at',
+    header: t('Time'),
+    cell: ({ row }) => {
+      const timestamp = row.getValue('created_at') as number
 
-        return (
-          <div className='flex min-w-0 flex-col gap-0.5'>
-            <span className='truncate font-mono text-xs tabular-nums'>
-              {formatTimestampToDate(timestamp)}
-            </span>
-            <StatusBadge
-              label={t(config.label)}
-              variant={config.color as StatusBadgeProps['variant']}
-              size='sm'
-              copyable={false}
-              className='!text-xs [&_span]:!text-xs'
-            />
-          </div>
-        )
-      },
-      filterFn: (row, _id, value) => {
-        if (!Array.isArray(value) || value.length === 0) return true
-        if (value.includes(LOG_TYPE_ALL_VALUE)) return true
-        return value.includes(String(row.original.type))
-      },
-      enableHiding: false,
-      size: 180,
+      return (
+        <div className='flex min-w-0 flex-col gap-0.5'>
+          <span className='truncate font-mono text-xs tabular-nums'>
+            {formatTimestampToDate(timestamp)}
+          </span>
+        </div>
+      )
     },
-  ]
+    filterFn: (row, _id, value) => {
+      if (!Array.isArray(value) || value.length === 0) return true
+      if (value.includes(LOG_TYPE_ALL_VALUE)) return true
+      return value.includes(String(row.original.type))
+    },
+    enableHiding: false,
+    size: 180,
+  }
+  const eventColumn: ColumnDef<UsageLog> = {
+    id: 'event',
+    header: t('Event'),
+    accessorFn: (row) => row.type,
+    cell: ({ row }) => {
+      const config = getLogTypeConfig(row.original.type)
+
+      return (
+        <StatusBadge
+          label={t(config.label)}
+          variant={config.color as StatusBadgeProps['variant']}
+          size='sm'
+          copyable={false}
+          className='!text-xs [&_span]:!text-xs'
+        />
+      )
+    },
+    size: 100,
+  }
+
+  const columns: ColumnDef<UsageLog>[] = []
 
   if (isAdmin) {
     columns.push(
@@ -421,28 +429,13 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
           return (
             <button
               type='button'
-              className='flex items-center gap-1.5 text-left'
+              className='flex max-w-[120px] items-center text-left'
               onClick={(e) => {
                 e.stopPropagation()
                 setSelectedUserId(log.user_id)
                 setUserInfoDialogOpen(true)
               }}
             >
-              <Avatar className='ring-border/60 size-6 ring-1 max-sm:hidden'>
-                <AvatarFallback
-                  className={cn(
-                    'text-[11px] font-semibold',
-                    !sensitiveVisible && 'bg-muted text-muted-foreground'
-                  )}
-                  style={
-                    sensitiveVisible
-                      ? getUserAvatarStyle(log.username)
-                      : undefined
-                  }
-                >
-                  {sensitiveVisible ? getUserAvatarFallback(log.username) : '•'}
-                </AvatarFallback>
-              </Avatar>
               <TooltipProvider delay={300}>
                 <Tooltip>
                   <TooltipTrigger
@@ -462,6 +455,11 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
         },
       }
     )
+
+    const userColumn = columns.pop()
+    if (userColumn) {
+      columns.unshift(userColumn)
+    }
   }
 
   columns.push({
@@ -806,6 +804,9 @@ export function useCommonLogsColumns(isAdmin: boolean): ColumnDef<UsageLog>[] {
       maxSize: 200,
     }
   )
+
+  columns.push(eventColumn)
+  columns.push(timeColumn)
 
   return columns
 }

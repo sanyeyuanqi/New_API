@@ -497,7 +497,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<'li'>) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  'peer/menu-button group/menu-button relative flex w-full items-center gap-2 overflow-hidden rounded-lg border border-transparent px-2.5 py-2 text-left text-sm ring-sidebar-ring outline-hidden transition-[width,height,padding,color,background-color,border-color,box-shadow] duration-150 before:absolute before:left-1 before:top-1/2 before:h-4 before:w-0.5 before:-translate-y-1/2 before:rounded-full before:bg-transparent before:transition-colors before:duration-150 group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:p-2.5! group-data-[collapsible=icon]:before:hidden group-data-[collapsible=icon]:[&>span]:hidden hover:bg-accent/70 hover:text-accent-foreground focus-visible:ring-2 active:bg-accent active:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:hover:bg-accent/70 data-open:hover:text-accent-foreground data-active:border-slate-200/80 data-active:bg-white/78 data-active:font-semibold data-active:text-slate-950 data-active:shadow-[0_8px_22px_rgba(15,23,42,0.055),inset_0_1px_0_rgba(255,255,255,0.9)] data-active:before:bg-slate-950/70 dark:data-active:border-white/10 dark:data-active:bg-white/[0.075] dark:data-active:text-white dark:data-active:shadow-[0_10px_28px_rgba(0,0,0,0.28),inset_0_1px_0_rgba(255,255,255,0.08)] dark:data-active:before:bg-white/80 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate',
+  'peer/menu-button group/menu-button relative flex w-full items-center gap-2 overflow-hidden rounded-md border border-transparent px-2.5 py-2 text-left font-mono text-[13px] font-medium tabular-nums text-sidebar-foreground/88 ring-sidebar-ring outline-hidden transition-[width,height,padding,color,background-color,border-color] duration-150 group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:p-2.5! group-data-[collapsible=icon]:[&>span]:hidden hover:bg-muted/55 hover:text-foreground focus-visible:ring-2 active:bg-muted active:text-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:hover:bg-muted/55 data-open:hover:text-foreground data-active:border-border data-active:bg-muted/65 data-active:font-semibold data-active:text-foreground dark:data-active:border-white/10 dark:data-active:bg-white/[0.08] dark:data-active:text-white [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate',
   {
     variants: {
       variant: {
@@ -506,9 +506,9 @@ const sidebarMenuButtonVariants = cva(
           'bg-background shadow-[0_0_0_1px_var(--sidebar-border)] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:shadow-[0_0_0_1px_var(--sidebar-accent)]',
       },
       size: {
-        default: 'h-8 text-sm',
+        default: 'h-8 text-[13px]',
         sm: 'h-7 text-xs',
-        lg: 'h-12 text-sm group-data-[collapsible=icon]:p-0!',
+        lg: 'h-12 text-[13px] group-data-[collapsible=icon]:p-0!',
       },
     },
     defaultVariants: {
@@ -613,7 +613,7 @@ function SidebarMenuBadge({
       data-slot='sidebar-menu-badge'
       data-sidebar='menu-badge'
       className={cn(
-        'text-sidebar-foreground peer-hover/menu-button:text-sidebar-accent-foreground peer-data-active/menu-button:text-sidebar-accent-foreground pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-xs font-medium tabular-nums select-none group-data-[collapsible=icon]:hidden peer-data-[size=default]/menu-button:top-1.5 peer-data-[size=lg]/menu-button:top-2.5 peer-data-[size=sm]/menu-button:top-1',
+        'text-sidebar-foreground/75 peer-hover/menu-button:text-foreground peer-data-active/menu-button:text-foreground pointer-events-none absolute right-1 flex h-5 min-w-5 items-center justify-center rounded-md px-1 font-mono text-xs font-medium tabular-nums select-none group-data-[collapsible=icon]:hidden peer-data-[size=default]/menu-button:top-1.5 peer-data-[size=lg]/menu-button:top-2.5 peer-data-[size=sm]/menu-button:top-1',
         className
       )}
       {...props}
@@ -703,7 +703,7 @@ function SidebarMenuSubButton({
     props: mergeProps<'a'>(
       {
         className: cn(
-          'relative flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-lg border border-transparent px-2 text-sidebar-foreground ring-sidebar-ring outline-hidden transition-[color,background-color,border-color,box-shadow] duration-150 before:absolute before:left-1 before:top-1/2 before:h-3 before:w-0.5 before:-translate-y-1/2 before:rounded-full before:bg-transparent before:transition-colors before:duration-150 group-data-[collapsible=icon]:hidden hover:bg-accent/70 hover:text-accent-foreground focus-visible:ring-2 active:bg-accent active:text-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm data-[size=sm]:text-xs data-active:border-slate-200/80 data-active:bg-white/72 data-active:font-medium data-active:text-slate-950 data-active:shadow-[0_6px_18px_rgba(15,23,42,0.045),inset_0_1px_0_rgba(255,255,255,0.85)] data-active:before:bg-slate-950/70 dark:data-active:border-white/10 dark:data-active:bg-white/[0.07] dark:data-active:text-white dark:data-active:shadow-[0_8px_22px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.08)] dark:data-active:before:bg-white/80 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
+          'relative flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md border border-transparent px-2 font-mono font-medium tabular-nums text-sidebar-foreground/85 ring-sidebar-ring outline-hidden transition-[color,background-color,border-color] duration-150 group-data-[collapsible=icon]:hidden hover:bg-muted/55 hover:text-foreground focus-visible:ring-2 active:bg-muted active:text-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-[13px] data-[size=sm]:text-xs data-active:border-border data-active:bg-muted/65 data-active:font-semibold data-active:text-foreground dark:data-active:border-white/10 dark:data-active:bg-white/[0.08] dark:data-active:text-white [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0',
           className
         ),
       },

@@ -38,6 +38,7 @@ import {
 import type { User } from '../types'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { useUsersColumns } from './users-columns'
+import { UsersPrimaryButtons } from './users-primary-buttons'
 import { useUsers } from './users-provider'
 
 const route = getRouteApi('/_authenticated/users/')
@@ -189,6 +190,7 @@ export function UsersTable() {
             singleSelect: true,
           },
         ],
+        postActions: <UsersPrimaryButtons />,
       }}
       getRowClassName={(row, { isMobile }) =>
         isDisabledUserRow(row.original)

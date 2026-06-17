@@ -26,7 +26,7 @@ import {
   useEffect,
   useState,
 } from 'react'
-import { BrainIcon, ChevronDownIcon } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useControllableState } from '@/lib/use-controllable-state'
 import { cn } from '@/lib/utils'
 import {
@@ -163,7 +163,6 @@ export const ReasoningTrigger = memo(
       >
         {children ?? (
           <>
-            <BrainIcon className='size-4' />
             {getThinkingMessage(isStreaming, duration)}
             <ChevronDownIcon
               className={cn(

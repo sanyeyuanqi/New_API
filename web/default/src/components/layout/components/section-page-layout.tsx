@@ -58,7 +58,6 @@ export function SectionPageLayout(props: SectionPageLayoutProps) {
     null
   )
 
-  let hasTitle = false
   let actions: ReactNode = null
   let content: ReactNode = null
   let breadcrumb: ReactNode = null
@@ -66,16 +65,14 @@ export function SectionPageLayout(props: SectionPageLayoutProps) {
   Children.forEach(props.children, (node) => {
     if (!isValidElement(node)) return
     const child = node as ReactElement<SlotProps>
-    if (child.type === SectionPageLayoutTitle) hasTitle = true
-    else if (child.type === SectionPageLayoutActions)
-      actions = child.props.children
+    if (child.type === SectionPageLayoutActions) actions = child.props.children
     else if (child.type === SectionPageLayoutContent)
       content = child.props.children
     else if (child.type === SectionPageLayoutBreadcrumb)
       breadcrumb = child.props.children
   })
 
-  const hasHeader = hasTitle || breadcrumb != null || actions != null
+  const hasHeader = breadcrumb != null || actions != null
 
   return (
     <PageFooterProvider container={footerContainer}>

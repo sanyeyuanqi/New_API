@@ -334,20 +334,24 @@ function BrandIntro({ isDark, compact = false, chipStyle }: BrandIntroProps) {
         <div className='absolute -inset-x-8 -inset-y-6 -z-10 rounded-[2rem] bg-[radial-gradient(circle_at_18%_20%,rgba(255,255,255,0.08),rgba(255,255,255,0)_58%)]' />
       )}
       <p
-        className='mb-3 max-w-[12rem] text-xs tracking-[0.2em] uppercase sm:max-w-none'
+        className='mb-2 max-w-full text-xs tracking-[0.18em] uppercase sm:mb-3 sm:tracking-[0.2em]'
         style={{ color: isDark ? '#e5e7eb' : '#818cf8', fontWeight: 700 }}
       >
         {t('Global AI API Platform')}
       </p>
       <h2
-        className={compact ? 'mb-3 max-w-[36rem]' : 'mb-3 max-w-[38rem]'}
+        className={
+          compact
+            ? 'mb-2 max-w-[min(100%,36rem)] break-words sm:mb-3'
+            : 'mb-3 max-w-[38rem]'
+        }
         style={{
           fontSize: compact
-            ? 'clamp(2rem, 9.5vw, 2.7rem)'
+            ? 'clamp(1.85rem, 8.5vw, 2.55rem)'
             : 'clamp(2.1rem, 5.4vw, 3rem)',
           fontWeight: 800,
           color: isDark ? '#f8fafc' : '#1e1b4b',
-          lineHeight: 1.2,
+          lineHeight: compact ? 1.12 : 1.2,
           textShadow: isDark
             ? '0 0 28px rgba(255,255,255,0.18)'
             : undefined,
@@ -451,19 +455,13 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           </div>
         </div>
 
-        <div className='relative z-10 px-4 pt-1 pb-4 select-none sm:px-8 sm:pt-3 lg:hidden'>
+        <div className='relative z-10 px-4 pt-1 pb-5 select-none sm:px-8 sm:pt-3 sm:pb-6 md:px-10 lg:hidden'>
           <BrandIntro isDark={isDark} compact chipStyle={chipStyle} />
         </div>
 
         {/* Right — auth card */}
         <div
-          className='relative z-10 flex w-full flex-1 items-start justify-center px-4 pt-0 pb-6 sm:px-6 sm:pt-2 lg:flex-none lg:items-center lg:px-[clamp(12px,2vw,24px)] lg:pt-8'
-          style={{
-            width: 'clamp(340px, 38vw, 480px)',
-            marginRight: 'clamp(24px, 6vw, 128px)',
-            transform:
-              'translate(clamp(-82px, -7vw, -18px), clamp(-112px, -9vw, -48px))',
-          }}
+          className='relative z-10 flex w-full flex-1 items-start justify-center px-4 pt-0 pb-8 sm:px-6 md:px-10 lg:mr-[clamp(24px,6vw,128px)] lg:w-[clamp(340px,38vw,480px)] lg:flex-none lg:items-center lg:px-[clamp(12px,2vw,24px)] lg:pt-8 lg:pb-8 lg:[transform:translate(clamp(-56px,-5vw,-12px),clamp(-72px,-6vw,-32px))]'
         >
           <div
             className={`w-full max-w-[min(420px,100%)] rounded-xl border p-5 backdrop-blur-xl transition-all duration-300 ease-out sm:p-7 md:p-8 lg:max-w-[min(410px,100%)] lg:hover:-translate-y-1 ${authCardSurfaceClass}`}

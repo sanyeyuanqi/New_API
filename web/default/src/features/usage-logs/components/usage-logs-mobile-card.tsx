@@ -19,7 +19,6 @@ For commercial licensing, please contact support@quantumnous.com
 import { flexRender, type Cell, type Table } from '@tanstack/react-table'
 import { Database } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { formatTimestampToDate } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import {
   Empty,
@@ -29,13 +28,7 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import { Skeleton } from '@/components/ui/skeleton'
-import {
-  dotColorMap,
-  textColorMap,
-  type StatusVariant,
-} from '@/components/status-badge'
 import { LOG_TYPE_ENUM } from '../constants'
-import { getLogTypeConfig } from '../lib/utils'
 import type { LogCategory } from '../types'
 
 const logTypeRowTint: Record<number, string> = {
@@ -52,6 +45,19 @@ interface UsageLogsMobileListProps<TData> {
   emptyDescription?: string
   logCategory: LogCategory
 }
+
+const COMMON_MOBILE_COLUMNS = [
+  { id: 'user', labelKey: 'User', width: '120px' },
+  { id: 'channel', labelKey: 'Channel', width: '130px' },
+  { id: 'token_name', labelKey: 'Token', width: '150px' },
+  { id: 'model_name', labelKey: 'Model', width: '150px' },
+  { id: 'use_time', labelKey: 'Timing', width: '130px' },
+  { id: 'prompt_tokens', labelKey: 'Tokens', width: '130px' },
+  { id: 'quota', labelKey: 'Cost', width: '110px' },
+  { id: 'content', labelKey: 'Details', width: '240px' },
+  { id: 'event', labelKey: 'Event', width: '100px' },
+  { id: 'created_at', labelKey: 'Time', width: '160px' },
+] as const
 
 function UsageLogsMobileSkeleton() {
   return (
@@ -139,99 +145,67 @@ function SummaryField<TData>({
   )
 }
 
-function MobileLogTimeStatus({
-  createdAt,
-  type,
-}: {
-  createdAt: unknown
-  type: unknown
-}) {
+function CommonLogsMobileTable<TData>({ table }: { table: Table<TData> }) {
   const { t } = useTranslation()
-  const timestamp = typeof createdAt === 'number' ? createdAt : undefined
-  const logType = typeof type === 'number' ? type : undefined
-  const config = getLogTypeConfig(logType ?? LOG_TYPE_ENUM.UNKNOWN)
-  const variant = config.color as StatusVariant
+  const rows = table.getRowModel().rows
+  const mobileColumns = COMMON_MOBILE_COLUMNS.filter((column) => {
+    return table.getColumn(column.id)?.getIsVisible() ?? false
+  })
+  const gridTemplateColumns = mobileColumns
+    .map((column) => column.width)
+    .join(' ')
 
   return (
-    <div className='space-y-1'>
-      <div className='font-mono text-xs leading-tight tabular-nums'>
-        {formatTimestampToDate(timestamp)}
-      </div>
-      <div
-        className={cn(
-          'inline-flex items-center gap-1 text-xs leading-none font-medium',
-          textColorMap[variant]
-        )}
-      >
-        <span
-          className={cn('size-1.5 shrink-0 rounded-full', dotColorMap[variant])}
-          aria-hidden='true'
-        />
-        <span>{t(config.label)}</span>
-      </div>
-    </div>
-  )
-}
-
-function CommonLogsCard<TData>({
-  cells,
-}: {
-  cells: Map<string, Cell<TData, unknown>>
-}) {
-  const { t } = useTranslation()
-
-  const modelCell = cells.get('model_name')
-  const quotaCell = cells.get('quota')
-  const rowData = cells.get('created_at')?.row.original as
-    | Record<string, unknown>
-    | undefined
-
-  return (
-    <div className='space-y-2.5'>
-      <div className='flex min-w-0 items-center justify-between gap-3'>
-        <CompactCell cell={modelCell} className='flex-1' />
-        <CompactCell
-          cell={quotaCell}
-          className='shrink-0 text-right [&_.flex-col]:items-end'
-        />
-      </div>
-
-      <div className='grid grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] gap-1.5'>
-        <div className='bg-muted/20 min-w-0 rounded-md px-2 py-1.5'>
-          <div className='text-muted-foreground mb-1 text-[11px] leading-none font-medium select-none'>
-            {t('Time')}
-          </div>
-          <MobileLogTimeStatus
-            createdAt={rowData?.created_at}
-            type={rowData?.type}
-          />
+    <div className='border-border/50 bg-card overflow-x-auto rounded-lg border'>
+      <div style={{ gridTemplateColumns }} className='min-w-max'>
+        <div
+          style={{ gridTemplateColumns }}
+          className='bg-muted/30 border-border/50 grid border-b'
+        >
+          {mobileColumns.map((column) => (
+            <div
+              key={column.id}
+              className='text-muted-foreground px-3 py-2 text-[12px] leading-none font-medium'
+            >
+              {t(column.labelKey)}
+            </div>
+          ))}
         </div>
-        <SummaryField
-          label={t('Channel')}
-          cell={cells.get('channel')}
-          primaryOnly
-        />
-        <SummaryField label={t('User')} cell={cells.get('user')} primaryOnly />
-        <SummaryField
-          label={t('Token')}
-          cell={cells.get('token_name')}
-          valueClassName='[&_.flex-col]:max-w-none [&_.flex-col>*:not(:first-child)]:text-[11px] [&_.flex-col>*:not(:first-child)]:leading-none'
-        />
-        <SummaryField
-          label={t('Timing')}
-          cell={cells.get('use_time')}
-          primaryOnly
-        />
-        <SummaryField
-          label={t('Tokens')}
-          cell={cells.get('prompt_tokens')}
-          primaryOnly
-        />
-        <SummaryField
-          label={t('Details')}
-          cell={cells.get('content')}
-          className='col-span-2 bg-transparent px-0 py-0'
-        />
+
+        {rows.map((row) => {
+          const cells = new Map(
+            row.getVisibleCells().map((cell) => [cell.column.id, cell])
+          )
+          const logType = (row.original as Record<string, unknown>).type as
+            | number
+            | undefined
+          const tintClass =
+            logType != null ? (logTypeRowTint[logType] ?? '') : ''
+
+          return (
+            <div
+              key={row.id}
+              style={{ gridTemplateColumns }}
+              className={cn(
+                'border-border/40 grid border-b last:border-b-0',
+                tintClass
+              )}
+            >
+              {mobileColumns.map((column) => (
+                <div
+                  key={column.id}
+                  className='min-w-0 px-3 py-2.5 align-middle'
+                >
+                  <CompactCell
+                    cell={cells.get(column.id)}
+                    primaryOnly={column.id !== 'token_name'}
+                    className='truncate text-[12px] [&_button]:truncate [&_span]:truncate'
+                  />
+                </div>
+              ))}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -351,6 +325,10 @@ export function UsageLogsMobileList<TData>({
     )
   }
 
+  if (logCategory === 'common') {
+    return <CommonLogsMobileTable table={table} />
+  }
+
   return (
     <div className='border-border/50 bg-card overflow-hidden rounded-lg border'>
       {rows.map((row) => {
@@ -371,7 +349,6 @@ export function UsageLogsMobileList<TData>({
               tintClass
             )}
           >
-            {logCategory === 'common' && <CommonLogsCard cells={cells} />}
             {logCategory === 'task' && <TaskLogsCard cells={cells} />}
             {logCategory === 'drawing' && <DrawingLogsCard cells={cells} />}
           </div>

@@ -217,10 +217,28 @@ export function ChatPresetsItem({ item }: { item: NavChatPresets }) {
   )
 
   const normalizedHref = normalizeHref(href)
+  const isFlat = item.variant === 'flat'
 
   // Don't render if no visible presets
   if (visiblePresets.length === 0) {
     return null
+  }
+
+  if (isFlat) {
+    return (
+      <>
+        {visiblePresets.map((preset) => (
+          <ChatMenuItem
+            key={preset.id}
+            preset={preset}
+            active={normalizedHref === `/chat/${preset.id}`}
+            loading={loadingPresetId === preset.id}
+            onOpen={handleOpenExternal}
+            onNavigate={() => setOpenMobile(false)}
+          />
+        ))}
+      </>
+    )
   }
 
   // Collapsed state on non-mobile - render dropdown menu
