@@ -3441,6 +3441,7 @@
     "Reset balance and used quota": "重置余额和已用配额",
     "Reset Cycle": "重置周期",
     "Reset email sent, please check your inbox": "重置邮件已发送，请检查您的收件箱",
+    "Send reset email": "发送重置邮件",
     "Reset failed": "重置失败",
     "Reset model ratios": "重置模型倍率",
     "Reset Passkey": "重置 Passkey",
