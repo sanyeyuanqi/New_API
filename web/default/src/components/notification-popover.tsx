@@ -17,13 +17,20 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import type { TFunction } from 'i18next'
-import { Bell, Megaphone } from 'lucide-react'
+import { Bell, Megaphone, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { getAnnouncementColorClass } from '@/lib/colors'
 import { formatDateTimeObject } from '@/lib/time'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import {
   Empty,
   EmptyDescription,
@@ -32,13 +39,6 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty'
 import { Markdown } from '@/components/ui/markdown'
-import {
-  Popover,
-  PopoverContent,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverTrigger,
-} from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -59,6 +59,7 @@ interface NotificationPopoverProps {
   notice: string
   announcements: AnnouncementItem[]
   loading: boolean
+  onCloseToday?: () => void
   className?: string
 }
 
@@ -184,7 +185,7 @@ function NoticeContent({
 
   return (
     <ScrollArea className='h-[min(52vh,28rem)] pr-3'>
-      <Markdown>{notice}</Markdown>
+      <Markdown className='mx-auto max-w-[46rem]'>{notice}</Markdown>
     </ScrollArea>
   )
 }
@@ -277,12 +278,13 @@ export function NotificationPopover({
   notice,
   announcements,
   loading,
+  onCloseToday,
   className,
 }: NotificationPopoverProps) {
   const { t } = useTranslation()
   return (
-    <Popover open={open} onOpenChange={onOpenChange}>
-      <PopoverTrigger
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger
         render={
           <Button
             variant='ghost'
@@ -301,40 +303,55 @@ export function NotificationPopover({
             {unreadCount > 99 ? '99+' : unreadCount}
           </Badge>
         ) : null}
-      </PopoverTrigger>
+      </DialogTrigger>
 
-      <PopoverContent
-        align='end'
-        sideOffset={8}
-        className='w-[min(26rem,calc(100vw-1rem))] gap-3 p-3'
+      <DialogContent
+        showCloseButton={false}
+        className='top-8 flex max-h-[calc(100vh-4rem)] w-[min(58rem,calc(100vw-2rem))] max-w-none translate-y-0 flex-col gap-6 overflow-hidden p-5 sm:top-10 sm:max-w-[58rem] sm:p-6'
       >
-        <PopoverHeader className='gap-1 px-1'>
-          <PopoverTitle>{t('System Announcements')}</PopoverTitle>
-          <p className='text-muted-foreground text-xs'>
-            {t('Latest platform updates and notices')}
-          </p>
-        </PopoverHeader>
-
         <Tabs
           value={activeTab}
           onValueChange={onTabChange as (value: string) => void}
+          className='min-h-0 gap-5'
         >
-          <TabsList className='grid w-full grid-cols-2'>
-            <TabsTrigger value='notice' className='gap-1.5'>
-              <Bell className='size-3.5' />
-              {t('Notice')}
-            </TabsTrigger>
-            <TabsTrigger value='announcements' className='gap-1.5'>
-              <Megaphone className='size-3.5' />
-              {t('Timeline')}
-            </TabsTrigger>
-          </TabsList>
+          <DialogHeader className='flex-row items-start justify-between gap-4 space-y-0'>
+            <DialogTitle className='pt-1 text-lg font-semibold'>
+              {t('System Announcements')}
+            </DialogTitle>
+            <div className='flex shrink-0 items-center gap-2'>
+              <TabsList className='bg-transparent p-0 group-data-horizontal/tabs:h-9'>
+                <TabsTrigger
+                  value='notice'
+                  className='data-active:bg-primary/10 data-active:text-primary h-9 gap-1.5 rounded-lg px-3 text-xs data-active:shadow-none'
+                >
+                  <Bell className='size-3.5' />
+                  {t('Notice')}
+                </TabsTrigger>
+                <TabsTrigger
+                  value='announcements'
+                  className='data-active:bg-primary/10 data-active:text-primary h-9 gap-1.5 rounded-lg px-3 text-xs data-active:shadow-none'
+                >
+                  <Megaphone className='size-3.5' />
+                  {t('System Announcements')}
+                </TabsTrigger>
+              </TabsList>
+              <Button
+                variant='ghost'
+                size='icon-sm'
+                className='size-8'
+                onClick={() => onOpenChange(false)}
+                aria-label={t('Close')}
+              >
+                <X className='size-4' />
+              </Button>
+            </div>
+          </DialogHeader>
 
-          <TabsContent value='notice' className='mt-2'>
+          <TabsContent value='notice' className='min-h-0'>
             <NoticeContent notice={notice} loading={loading} t={t} />
           </TabsContent>
 
-          <TabsContent value='announcements' className='mt-2'>
+          <TabsContent value='announcements' className='min-h-0'>
             <AnnouncementsContent
               announcements={announcements}
               loading={loading}
@@ -343,12 +360,25 @@ export function NotificationPopover({
           </TabsContent>
         </Tabs>
 
-        <div className='flex justify-end'>
-          <Button size='sm' onClick={() => onOpenChange(false)}>
-            {t('Close')}
+        <div className='border-border/60 flex shrink-0 flex-wrap justify-end gap-2 border-t pt-4'>
+          <Button
+            variant='ghost'
+            size='sm'
+            className='h-8 min-w-[4.75rem] rounded-[8px] bg-zinc-100 px-3 text-zinc-600 hover:bg-zinc-200 hover:text-zinc-900 dark:bg-white/10 dark:text-zinc-300 dark:hover:bg-white/15 dark:hover:text-white'
+            onClick={onCloseToday}
+          >
+            {t('Close Today')}
+          </Button>
+          <Button
+            variant='ghost'
+            size='sm'
+            className='h-8 min-w-[4.75rem] rounded-[8px] border border-zinc-900 bg-zinc-900 px-3 text-white shadow-sm hover:bg-zinc-800 dark:border-white/15 dark:bg-white/10 dark:text-foreground dark:shadow-none dark:hover:bg-white/15'
+            onClick={() => onOpenChange(false)}
+          >
+            {t('Close announcement')}
           </Button>
         </div>
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   )
 }

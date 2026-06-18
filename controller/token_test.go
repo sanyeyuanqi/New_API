@@ -506,6 +506,38 @@ func TestUpdateTokenMasksKeyInResponse(t *testing.T) {
 	}
 }
 
+func TestUpdateTokenStatusOnlySkipsQuotaValidation(t *testing.T) {
+	db := setupTokenControllerTestDB(t)
+	token := seedToken(t, db, 1, "status-token", "stat1234token5678")
+
+	originalQuotaPerUnit := common.QuotaPerUnit
+	common.QuotaPerUnit = -1
+	t.Cleanup(func() {
+		common.QuotaPerUnit = originalQuotaPerUnit
+	})
+
+	body := map[string]any{
+		"id":     token.Id,
+		"status": common.TokenStatusDisabled,
+	}
+
+	ctx, recorder := newAuthenticatedContext(t, http.MethodPut, "/api/token/?status_only=true", body, 1)
+	UpdateToken(ctx)
+
+	response := decodeAPIResponse(t, recorder)
+	if !response.Success {
+		t.Fatalf("expected status-only update to skip quota validation, got message: %s", response.Message)
+	}
+
+	var updated model.Token
+	if err := db.First(&updated, token.Id).Error; err != nil {
+		t.Fatalf("failed to load updated token: %v", err)
+	}
+	if updated.Status != common.TokenStatusDisabled {
+		t.Fatalf("expected token status %d, got %d", common.TokenStatusDisabled, updated.Status)
+	}
+}
+
 func TestGetTokenKeyRequiresOwnershipAndReturnsFullKey(t *testing.T) {
 	db := setupTokenControllerTestDB(t)
 	token := seedToken(t, db, 1, "owned-token", "owner1234token5678")

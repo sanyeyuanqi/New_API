@@ -171,22 +171,88 @@ export function PricingToolbar(props: PricingToolbarProps) {
   return (
     <div className='rounded-2xl border border-white/70 bg-white/72 p-3 shadow-[0_18px_60px_rgba(15,23,42,0.08)] backdrop-blur-2xl dark:border-white/10 dark:bg-white/[0.055]'>
       <div className='flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between'>
-        <div className='flex flex-1 flex-col gap-2 sm:flex-row sm:items-center'>
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            onClick={() => setMobileFiltersOpen(true)}
-            className='w-fit rounded-full gap-1.5 xl:hidden'
-          >
-            <Filter className='size-4' />
-            {t('Filter')}
-            {props.activeFilterCount > 0 && (
-              <Badge className='ml-0.5 size-5 justify-center p-0 text-[10px]'>
-                {props.activeFilterCount}
-              </Badge>
-            )}
-          </Button>
+        <div className='flex flex-1 flex-col gap-2 xl:flex-row xl:items-center'>
+          <div className='flex items-center gap-2 xl:hidden'>
+            <Button
+              type='button'
+              variant='outline'
+              size='sm'
+              onClick={() => setMobileFiltersOpen(true)}
+              className='h-8 shrink-0 gap-1.5 rounded-full px-3'
+            >
+              <Filter className='size-4' />
+              {t('Filter')}
+              {props.activeFilterCount > 0 && (
+                <Badge className='ml-0.5 size-5 justify-center p-0 text-[10px]'>
+                  {props.activeFilterCount}
+                </Badge>
+              )}
+            </Button>
+
+            <div className='ml-auto flex min-w-0 items-center justify-end gap-1.5'>
+              <div className='text-muted-foreground flex h-8 shrink-0 items-center justify-center rounded-full border border-slate-200/80 bg-white/80 px-2.5 text-xs shadow-sm dark:border-white/10 dark:bg-white/[0.06]'>
+                <span className='text-foreground font-semibold tabular-nums'>
+                  {props.filteredCount.toLocaleString()}
+                </span>
+                <span className='ml-1'>
+                  {props.filteredCount === 1 ? t('model') : t('models')}
+                </span>
+              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      className='h-8 gap-1.5 px-2.5 text-xs'
+                    />
+                  }
+                >
+                  <ArrowUpDown className='size-3.5' />
+                  <span className='max-w-12 truncate'>
+                    {sortLabels[props.sortBy as SortOption] || t('Sort')}
+                  </span>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end' className='w-44'>
+                  {Object.entries(sortLabels).map(([value, label]) => (
+                    <DropdownMenuItem
+                      key={value}
+                      onClick={() => props.onSortChange(value)}
+                      className='gap-2'
+                    >
+                      <Check
+                        className={cn(
+                          'size-4 shrink-0',
+                          props.sortBy === value ? 'opacity-100' : 'opacity-0'
+                        )}
+                      />
+                      {label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <SegmentedControl
+                options={[
+                  {
+                    value: VIEW_MODES.CARD,
+                    icon: Grid2X2,
+                    tooltip: t('Card view'),
+                  },
+                  {
+                    value: VIEW_MODES.TABLE,
+                    icon: Table2,
+                    tooltip: t('Table view'),
+                  },
+                ]}
+                value={props.viewMode}
+                onChange={handleViewModeChange}
+                ariaLabel={t('View mode')}
+              />
+            </div>
+          </div>
 
           <SearchBar
             value={props.searchValue}
@@ -197,7 +263,7 @@ export function PricingToolbar(props: PricingToolbarProps) {
           />
         </div>
 
-        <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end'>
+        <div className='hidden flex-col gap-2 sm:flex-row sm:items-center sm:justify-end xl:flex'>
           <div className='text-muted-foreground flex h-8 items-center justify-center rounded-full border border-slate-200/80 bg-white/80 px-3 text-sm shadow-sm dark:border-white/10 dark:bg-white/[0.06]'>
             <span className='text-foreground font-semibold tabular-nums'>
               {props.filteredCount.toLocaleString()}
