@@ -29,7 +29,7 @@ import {
   ModelCardGrid,
   ModelDetailsDrawer,
 } from './components'
-import { EXCLUDED_GROUPS, VIEW_MODES } from './constants'
+import { EXCLUDED_GROUPS, FILTER_ALL, VIEW_MODES } from './constants'
 import { useFilters } from './hooks/use-filters'
 import { usePricingData } from './hooks/use-pricing-data'
 
@@ -107,6 +107,9 @@ export function Pricing() {
     clearSearch()
   }, [clearFilters, clearSearch])
 
+  const selectedPricingGroup =
+    groupFilter === FILTER_ALL ? undefined : groupFilter
+
   const renderPricingContent = () => {
     if (filteredModels.length === 0) {
       return (
@@ -127,6 +130,7 @@ export function Pricing() {
           usdExchangeRate={usdExchangeRate}
           tokenUnit={tokenUnit}
           showRechargePrice={showRechargePrice}
+          selectedGroup={selectedPricingGroup}
         />
       )
     }
@@ -138,6 +142,7 @@ export function Pricing() {
         usdExchangeRate={usdExchangeRate}
         tokenUnit={tokenUnit}
         showRechargePrice={showRechargePrice}
+        selectedGroup={selectedPricingGroup}
         onModelClick={handleModelClick}
       />
     )
