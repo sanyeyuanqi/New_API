@@ -190,9 +190,11 @@ function getTestTableColumnClass(columnId: string) {
     case 'model':
       return 'w-auto whitespace-nowrap'
     case 'status':
-      return 'w-70 min-w-70 max-w-70 whitespace-normal'
+      return 'w-40 min-w-40 max-w-40 whitespace-normal'
+    case 'responseTime':
+      return 'w-40 min-w-40 whitespace-nowrap'
     case 'actions':
-      return 'bg-popover w-24 min-w-24 whitespace-nowrap sm:w-28 sm:min-w-28'
+      return 'bg-popover w-24 min-w-24 text-center whitespace-nowrap sm:w-28 sm:min-w-28'
     default:
       return undefined
   }
@@ -452,40 +454,53 @@ export function ChannelTestDialog({
       },
       {
         id: 'status',
-        header: t('Status'),
+        header: () => <div className='text-center'>{t('Status')}</div>,
         cell: ({ row }) => {
           const model = row.original.model
           const result = testResults[model]
           return (
-            <TestStatusCell
-              result={result}
-              model={model}
-              onOpenDetails={setFailureDetails}
-            />
+            <div className='flex justify-center text-center'>
+              <TestStatusCell
+                result={result}
+                model={model}
+                onOpenDetails={setFailureDetails}
+              />
+            </div>
           )
         },
         enableSorting: false,
         size: 220,
       },
       {
+        id: 'responseTime',
+        header: t('Response Time'),
+        cell: ({ row }) => (
+          <ResponseTimeCell result={testResults[row.original.model]} />
+        ),
+        enableSorting: false,
+        size: 112,
+      },
+      {
         id: 'actions',
-        header: t('Actions'),
+        header: () => <div className='text-center'>{t('Actions')}</div>,
         cell: ({ row }) => {
           const model = row.original.model
           const isTestingModel = testingModels.has(model)
 
           return (
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={() => testSingleModel(model)}
-              disabled={isTestingModel || isBatchTesting}
-            >
-              {isTestingModel && (
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-              )}
-              {t('Test')}
-            </Button>
+            <div className='flex justify-center'>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() => testSingleModel(model)}
+                disabled={isTestingModel || isBatchTesting}
+              >
+                {isTestingModel && (
+                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                )}
+                {t('Test')}
+              </Button>
+            </div>
           )
         },
         enableSorting: false,
@@ -627,7 +642,8 @@ export function ChannelTestDialog({
                   <colgroup>
                     <col className='w-10 min-w-10' />
                     <col className='w-auto' />
-                    <col className='w-70' />
+                    <col className='w-40' />
+                    <col className='w-40' />
                     <col className='w-24 sm:w-28' />
                   </colgroup>
                 }
@@ -693,14 +709,7 @@ function TestStatusCell({
 
   if (result.status === 'success') {
     return (
-      <div className='flex min-w-0 flex-col gap-1 text-xs'>
-        <StatusBadge label={t('Success')} variant='success' copyable={false} />
-        {typeof result.responseTime === 'number' && (
-          <span className='text-muted-foreground truncate'>
-            {formatResponseTime(result.responseTime, t)}
-          </span>
-        )}
-      </div>
+      <StatusBadge label={t('Success')} variant='success' copyable={false} />
     )
   }
 
@@ -710,6 +719,20 @@ function TestStatusCell({
       model={model}
       onOpenDetails={onOpenDetails}
     />
+  )
+}
+
+function ResponseTimeCell({ result }: { result?: TestResult }) {
+  const { t } = useTranslation()
+
+  if (result?.status !== 'success' || typeof result.responseTime !== 'number') {
+    return <span className='text-muted-foreground'>—</span>
+  }
+
+  return (
+    <span className='text-muted-foreground text-sm tabular-nums'>
+      {formatResponseTime(result.responseTime, t)}
+    </span>
   )
 }
 
@@ -736,12 +759,12 @@ function FailureStatusContent({
   })
 
   return (
-    <div className='flex min-w-0 flex-col gap-1.5 text-xs whitespace-normal'>
+    <div className='flex min-w-0 flex-col items-center gap-1.5 text-center text-xs whitespace-normal'>
       <StatusBadge label={t('Failed')} variant='danger' copyable={false} />
       <p className='text-muted-foreground line-clamp-2 min-w-0 leading-snug wrap-break-word'>
         {summary}
       </p>
-      <div className='flex min-w-0 flex-wrap items-center gap-1.5'>
+      <div className='flex min-w-0 flex-wrap items-center justify-center gap-1.5'>
         {isModelPriceError && (
           <Button
             variant='outline'

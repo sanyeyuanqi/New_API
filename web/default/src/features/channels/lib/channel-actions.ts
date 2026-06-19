@@ -241,7 +241,10 @@ export async function handleTestChannel(
       if (!options?.silent) {
         toast.success(i18next.t(SUCCESS_MESSAGES.TESTED))
       }
-      onTestComplete?.(true, response.data?.response_time)
+      const responseTime =
+        response.data?.response_time ??
+        (typeof response.time === 'number' ? response.time * 1000 : undefined)
+      onTestComplete?.(true, responseTime)
     } else {
       if (!options?.silent) {
         toast.error(response.message || i18next.t(ERROR_MESSAGES.TEST_FAILED))
