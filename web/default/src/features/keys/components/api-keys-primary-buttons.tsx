@@ -17,12 +17,10 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Plus } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { useApiKeys } from './api-keys-provider'
 
 export function ApiKeysPrimaryButtons() {
-  const { t } = useTranslation()
   const { setOpen } = useApiKeys()
   return (
     <div className='flex shrink-0'>
@@ -32,7 +30,7 @@ export function ApiKeysPrimaryButtons() {
         className='bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20 ring-primary/10 h-8 rounded-full px-3.5 font-semibold shadow-sm ring-1'
       >
         <Plus className='h-4 w-4' />
-        {t('Create API Key')}
+        创建 Key
       </Button>
     </div>
   )

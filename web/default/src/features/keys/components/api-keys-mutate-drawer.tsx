@@ -213,11 +213,7 @@ export function ApiKeysMutateDrawer({
         }
 
         if (successCount > 0) {
-          toast.success(
-            t('Successfully created {{count}} API Key(s)', {
-              count: successCount,
-            })
-          )
+          toast.success(`成功创建 ${successCount} 个 Key`)
           onOpenChange(false)
           triggerRefresh()
         }
@@ -274,9 +270,7 @@ export function ApiKeysMutateDrawer({
         className={sideDrawerContentClassName('max-w-none sm:!max-w-[620px]')}
       >
         <SheetHeader className={sideDrawerHeaderClassName()}>
-          <SheetTitle>
-            {isUpdate ? t('Update API Key') : t('Create API Key')}
-          </SheetTitle>
+          <SheetTitle>{isUpdate ? '更新 Key' : '创建 Key'}</SheetTitle>
           <SheetDescription>
             {isUpdate
               ? t('Update name, quota, or access limits.')
