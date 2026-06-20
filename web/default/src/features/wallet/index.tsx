@@ -273,7 +273,7 @@ export function Wallet(props: WalletProps) {
         <SectionPageLayout.Title>{t('Wallet')}</SectionPageLayout.Title>
         <SectionPageLayout.Content>
           <div className='flex w-full flex-col gap-4 sm:gap-5'>
-            <div className='grid gap-4 sm:gap-5 xl:grid-cols-[minmax(0,0.82fr)_minmax(420px,1.18fr)]'>
+            <div className='grid gap-4 sm:gap-5 xl:grid-cols-2'>
               <div className='flex min-w-0 flex-col gap-4 sm:gap-5 xl:h-full'>
                 <WalletStatsCard user={user} loading={userLoading} />
 
