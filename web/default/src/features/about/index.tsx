@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query'
 import gsap from 'gsap'
 import { Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Skeleton } from '@/components/ui/skeleton'
 import { PublicLayout } from '@/components/layout'
 import { getAboutContent } from './api'
@@ -74,9 +75,23 @@ const workflowSteps = [
   },
 ]
 
+function replaceDefaultSiteName(text: string, siteName: string) {
+  return text.replace(/连邦 API|Lianbang API/g, siteName)
+}
+
 function AboutShowcase() {
   const { t } = useTranslation()
+  const { systemName } = useSystemConfig()
   const rootRef = useRef<HTMLDivElement>(null)
+  const displaySiteName = systemName?.trim() || 'New API'
+  const eyebrowText = replaceDefaultSiteName(
+    t('about.hero.eyebrow'),
+    displaySiteName
+  )
+  const descriptionText = replaceDefaultSiteName(
+    t('about.hero.description'),
+    displaySiteName
+  )
 
   useEffect(() => {
     const root = rootRef.current
@@ -133,13 +148,13 @@ function AboutShowcase() {
           <div>
             <div className='inline-flex w-fit items-center gap-2 text-xs font-semibold tracking-wide text-cyan-700 uppercase dark:text-cyan-200'>
               <Sparkles className='size-3.5' />
-              {t('about.hero.eyebrow')}
+              {eyebrowText}
             </div>
             <h1 className='mt-7 max-w-3xl text-5xl leading-[0.96] font-semibold tracking-normal text-slate-950 sm:text-6xl lg:text-7xl dark:text-white'>
               {t('about.hero.title')}
             </h1>
             <p className='mt-7 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg dark:text-slate-300'>
-              {t('about.hero.description')}
+              {descriptionText}
             </p>
           </div>
 
