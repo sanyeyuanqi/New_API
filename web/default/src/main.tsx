@@ -29,6 +29,7 @@ import i18next from 'i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { getStatus } from '@/lib/api'
 import { installBuildMetadata } from '@/lib/build-metadata'
+import { installChunkLoadRecovery } from '@/lib/chunk-load-recovery'
 import { DEFAULT_SYSTEM_NAME } from '@/lib/constants'
 import '@/lib/dayjs'
 import { applyFaviconToDom } from '@/lib/dom-utils'
@@ -48,6 +49,7 @@ import './styles/index.css'
 // VChart theme is driven by our ThemeProvider (html.light/html.dark) via per-chart `theme` prop.
 initializeFrontendCache()
 installBuildMetadata()
+installChunkLoadRecovery()
 
 const queryClient = new QueryClient({
   defaultOptions: {
