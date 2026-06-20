@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { formatQuota } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import { useIsAdmin } from '@/hooks/use-admin'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -42,6 +43,7 @@ import {
 } from '@/components/ui/tooltip'
 import { dotColorMap, textColorMap } from '@/components/status-badge'
 import {
+  getAdminPlans,
   getPublicPlans,
   getSelfSubscriptionFull,
   updateBillingPreference,
@@ -96,6 +98,7 @@ export function SubscriptionPlansCard({
   onPurchaseSuccess,
 }: SubscriptionPlansCardProps) {
   const { t } = useTranslation()
+  const isAdmin = useIsAdmin()
   const [planGridElement, setPlanGridElement] = useState<HTMLDivElement | null>(
     null
   )
@@ -109,6 +112,7 @@ export function SubscriptionPlansCard({
   )
 
   const [plans, setPlans] = useState<PlanRecord[]>([])
+  const [planLookupRecords, setPlanLookupRecords] = useState<PlanRecord[]>([])
   const [activeSubscriptions, setActiveSubscriptions] = useState<
     UserSubscriptionRecord[]
   >([])
@@ -136,12 +140,26 @@ export function SubscriptionPlansCard({
     try {
       const res = await getPublicPlans()
       if (res.success) {
-        setPlans(res.data || [])
+        const publicPlans = res.data || []
+        setPlans(publicPlans)
+        setPlanLookupRecords(publicPlans)
+      }
+
+      if (isAdmin) {
+        try {
+          const adminRes = await getAdminPlans()
+          if (adminRes.success) {
+            setPlanLookupRecords(adminRes.data || res.data || [])
+          }
+        } catch {
+          // Keep public plans as lookup fallback when admin plan lookup is unavailable.
+        }
       }
     } catch {
       setPlans([])
+      setPlanLookupRecords([])
     }
-  }, [])
+  }, [isAdmin])
 
   const fetchSelfSubscription = useCallback(async () => {
     try {
@@ -216,13 +234,13 @@ export function SubscriptionPlansCard({
 
   const planMap = useMemo(() => {
     const map = new Map<number, PlanRecord['plan']>()
-    for (const item of plans) {
+    for (const item of planLookupRecords) {
       if (item?.plan?.id) {
         map.set(Number(item.plan.id), item.plan)
       }
     }
     return map
-  }, [plans])
+  }, [planLookupRecords])
 
   useEffect(() => {
     onAvailabilityChange?.(isAvailable)
