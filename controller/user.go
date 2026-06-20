@@ -586,12 +586,41 @@ func GetUserModels(c *gin.Context) {
 		return
 	}
 	groups := service.GetUserUsableGroups(user.Group)
+	requestedGroup := strings.TrimSpace(c.Query("group"))
 	var models []string
-	for group := range groups {
+
+	addModels := func(group string) {
 		for _, g := range model.GetGroupEnabledModels(group) {
 			if !common.StringsContains(models, g) {
 				models = append(models, g)
 			}
+		}
+	}
+
+	if requestedGroup != "" {
+		if _, ok := groups[requestedGroup]; !ok {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "group not available",
+			})
+			return
+		}
+		if requestedGroup == "auto" {
+			for _, autoGroup := range service.GetUserAutoGroup(user.Group) {
+				addModels(autoGroup)
+			}
+		} else {
+			addModels(requestedGroup)
+		}
+	} else {
+		for group := range groups {
+			if group == "auto" {
+				for _, autoGroup := range service.GetUserAutoGroup(user.Group) {
+					addModels(autoGroup)
+				}
+				continue
+			}
+			addModels(group)
 		}
 	}
 	c.JSON(http.StatusOK, gin.H{

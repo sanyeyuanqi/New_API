@@ -66,7 +66,7 @@ export function LegalConsent({
           checked={checked}
           onCheckedChange={handleChange}
           className={cn(
-            'mt-0.5 size-5 rounded-md dark:border-white/35',
+            'size-5 rounded-md border-slate-300 bg-white shadow-[inset_0_0_0_1px_rgba(148,163,184,0.18)] hover:border-slate-400 focus-visible:border-slate-500 dark:border-white/35 dark:bg-white/5 dark:hover:border-white/50',
             checked &&
               'border-slate-700 bg-slate-700 text-white shadow-sm dark:border-white/80 dark:bg-slate-700 dark:text-white dark:ring-2 dark:ring-white/20 [&_[data-slot=checkbox-indicator]]:text-white [&_[data-slot=checkbox-indicator]>svg]:size-4 [&_[data-slot=checkbox-indicator]>svg]:text-white [&_[data-slot=checkbox-indicator]>svg]:stroke-[3]'
           )}

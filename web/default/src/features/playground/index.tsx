@@ -114,23 +114,6 @@ export function Playground() {
     config.model ||
     'AI'
 
-  // Load models
-  const { data: modelsData, isLoading: isLoadingModels } = useQuery({
-    queryKey: ['playground-models', t],
-    queryFn: async () => {
-      try {
-        return await getUserModels()
-      } catch (error) {
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : t('Failed to load playground models')
-        )
-        return []
-      }
-    },
-  })
-
   // Load groups
   const { data: groupsData } = useQuery({
     queryKey: ['playground-groups', t],
@@ -146,6 +129,30 @@ export function Playground() {
         return []
       }
     },
+  })
+
+  const selectedGroupAvailable = useMemo(
+    () => Boolean(groupsData?.some((group) => group.value === config.group)),
+    [groupsData, config.group]
+  )
+  const selectedModelGroup = selectedGroupAvailable ? config.group : undefined
+
+  // Load models for the selected group
+  const { data: modelsData, isLoading: isLoadingModels } = useQuery({
+    queryKey: ['playground-models', selectedModelGroup, t],
+    queryFn: async () => {
+      try {
+        return await getUserModels(selectedModelGroup)
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : t('Failed to load playground models')
+        )
+        return []
+      }
+    },
+    enabled: Boolean(selectedModelGroup),
   })
 
   // Update models when data changes
