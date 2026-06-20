@@ -42,6 +42,11 @@ func isPositiveOptionValue(value string) bool {
 	return err == nil && floatValue > 0
 }
 
+func isPositiveIntegerOptionValue(value string) bool {
+	intValue, err := strconv.Atoi(strings.TrimSpace(value))
+	return err == nil && intValue > 0
+}
+
 func collectModelNamesFromOptionValue(raw string, modelNames map[string]struct{}) {
 	if strings.TrimSpace(raw) == "" {
 		return
@@ -266,6 +271,14 @@ func UpdateOption(c *gin.Context) {
 			c.JSON(http.StatusOK, gin.H{
 				"success": false,
 				"message": err.Error(),
+			})
+			return
+		}
+	case "CaptchaRateLimitNum", "CaptchaRateLimitDuration", "CriticalRateLimitNum", "CriticalRateLimitDuration":
+		if !isPositiveIntegerOptionValue(option.Value.(string)) {
+			c.JSON(http.StatusOK, gin.H{
+				"success": false,
+				"message": "请求频率必须为正整数",
 			})
 			return
 		}

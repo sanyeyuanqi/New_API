@@ -109,6 +109,12 @@ const AUTH_SECTIONS = [
           TurnstileSiteKey: settings.TurnstileSiteKey,
           TurnstileSecretKey: settings.TurnstileSecretKey,
           ImageCaptchaEnabled: settings.ImageCaptchaEnabled,
+          CaptchaRateLimitEnabled: settings.CaptchaRateLimitEnabled,
+          CaptchaRateLimitNum: settings.CaptchaRateLimitNum,
+          CaptchaRateLimitDuration: settings.CaptchaRateLimitDuration,
+          CriticalRateLimitEnabled: settings.CriticalRateLimitEnabled,
+          CriticalRateLimitNum: settings.CriticalRateLimitNum,
+          CriticalRateLimitDuration: settings.CriticalRateLimitDuration,
         }}
       />
     ),

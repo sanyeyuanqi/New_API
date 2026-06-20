@@ -66,7 +66,7 @@ export interface ImageCaptchaData {
 export async function getImageCaptcha(): Promise<
   ApiResponse & { data?: ImageCaptchaData }
 > {
-  const res = await api.get('/api/captcha')
+  const res = await api.get('/api/captcha', { skipErrorHandler: true })
   return res.data
 }
 
@@ -74,7 +74,11 @@ export async function verifyImageCaptcha(
   key: string,
   points: Array<{ x: number; y: number }>
 ): Promise<ApiResponse & { data?: { token?: string } }> {
-  const res = await api.post('/api/captcha/verify', { key, points })
+  const res = await api.post(
+    '/api/captcha/verify',
+    { key, points },
+    { skipErrorHandler: true }
+  )
   return res.data
 }
 

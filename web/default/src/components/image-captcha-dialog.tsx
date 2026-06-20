@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useEffect, useState } from 'react'
+import { isAxiosError } from 'axios'
 import { Loader2, RotateCcw, ShieldCheck, Undo2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -36,6 +37,17 @@ interface ImageCaptchaDialogProps {
 
 type CaptchaPoint = { x: number; y: number }
 
+function getCaptchaErrorMessage(
+  error: unknown,
+  fallback: string,
+  rateLimitMessage: string
+) {
+  if (isAxiosError(error) && error.response?.status === 429) {
+    return rateLimitMessage
+  }
+  return error instanceof Error ? error.message : fallback
+}
+
 export function ImageCaptchaDialog({
   open,
   onOpenChange,
@@ -46,11 +58,13 @@ export function ImageCaptchaDialog({
   const [points, setPoints] = useState<CaptchaPoint[]>([])
   const [loading, setLoading] = useState(false)
   const [verifying, setVerifying] = useState(false)
+  const [loadError, setLoadError] = useState<string | null>(null)
 
   const loadCaptcha = useCallback(async () => {
     setLoading(true)
     setCaptcha(null)
     setPoints([])
+    setLoadError(null)
     try {
       const response = await getImageCaptcha()
       const data = response.data
@@ -59,9 +73,13 @@ export function ImageCaptchaDialog({
       }
       setCaptcha(data)
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : t('Failed to load CAPTCHA')
+      const message = getCaptchaErrorMessage(
+        error,
+        t('Failed to load CAPTCHA'),
+        t('CAPTCHA requests are too frequent. Please try again later.')
       )
+      setLoadError(message)
+      toast.error(message)
     } finally {
       setLoading(false)
     }
@@ -84,12 +102,19 @@ export function ImageCaptchaDialog({
       onVerified(token)
       onOpenChange(false)
     } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : t('CAPTCHA verification failed')
+      const message = getCaptchaErrorMessage(
+        error,
+        t('CAPTCHA verification failed'),
+        t('CAPTCHA requests are too frequent. Please try again later.')
       )
-      await loadCaptcha()
+      toast.error(message)
+      if (isAxiosError(error) && error.response?.status === 429) {
+        setLoadError(message)
+        setCaptcha(null)
+        setPoints([])
+      } else {
+        await loadCaptcha()
+      }
     } finally {
       setVerifying(false)
     }
@@ -127,7 +152,19 @@ export function ImageCaptchaDialog({
             draggable={false}
           />
         ) : (
-          <Loader2 className='text-muted-foreground size-4 animate-spin' />
+          <Button
+            type='button'
+            variant='ghost'
+            size='icon'
+            className='size-8'
+            disabled={loading}
+            onClick={() => void loadCaptcha()}
+            aria-label={t('Refresh CAPTCHA')}
+          >
+            <RotateCcw
+              className={loading ? 'size-4 animate-spin' : 'size-4'}
+            />
+          </Button>
         )}
       </div>
 
@@ -159,9 +196,22 @@ export function ImageCaptchaDialog({
               </span>
             ))}
           </div>
-        ) : (
+        ) : loading ? (
           <div className='flex aspect-[5/3] items-center justify-center'>
             <Loader2 className='text-muted-foreground size-7 animate-spin' />
+          </div>
+        ) : (
+          <div className='text-muted-foreground flex aspect-[5/3] flex-col items-center justify-center gap-3 px-4 text-center text-sm'>
+            <p>{loadError || t('Failed to load CAPTCHA')}</p>
+            <Button
+              type='button'
+              variant='outline'
+              size='sm'
+              onClick={() => void loadCaptcha()}
+            >
+              <RotateCcw className='size-3.5' />
+              {t('Retry')}
+            </Button>
           </div>
         )}
       </div>

@@ -107,6 +107,12 @@ export type AuthSettings = {
   TurnstileSiteKey: string
   TurnstileSecretKey: string
   ImageCaptchaEnabled: boolean
+  CaptchaRateLimitEnabled: boolean
+  CaptchaRateLimitNum: number
+  CaptchaRateLimitDuration: number
+  CriticalRateLimitEnabled: boolean
+  CriticalRateLimitNum: number
+  CriticalRateLimitDuration: number
   'passkey.enabled': boolean
   'passkey.rp_display_name': string
   'passkey.rp_id': string

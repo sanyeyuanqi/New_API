@@ -46,6 +46,12 @@ const botProtectionSchema = z.object({
   TurnstileSiteKey: z.string().optional(),
   TurnstileSecretKey: z.string().optional(),
   ImageCaptchaEnabled: z.boolean(),
+  CaptchaRateLimitEnabled: z.boolean(),
+  CaptchaRateLimitNum: z.number().int().min(1).max(1000000),
+  CaptchaRateLimitDuration: z.number().int().min(1).max(86400),
+  CriticalRateLimitEnabled: z.boolean(),
+  CriticalRateLimitNum: z.number().int().min(1).max(1000000),
+  CriticalRateLimitDuration: z.number().int().min(1).max(86400),
 })
 
 type BotProtectionFormValues = z.infer<typeof botProtectionSchema>
@@ -110,6 +116,168 @@ export function BotProtectionSection({
               </SettingsSwitchItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name='CaptchaRateLimitEnabled'
+            render={({ field }) => (
+              <SettingsSwitchItem>
+                <SettingsSwitchContent>
+                  <FormLabel>{t('Enable CAPTCHA request rate limit')}</FormLabel>
+                  <FormDescription>
+                    {t(
+                      'Limit how often one IP can load or verify image CAPTCHA challenges'
+                    )}
+                  </FormDescription>
+                </SettingsSwitchContent>
+                <FormControl>
+                  <SettingsEnableDisableButton
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </SettingsSwitchItem>
+            )}
+          />
+
+          <div className='grid gap-4 md:grid-cols-2'>
+            <FormField
+              control={form.control}
+              name='CaptchaRateLimitNum'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('CAPTCHA max requests')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type='number'
+                      min={1}
+                      step={1}
+                      placeholder='60'
+                      {...field}
+                      onChange={(event) =>
+                        field.onChange(parseInt(event.target.value, 10) || 1)
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t('Maximum CAPTCHA requests allowed per time window.')}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='CaptchaRateLimitDuration'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('CAPTCHA time window seconds')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type='number'
+                      min={1}
+                      step={1}
+                      placeholder='60'
+                      {...field}
+                      onChange={(event) =>
+                        field.onChange(parseInt(event.target.value, 10) || 1)
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t('Time window for CAPTCHA request frequency, in seconds.')}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name='CriticalRateLimitEnabled'
+            render={({ field }) => (
+              <SettingsSwitchItem>
+                <SettingsSwitchContent>
+                  <FormLabel>
+                    {t('Enable sensitive request rate limit')}
+                  </FormLabel>
+                  <FormDescription>
+                    {t(
+                      'Limit login, registration, password reset, OAuth, and other sensitive API requests by IP'
+                    )}
+                  </FormDescription>
+                </SettingsSwitchContent>
+                <FormControl>
+                  <SettingsEnableDisableButton
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </SettingsSwitchItem>
+            )}
+          />
+
+          <div className='grid gap-4 md:grid-cols-2'>
+            <FormField
+              control={form.control}
+              name='CriticalRateLimitNum'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t('Sensitive request max requests')}</FormLabel>
+                  <FormControl>
+                    <Input
+                      type='number'
+                      min={1}
+                      step={1}
+                      placeholder='20'
+                      {...field}
+                      onChange={(event) =>
+                        field.onChange(parseInt(event.target.value, 10) || 1)
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      'Maximum sensitive requests allowed per time window.'
+                    )}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='CriticalRateLimitDuration'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    {t('Sensitive request time window seconds')}
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type='number'
+                      min={1}
+                      step={1}
+                      placeholder='1200'
+                      {...field}
+                      onChange={(event) =>
+                        field.onChange(parseInt(event.target.value, 10) || 1)
+                      }
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    {t(
+                      'Time window for sensitive request frequency, in seconds.'
+                    )}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={form.control}

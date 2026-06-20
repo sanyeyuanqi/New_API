@@ -45,6 +45,12 @@ func InitOptionMap() {
 	common.OptionMap["WeChatAuthEnabled"] = strconv.FormatBool(common.WeChatAuthEnabled)
 	common.OptionMap["TurnstileCheckEnabled"] = strconv.FormatBool(common.TurnstileCheckEnabled)
 	common.OptionMap["ImageCaptchaEnabled"] = strconv.FormatBool(common.ImageCaptchaEnabled)
+	common.OptionMap["CaptchaRateLimitEnabled"] = strconv.FormatBool(common.CaptchaRateLimitEnable)
+	common.OptionMap["CaptchaRateLimitNum"] = strconv.Itoa(common.CaptchaRateLimitNum)
+	common.OptionMap["CaptchaRateLimitDuration"] = strconv.FormatInt(common.CaptchaRateLimitDuration, 10)
+	common.OptionMap["CriticalRateLimitEnabled"] = strconv.FormatBool(common.CriticalRateLimitEnable)
+	common.OptionMap["CriticalRateLimitNum"] = strconv.Itoa(common.CriticalRateLimitNum)
+	common.OptionMap["CriticalRateLimitDuration"] = strconv.FormatInt(common.CriticalRateLimitDuration, 10)
 	common.OptionMap["RegisterEnabled"] = strconv.FormatBool(common.RegisterEnabled)
 	common.OptionMap["AutomaticDisableChannelEnabled"] = strconv.FormatBool(common.AutomaticDisableChannelEnabled)
 	common.OptionMap["AutomaticEnableChannelEnabled"] = strconv.FormatBool(common.AutomaticEnableChannelEnabled)
@@ -297,6 +303,10 @@ func updateOptionMap(key string, value string) (err error) {
 			common.TurnstileCheckEnabled = boolValue
 		case "ImageCaptchaEnabled":
 			common.ImageCaptchaEnabled = boolValue
+		case "CaptchaRateLimitEnabled":
+			common.CaptchaRateLimitEnable = boolValue
+		case "CriticalRateLimitEnabled":
+			common.CriticalRateLimitEnable = boolValue
 		case "RegisterEnabled":
 			common.RegisterEnabled = boolValue
 		case "EmailDomainRestrictionEnabled":
@@ -515,6 +525,14 @@ func updateOptionMap(key string, value string) (err error) {
 		setting.ModelRequestRateLimitSuccessCount, _ = strconv.Atoi(value)
 	case "ModelRequestRateLimitGroup":
 		err = setting.UpdateModelRequestRateLimitGroupByJSONString(value)
+	case "CaptchaRateLimitNum":
+		common.CaptchaRateLimitNum, _ = strconv.Atoi(value)
+	case "CaptchaRateLimitDuration":
+		common.CaptchaRateLimitDuration, _ = strconv.ParseInt(value, 10, 64)
+	case "CriticalRateLimitNum":
+		common.CriticalRateLimitNum, _ = strconv.Atoi(value)
+	case "CriticalRateLimitDuration":
+		common.CriticalRateLimitDuration, _ = strconv.ParseInt(value, 10, 64)
 	case "RetryTimes":
 		common.RetryTimes, _ = strconv.Atoi(value)
 	case "DataExportInterval":

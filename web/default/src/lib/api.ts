@@ -110,6 +110,13 @@ api.interceptors.response.use(
       if (!skip) {
         toast.error(t('Session expired!'))
       }
+    } else if (status === 429) {
+      if (!skip) {
+        toast.error(
+          error?.response?.data?.message ||
+            t('Too many requests. Please try again later.')
+        )
+      }
     } else if (!skip) {
       // Other errors: show error message from response or default
       const msg =
