@@ -30,7 +30,7 @@ export function ApiKeysPrimaryButtons() {
         className='bg-primary text-primary-foreground hover:bg-primary/90 shadow-primary/20 ring-primary/10 h-8 rounded-full px-3.5 font-semibold shadow-sm ring-1'
       >
         <Plus className='h-4 w-4' />
-        创建 Key
+        创建 API Key
       </Button>
     </div>
   )

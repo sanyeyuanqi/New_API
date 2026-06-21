@@ -106,9 +106,9 @@ function ApiKeysMobileList({
             <EmptyMedia variant='icon'>
               <Database className='size-6' />
             </EmptyMedia>
-            <EmptyTitle>未找到 Key</EmptyTitle>
+            <EmptyTitle>未找到 API Key</EmptyTitle>
             <EmptyDescription>
-              暂无 Key。创建第一个 Key 后即可开始使用。
+              暂无 API Key。创建第一个 API Key 后即可开始使用。
             </EmptyDescription>
           </EmptyHeader>
         </Empty>
@@ -136,7 +136,9 @@ function ApiKeysMobileList({
                 <div className='truncate text-sm font-semibold'>
                   {apiKey.name}
                 </div>
-                <div className='text-muted-foreground text-[11px]'>Key</div>
+                <div className='text-muted-foreground text-[11px]'>
+                  API Key
+                </div>
               </div>
               {statusConfig && (
                 <StatusBadge
@@ -278,16 +280,16 @@ export function ApiKeysTable() {
       columns={columns}
       isLoading={isLoading}
       isFetching={isFetching}
-      emptyTitle='未找到 Key'
-      emptyDescription='暂无 Key。创建第一个 Key 后即可开始使用。'
+      emptyTitle='未找到 API Key'
+      emptyDescription='暂无 API Key。创建第一个 API Key 后即可开始使用。'
       skeletonKeyPrefix='api-keys-skeleton'
       applyHeaderSize
       toolbarProps={{
         searchPlaceholder: t('Filter by name...'),
         additionalSearch: (
           <Input
-            placeholder='按 Key 筛选...'
-            aria-label='按 Key 筛选...'
+            placeholder='按 API Key 筛选...'
+            aria-label='按 API Key 筛选...'
             value={tokenFilterInput}
             onChange={(e) => setTokenFilterInput(e.target.value)}
             className='w-full sm:w-50 lg:w-60'

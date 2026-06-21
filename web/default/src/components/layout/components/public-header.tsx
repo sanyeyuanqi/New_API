@@ -34,6 +34,10 @@ import { defaultTopNavLinks } from '../config/top-nav.config'
 import type { TopNavLink } from '../types'
 
 const AUTH_PROMPT_SECONDS = 5
+const publicHeaderToolButtonClass =
+  'size-8 rounded-full text-slate-600 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-105 hover:bg-white/90 hover:text-slate-950 hover:shadow-[0_8px_18px_rgba(15,23,42,0.10)] data-popup-open:bg-white/90 dark:text-slate-300 dark:hover:bg-white/12 dark:hover:text-white dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.28)]'
+const publicHeaderProfileButtonClass =
+  'group relative !h-8 !w-auto max-w-[7rem] overflow-hidden !rounded-full border border-slate-200/80 bg-white/70 px-3 text-[12px] font-semibold text-slate-700 shadow-[0_6px_18px_rgba(15,23,42,0.08)] ring-1 ring-white/60 transition-all duration-200 ease-out before:absolute before:inset-0 before:bg-[linear-gradient(135deg,rgba(255,255,255,0.92)_0%,rgba(255,255,255,0.26)_55%,rgba(14,165,233,0.12)_100%)] before:opacity-0 before:transition-opacity before:duration-200 hover:-translate-y-0.5 hover:scale-[1.02] hover:border-slate-300 hover:bg-white/90 hover:text-slate-950 hover:shadow-[0_10px_24px_rgba(15,23,42,0.13)] hover:before:opacity-100 data-popup-open:bg-white/90 sm:max-w-[10rem] dark:border-white/10 dark:bg-white/8 dark:text-slate-200 dark:ring-white/8 dark:before:bg-[linear-gradient(135deg,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0.06)_55%,rgba(34,211,238,0.12)_100%)] dark:hover:border-white/18 dark:hover:bg-white/14 dark:hover:text-white dark:hover:shadow-[0_10px_24px_rgba(0,0,0,0.32)]'
 
 type AuthPromptTarget = {
   title: string
@@ -270,7 +274,7 @@ export function PublicHeader(props: PublicHeaderProps) {
             </Link>
 
             {/* Desktop nav */}
-            <div className='absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 sm:flex'>
+            <div className='absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full bg-white/35 p-0.5 ring-1 ring-slate-200/45 backdrop-blur-sm sm:flex dark:bg-white/[0.03] dark:ring-white/8'>
               {navItems.map((link) => {
                 if (link.external) {
                   return (
@@ -283,7 +287,7 @@ export function PublicHeader(props: PublicHeaderProps) {
                       tabIndex={link.disabled ? -1 : undefined}
                       onClick={(event) => handleNavLinkClick(event, link)}
                       className={cn(
-                        'rounded-lg px-2.5 py-1 text-[12px] font-medium text-slate-500 transition-colors duration-200 hover:bg-slate-950/[0.04] hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-slate-100',
+                        'inline-flex h-7 items-center justify-center rounded-full px-3 text-[12px] leading-none font-semibold text-slate-500 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:bg-white/85 hover:text-slate-950 hover:shadow-[0_8px_18px_rgba(15,23,42,0.10)] active:translate-y-0 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-100 dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.28)]',
                         link.disabled && 'pointer-events-none opacity-50'
                       )}
                     >
@@ -298,10 +302,10 @@ export function PublicHeader(props: PublicHeaderProps) {
                     disabled={link.disabled}
                     onClick={(event) => handleNavLinkClick(event, link)}
                     className={cn(
-                      'rounded-lg px-2.5 py-1 text-[12px] font-medium transition-colors duration-200',
+                      'inline-flex h-7 items-center justify-center rounded-full px-3 text-[12px] leading-none font-semibold transition-all duration-200 ease-out active:translate-y-0',
                       link.isActive
-                        ? 'bg-slate-950 text-white shadow-sm dark:bg-white dark:text-slate-950'
-                        : 'text-slate-500 hover:bg-slate-950/[0.04] hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/[0.06] dark:hover:text-slate-100',
+                        ? 'scale-[1.02] bg-[linear-gradient(135deg,#020617_0%,#111827_52%,#1e293b_100%)] text-white shadow-[0_10px_24px_rgba(15,23,42,0.22),inset_0_1px_0_rgba(255,255,255,0.16)] ring-1 ring-slate-950/10 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,23,42,0.26),inset_0_1px_0_rgba(255,255,255,0.20)] dark:bg-[linear-gradient(135deg,#ffffff_0%,#f8fafc_55%,#e2e8f0_100%)] dark:text-slate-950 dark:shadow-[0_10px_26px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.85)] dark:ring-white/15'
+                        : 'text-slate-500 hover:-translate-y-0.5 hover:bg-white/85 hover:text-slate-950 hover:shadow-[0_8px_18px_rgba(15,23,42,0.10)] dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-100 dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.28)]',
                       link.disabled && 'pointer-events-none opacity-50'
                     )}
                   >
@@ -311,21 +315,32 @@ export function PublicHeader(props: PublicHeaderProps) {
               })}
             </div>
 
-            <div className='ml-auto hidden items-center gap-1 sm:flex'>
-              {showLanguageSwitcher && <LanguageSwitcher />}
-              {showThemeSwitch && <ThemeSwitch />}
-              {showNotifications && isDesktop && (
-                <NotificationPopover
-                  open={notifications.popoverOpen}
-                  onOpenChange={notifications.setPopoverOpen}
-                  unreadCount={notifications.unreadCount}
-                  activeTab={notifications.activeTab}
-                  onTabChange={notifications.setActiveTab}
-                  notice={notifications.notice}
-                  announcements={notifications.announcements}
-                  loading={notifications.loading}
-                  onCloseToday={notifications.closeToday}
-                />
+            <div className='ml-auto hidden items-center gap-1.5 sm:flex'>
+              {(showLanguageSwitcher ||
+                showThemeSwitch ||
+                (showNotifications && isDesktop)) && (
+                <div className='flex items-center gap-0.5 rounded-full bg-white/35 p-0.5 ring-1 ring-slate-200/45 backdrop-blur-sm dark:bg-white/[0.03] dark:ring-white/8'>
+                  {showLanguageSwitcher && (
+                    <LanguageSwitcher className={publicHeaderToolButtonClass} />
+                  )}
+                  {showThemeSwitch && (
+                    <ThemeSwitch className={publicHeaderToolButtonClass} />
+                  )}
+                  {showNotifications && isDesktop && (
+                    <NotificationPopover
+                      open={notifications.popoverOpen}
+                      onOpenChange={notifications.setPopoverOpen}
+                      unreadCount={notifications.unreadCount}
+                      activeTab={notifications.activeTab}
+                      onTabChange={notifications.setActiveTab}
+                      notice={notifications.notice}
+                      announcements={notifications.announcements}
+                      loading={notifications.loading}
+                      onCloseToday={notifications.closeToday}
+                      className={publicHeaderToolButtonClass}
+                    />
+                  )}
+                </div>
               )}
 
               {showAuthButtons && (
@@ -334,11 +349,15 @@ export function PublicHeader(props: PublicHeaderProps) {
                   {loading ? (
                     <Skeleton className='h-8 w-20 rounded-lg' />
                   ) : isAuthenticated ? (
-                    <ProfileDropdown showName nameMode='username' />
+                    <ProfileDropdown
+                      showName
+                      nameMode='username'
+                      className={publicHeaderProfileButtonClass}
+                    />
                   ) : (
                     <Link
                       to='/sign-in'
-                      className='h-8 rounded-lg bg-slate-950 px-3.5 text-xs font-semibold text-white shadow-sm hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200'
+                      className='inline-flex h-8 min-w-14 items-center justify-center rounded-lg border border-slate-200/80 bg-white/80 px-3.5 text-[12px] leading-none font-semibold text-slate-700 shadow-[0_6px_18px_rgba(15,23,42,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white hover:text-slate-950 hover:shadow-[0_10px_24px_rgba(15,23,42,0.12)] dark:border-white/10 dark:bg-white/8 dark:text-slate-200 dark:hover:border-white/18 dark:hover:bg-white/14 dark:hover:text-white'
                     >
                       {t('Sign in')}
                     </Link>

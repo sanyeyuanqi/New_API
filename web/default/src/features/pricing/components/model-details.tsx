@@ -996,12 +996,7 @@ export function ModelDetailsDrawer(props: ModelDetailsDrawerProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side='right'
-        className={sideDrawerContentClassName(
-          'sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl'
-        )}
-      >
+      <SheetContent side='right' className={sideDrawerContentClassName()}>
         <SheetHeader className='sr-only'>
           <SheetTitle>{props.model.model_name}</SheetTitle>
           <SheetDescription>{t('Model details')}</SheetDescription>

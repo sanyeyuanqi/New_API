@@ -1069,7 +1069,7 @@ export function ChannelMutateDrawer({
   return (
     <>
       <Sheet open={open} onOpenChange={handleOpenChange}>
-        <SheetContent className={sideDrawerContentClassName('sm:max-w-3xl')}>
+        <SheetContent className={sideDrawerContentClassName()}>
           <SheetHeader className={sideDrawerHeaderClassName()}>
             <SheetTitle className='flex items-center gap-3'>
               <span className='bg-muted flex size-9 shrink-0 items-center justify-center rounded-md'>

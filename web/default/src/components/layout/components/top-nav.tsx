@@ -289,7 +289,7 @@ export function TopNav({
       {/* 桌面端水平导航 */}
       <nav
         className={cn(
-          'absolute top-1/2 left-1/2 hidden h-8 min-w-0 -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1 rounded-lg border-transparent bg-transparent p-0 shadow-none backdrop-blur-none transition-[width,max-width] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] lg:inline-flex dark:border-transparent dark:bg-transparent',
+          'absolute top-1/2 left-1/2 hidden min-w-0 -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1 rounded-full bg-white/35 p-0.5 shadow-none ring-1 ring-slate-200/45 backdrop-blur-sm transition-[width,max-width] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] lg:inline-flex dark:bg-white/[0.03] dark:ring-white/8',
           !showDesktopNav && 'lg:hidden',
           className
         )}
@@ -304,10 +304,10 @@ export function TopNav({
                 target='_blank'
                 rel='noopener noreferrer'
                 className={cn(
-                  'inline-flex h-7 items-center rounded-lg px-2.5 text-xs font-medium transition-colors',
+                  'inline-flex h-7 items-center justify-center rounded-full px-3 text-xs leading-none font-semibold transition-all duration-200 ease-out active:translate-y-0',
                   isActive
-                    ? 'bg-slate-950 text-white shadow-sm dark:bg-white dark:text-slate-950'
-                    : 'text-slate-500 hover:bg-slate-950/[0.045] hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/[0.075] dark:hover:text-white'
+                    ? 'scale-[1.02] bg-[linear-gradient(135deg,#020617_0%,#111827_52%,#1e293b_100%)] text-white shadow-[0_10px_24px_rgba(15,23,42,0.22),inset_0_1px_0_rgba(255,255,255,0.16)] ring-1 ring-slate-950/10 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,23,42,0.26),inset_0_1px_0_rgba(255,255,255,0.20)] dark:bg-[linear-gradient(135deg,#ffffff_0%,#f8fafc_55%,#e2e8f0_100%)] dark:text-slate-950 dark:shadow-[0_10px_26px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.85)] dark:ring-white/15'
+                    : 'text-slate-500 hover:-translate-y-0.5 hover:bg-white/85 hover:text-slate-950 hover:shadow-[0_8px_18px_rgba(15,23,42,0.10)] dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-100 dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.28)]'
                 )}
               >
                 {title}
@@ -327,10 +327,10 @@ export function TopNav({
                   })
                 }
                 className={cn(
-                  'inline-flex h-7 items-center rounded-lg px-2.5 text-xs font-medium transition-colors',
+                  'inline-flex h-7 items-center justify-center rounded-full px-3 text-xs leading-none font-semibold transition-all duration-200 ease-out active:translate-y-0',
                   isActive
-                    ? 'bg-slate-950 text-white shadow-sm dark:bg-white dark:text-slate-950'
-                    : 'text-slate-500 hover:bg-slate-950/[0.045] hover:text-slate-950 dark:text-slate-400 dark:hover:bg-white/[0.075] dark:hover:text-white',
+                    ? 'scale-[1.02] bg-[linear-gradient(135deg,#020617_0%,#111827_52%,#1e293b_100%)] text-white shadow-[0_10px_24px_rgba(15,23,42,0.22),inset_0_1px_0_rgba(255,255,255,0.16)] ring-1 ring-slate-950/10 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_rgba(15,23,42,0.26),inset_0_1px_0_rgba(255,255,255,0.20)] dark:bg-[linear-gradient(135deg,#ffffff_0%,#f8fafc_55%,#e2e8f0_100%)] dark:text-slate-950 dark:shadow-[0_10px_26px_rgba(0,0,0,0.36),inset_0_1px_0_rgba(255,255,255,0.85)] dark:ring-white/15'
+                    : 'text-slate-500 hover:-translate-y-0.5 hover:bg-white/85 hover:text-slate-950 hover:shadow-[0_8px_18px_rgba(15,23,42,0.10)] dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-slate-100 dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.28)]',
                   disabled && 'pointer-events-none opacity-50'
                 )}
               >

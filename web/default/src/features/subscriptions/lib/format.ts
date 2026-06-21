@@ -18,6 +18,7 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import type { TFunction } from 'i18next'
 import dayjs from '@/lib/dayjs'
+import { formatQuota } from '@/lib/format'
 import type { SubscriptionPlan } from '../types'
 
 export function formatDuration(
@@ -48,7 +49,15 @@ export function formatResetPeriod(
 ): string {
   const period = plan?.quota_reset_period || 'never'
   if (period === 'daily') return t('Daily')
-  if (period === 'weekly') return t('Weekly')
+  if (period === 'weekly') {
+    if (
+      plan?.five_hour_quota_enabled &&
+      Number(plan?.five_hour_quota || 0) > 0
+    ) {
+      return `${t('Weekly')} / ${t('5-hour quota')} ${formatQuota(Number(plan.five_hour_quota || 0))}`
+    }
+    return t('Weekly')
+  }
   if (period === 'monthly') return t('Monthly')
   if (period === 'custom') {
     const seconds = Number(plan?.quota_reset_custom_seconds || 0)

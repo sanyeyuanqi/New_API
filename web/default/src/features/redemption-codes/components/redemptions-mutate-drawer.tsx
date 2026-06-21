@@ -158,7 +158,7 @@ export function RedemptionsMutateDrawer({
         }
       }}
     >
-      <SheetContent className={sideDrawerContentClassName('sm:max-w-[600px]')}>
+      <SheetContent className={sideDrawerContentClassName()}>
         <SheetHeader className={sideDrawerHeaderClassName()}>
           <SheetTitle>
             {isUpdate

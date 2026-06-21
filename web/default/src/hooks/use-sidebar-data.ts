@@ -61,7 +61,7 @@ export function useSidebarData(): SidebarData {
             icon: LayoutDashboard,
           },
           {
-            title: 'Key',
+            title: 'API Key',
             url: '/keys',
             icon: Key,
           },

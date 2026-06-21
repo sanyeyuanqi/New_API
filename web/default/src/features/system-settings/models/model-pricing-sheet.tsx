@@ -115,10 +115,7 @@ export const ModelPricingSheet = forwardRef<
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side='right'
-        className={sideDrawerContentClassName('sm:max-w-2xl')}
-      >
+      <SheetContent side='right' className={sideDrawerContentClassName()}>
         <SheetHeader className='sr-only'>
           <SheetTitle>{title}</SheetTitle>
           <SheetDescription>{description}</SheetDescription>

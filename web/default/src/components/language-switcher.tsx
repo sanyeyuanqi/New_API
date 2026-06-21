@@ -90,7 +90,11 @@ function TranslationIcon() {
   )
 }
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({
+  className,
+}: {
+  className?: string
+} = {}) {
   const { i18n, t } = useTranslation()
   const user = useAuthStore((s) => s.auth.user)
   const currentLanguage = normalizeInterfaceLanguage(i18n.language)
@@ -116,7 +120,10 @@ export function LanguageSwitcher() {
           <Button
             variant='ghost'
             size='icon'
-            className='h-8 w-8 rounded-lg text-slate-950 hover:bg-slate-100 dark:text-zinc-100 dark:hover:bg-zinc-800/70'
+            className={cn(
+              'h-8 w-8 rounded-lg text-slate-950 hover:bg-slate-100 dark:text-zinc-100 dark:hover:bg-zinc-800/70',
+              className
+            )}
           />
         }
       >

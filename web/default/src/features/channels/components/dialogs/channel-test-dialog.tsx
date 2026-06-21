@@ -812,8 +812,10 @@ function FailureDetailsSheet({
         side={isMobile ? 'bottom' : 'right'}
         className={
           isMobile
-            ? sideDrawerContentClassName('h-auto max-h-[85dvh] rounded-t-xl')
-            : sideDrawerContentClassName('sm:max-w-lg')
+            ? sideDrawerContentClassName(
+                'top-auto right-0 bottom-0 left-0 h-auto max-h-[85dvh] w-full rounded-t-xl rounded-b-none'
+              )
+            : sideDrawerContentClassName()
         }
       >
         {details && (

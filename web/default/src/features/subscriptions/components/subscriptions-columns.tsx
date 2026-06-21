@@ -93,6 +93,23 @@ export function useSubscriptionsColumns(): ColumnDef<PlanRecord>[] {
         size: 100,
       },
       {
+        id: 'five_hour_quota',
+        header: t('5-hour quota'),
+        meta: { mobileHidden: true },
+        cell: ({ row }) => {
+          const plan = row.original.plan
+          const quota = Number(plan.five_hour_quota || 0)
+          return (
+            <span className='text-muted-foreground'>
+              {plan.five_hour_quota_enabled && quota > 0
+                ? formatQuota(quota)
+                : '-'}
+            </span>
+          )
+        },
+        size: 120,
+      },
+      {
         accessorFn: (row) => row.plan.sort_order,
         id: 'sort_order',
         header: t('Priority'),
@@ -126,36 +143,6 @@ export function useSubscriptionsColumns(): ColumnDef<PlanRecord>[] {
             />
           ),
         size: 80,
-      },
-      {
-        id: 'payment',
-        header: t('Payment Channel'),
-        meta: { mobileHidden: true },
-        cell: ({ row }) => {
-          const plan = row.original.plan
-          return (
-            <div className='flex gap-1'>
-              {plan.stripe_price_id && (
-                <StatusBadge
-                  label='Stripe'
-                  variant='neutral'
-                  copyable={false}
-                />
-              )}
-              {plan.creem_product_id && (
-                <StatusBadge label='Creem' variant='neutral' copyable={false} />
-              )}
-              {plan.waffo_pancake_product_id && (
-                <StatusBadge
-                  label='Waffo Pancake'
-                  variant='neutral'
-                  copyable={false}
-                />
-              )}
-            </div>
-          )
-        },
-        size: 140,
       },
       {
         id: 'total_amount',

@@ -186,7 +186,7 @@ export function PrefillGroupFormDrawer({
 
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent className={sideDrawerContentClassName('sm:max-w-2xl')}>
+      <SheetContent className={sideDrawerContentClassName()}>
         <SheetHeader className={sideDrawerHeaderClassName()}>
           <SheetTitle>
             {isEdit ? t('Edit Prefill Group') : t('Create Prefill Group')}

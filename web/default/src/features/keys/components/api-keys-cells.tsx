@@ -94,7 +94,7 @@ export function ApiKeyCell({ apiKey }: { apiKey: ApiKey }) {
           align='start'
         >
           <div className='space-y-2'>
-            <p className='text-muted-foreground text-xs'>完整 Key</p>
+            <p className='text-muted-foreground text-xs'>完整 API Key</p>
             {isLoading ? (
               <div className='flex items-center gap-2 py-2'>
                 <Loader2 className='size-3.5 animate-spin' />
@@ -145,7 +145,7 @@ export function ApiKeyCell({ apiKey }: { apiKey: ApiKey }) {
             ? t('Loading...')
             : isCopied
               ? t('Copied!')
-              : '复制 Key'}
+              : '复制 API Key'}
         </TooltipContent>
       </Tooltip>
     </div>

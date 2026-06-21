@@ -189,9 +189,7 @@ export function UsersMutateDrawer({
           }
         }}
       >
-        <SheetContent
-          className={sideDrawerContentClassName('sm:max-w-[600px]')}
-        >
+        <SheetContent className={sideDrawerContentClassName()}>
           <SheetHeader className={sideDrawerHeaderClassName()}>
             <SheetTitle>
               {isUpdate ? t('Update') : t('Create')} {t('User')}

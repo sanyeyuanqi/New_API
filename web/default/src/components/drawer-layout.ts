@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils'
 
 export const sideDrawerContentClassName = (className?: string) =>
   cn(
-    'bg-background text-foreground flex h-dvh w-full flex-col gap-0 overflow-hidden p-0 shadow-none',
+    'bg-background text-foreground top-2 right-2 bottom-2 flex h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] flex-col gap-0 overflow-hidden rounded-[1.5rem] border p-0 shadow-[0_24px_72px_rgba(15,23,42,0.18)] sm:max-w-5xl dark:shadow-[0_24px_80px_rgba(0,0,0,0.5)]',
     className
   )
 

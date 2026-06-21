@@ -356,10 +356,7 @@ export function PricingToolbar(props: PricingToolbarProps) {
       </div>
 
       <Sheet open={mobileFiltersOpen} onOpenChange={setMobileFiltersOpen}>
-        <SheetContent
-          side='right'
-          className={sideDrawerContentClassName('sm:max-w-md')}
-        >
+        <SheetContent side='right' className={sideDrawerContentClassName()}>
           <SheetHeader className={sideDrawerHeaderClassName()}>
             <SheetTitle>{t('Filter')}</SheetTitle>
             <SheetDescription>

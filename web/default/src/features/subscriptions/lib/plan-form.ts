@@ -22,31 +22,68 @@ import { parseQuotaFromDollars, quotaUnitsToDollars } from '@/lib/format'
 import type { SubscriptionPlan, PlanPayload } from '../types'
 
 export function getPlanFormSchema(t: TFunction) {
-  return z.object({
-    title: z.string().min(1, t('Please enter plan title')),
-    subtitle: z.string().optional(),
-    price_amount: z.coerce.number().min(0, t('Please enter amount')),
-    duration_unit: z.enum(['year', 'month', 'day', 'hour', 'custom']),
-    duration_value: z.coerce.number().min(1),
-    custom_seconds: z.coerce.number().min(0).optional(),
-    quota_reset_period: z.enum([
-      'never',
-      'daily',
-      'weekly',
-      'monthly',
-      'custom',
-    ]),
-    quota_reset_custom_seconds: z.coerce.number().min(0).optional(),
-    enabled: z.boolean(),
-    sort_order: z.coerce.number(),
-    allow_balance_pay: z.boolean(),
-    max_purchase_per_user: z.coerce.number().min(0),
-    total_amount: z.coerce.number().min(0),
-    upgrade_group: z.string().optional(),
-    stripe_price_id: z.string().optional(),
-    creem_product_id: z.string().optional(),
-    waffo_pancake_product_id: z.string().optional(),
-  })
+  return z
+    .object({
+      title: z.string().min(1, t('Please enter plan title')),
+      subtitle: z.string().optional(),
+      price_amount: z.coerce.number().min(0, t('Please enter amount')),
+      duration_unit: z.enum(['year', 'month', 'day', 'hour', 'custom']),
+      duration_value: z.coerce.number().min(1),
+      custom_seconds: z.coerce.number().min(0).optional(),
+      quota_reset_period: z.enum([
+        'never',
+        'daily',
+        'weekly',
+        'monthly',
+        'custom',
+      ]),
+      quota_reset_custom_seconds: z.coerce.number().min(0).optional(),
+      enabled: z.boolean(),
+      sort_order: z.coerce.number(),
+      allow_balance_pay: z.boolean(),
+      max_purchase_per_user: z.coerce.number().min(0),
+      total_amount: z.coerce.number().min(0),
+      five_hour_quota_enabled: z.boolean(),
+      five_hour_quota: z.coerce.number().min(0),
+      upgrade_group: z.string().optional(),
+      stripe_price_id: z.string().optional(),
+      creem_product_id: z.string().optional(),
+      waffo_pancake_product_id: z.string().optional(),
+    })
+    .superRefine((values, ctx) => {
+      if (!values.five_hour_quota_enabled) return
+      if (values.quota_reset_period !== 'weekly') {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['five_hour_quota_enabled'],
+          message: t('Five-hour quota can only be enabled for weekly reset'),
+        })
+      }
+      if (values.total_amount <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['total_amount'],
+          message: t('Weekly quota must be greater than zero'),
+        })
+      }
+      if (values.five_hour_quota <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['five_hour_quota'],
+          message: t('Five-hour quota must be greater than zero'),
+        })
+      }
+      if (
+        values.total_amount > 0 &&
+        values.five_hour_quota > values.total_amount
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['five_hour_quota'],
+          message: t('Five-hour quota cannot exceed weekly quota'),
+        })
+      }
+    })
 }
 
 export type PlanFormValues = z.infer<ReturnType<typeof getPlanFormSchema>>
@@ -65,6 +102,8 @@ export const PLAN_FORM_DEFAULTS: PlanFormValues = {
   allow_balance_pay: true,
   max_purchase_per_user: 0,
   total_amount: 0,
+  five_hour_quota_enabled: false,
+  five_hour_quota: 0,
   upgrade_group: '',
   stripe_price_id: '',
   creem_product_id: '',
@@ -86,6 +125,8 @@ export function planToFormValues(plan: SubscriptionPlan): PlanFormValues {
     allow_balance_pay: plan.allow_balance_pay !== false,
     max_purchase_per_user: Number(plan.max_purchase_per_user || 0),
     total_amount: quotaUnitsToDollars(Number(plan.total_amount || 0)),
+    five_hour_quota_enabled: plan.five_hour_quota_enabled === true,
+    five_hour_quota: quotaUnitsToDollars(Number(plan.five_hour_quota || 0)),
     upgrade_group: plan.upgrade_group || '',
     stripe_price_id: plan.stripe_price_id || '',
     creem_product_id: plan.creem_product_id || '',
@@ -109,6 +150,11 @@ export function formValuesToPlanPayload(values: PlanFormValues): PlanPayload {
       sort_order: Number(values.sort_order || 0),
       max_purchase_per_user: Number(values.max_purchase_per_user || 0),
       total_amount: parseQuotaFromDollars(Number(values.total_amount || 0)),
+      five_hour_quota_enabled: values.five_hour_quota_enabled === true,
+      five_hour_quota:
+        values.five_hour_quota_enabled === true
+          ? parseQuotaFromDollars(Number(values.five_hour_quota || 0))
+          : 0,
       upgrade_group: values.upgrade_group || '',
     },
   }

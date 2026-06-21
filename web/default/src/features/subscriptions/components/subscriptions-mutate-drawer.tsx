@@ -138,6 +138,14 @@ export function SubscriptionsMutateDrawer({
 
   const durationUnit = form.watch('duration_unit')
   const resetPeriod = form.watch('quota_reset_period')
+  const fiveHourQuotaEnabled = form.watch('five_hour_quota_enabled')
+
+  useEffect(() => {
+    if (resetPeriod !== 'weekly' && form.getValues('five_hour_quota_enabled')) {
+      form.setValue('five_hour_quota_enabled', false, { shouldDirty: true })
+    }
+  }, [resetPeriod, form])
+
   // Gate "+ Create on Pancake" on the same checks the mint handler runs.
   const watchedTitle = form.watch('title')
   const watchedPrice = form.watch('price_amount')
@@ -261,11 +269,7 @@ export function SubscriptionsMutateDrawer({
         }
       }}
     >
-      <SheetContent
-        className={sideDrawerContentClassName(
-          'sm:max-w-[640px] lg:max-w-[680px]'
-        )}
-      >
+      <SheetContent className={sideDrawerContentClassName()}>
         <SheetHeader
           className={sideDrawerHeaderClassName(
             'px-5 py-4 sm:px-7 sm:py-5 [&_[data-slot=sheet-description]]:mt-1 [&_[data-slot=sheet-description]]:text-xs [&_[data-slot=sheet-title]]:text-base [&_[data-slot=sheet-title]]:font-semibold'
@@ -358,77 +362,6 @@ export function SubscriptionsMutateDrawer({
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name='total_amount'
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className='flex min-h-5 flex-row flex-wrap items-center gap-x-2 gap-y-1'>
-                        <FormLabel className='shrink-0'>
-                          {t('Reset Quota')}
-                        </FormLabel>
-                        <span className='text-muted-foreground inline-flex shrink-0 items-center text-xs leading-none'>
-                          {t('0 means unlimited')}
-                        </span>
-                      </div>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type='number'
-                          min={0}
-                          className={fieldControlClassName}
-                          onChange={(e) =>
-                            field.onChange(parseFloat(e.target.value) || 0)
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <div className={compactGridClassName}>
-                <FormField
-                  control={form.control}
-                  name='upgrade_group'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('Upgrade Group')}</FormLabel>
-                      <Select
-                        items={[
-                          { value: '__none__', label: t('No Upgrade') },
-                          ...groupOptions.map((g) => ({ value: g, label: g })),
-                        ]}
-                        onValueChange={(v) =>
-                          field.onChange(v === '__none__' ? '' : v)
-                        }
-                        value={field.value || ''}
-                      >
-                        <FormControl>
-                          <SelectTrigger className={fieldControlClassName}>
-                            <SelectValue placeholder={t('No Upgrade')} />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent alignItemWithTrigger={false}>
-                          <SelectGroup>
-                            <SelectItem value='__none__'>
-                              {t('No Upgrade')}
-                            </SelectItem>
-                            {groupOptions.map((g) => (
-                              <SelectItem key={g} value={g}>
-                                {g}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <FormField
                   control={form.control}
                   name='max_purchase_per_user'
@@ -459,7 +392,47 @@ export function SubscriptionsMutateDrawer({
                 />
               </div>
 
-              <div className={compactGridClassName}>
+              <div className='grid grid-cols-1 items-end gap-4 sm:grid-cols-2 md:grid-cols-4'>
+                <FormField
+                  control={form.control}
+                  name='upgrade_group'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Upgrade Group')}</FormLabel>
+                      <Select
+                        items={[
+                          { value: '__none__', label: t('No Upgrade') },
+                          ...groupOptions.map((g) => ({ value: g, label: g })),
+                        ]}
+                        onValueChange={(v) =>
+                          field.onChange(v === '__none__' ? '' : v)
+                        }
+                        value={field.value || ''}
+                      >
+                        <FormControl>
+                          <SelectTrigger
+                            className={`${fieldControlClassName} w-full`}
+                          >
+                            <SelectValue placeholder={t('No Upgrade')} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent alignItemWithTrigger={false}>
+                          <SelectGroup>
+                            <SelectItem value='__none__'>
+                              {t('No Upgrade')}
+                            </SelectItem>
+                            {groupOptions.map((g) => (
+                              <SelectItem key={g} value={g}>
+                                {g}
+                              </SelectItem>
+                            ))}
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name='sort_order'
@@ -480,7 +453,6 @@ export function SubscriptionsMutateDrawer({
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name='enabled'
@@ -498,7 +470,6 @@ export function SubscriptionsMutateDrawer({
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name='allow_balance_pay'
@@ -618,22 +589,34 @@ export function SubscriptionsMutateDrawer({
                 icon={<RefreshCw className={sectionHeaderIconClassName} />}
               />
 
-              <div className={compactGridClassName}>
+              <div
+                className={
+                  resetPeriod === 'custom'
+                    ? 'grid grid-cols-1 items-end gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(9rem,0.55fr)_minmax(0,1fr)]'
+                    : compactGridClassName
+                }
+              >
                 <FormField
                   control={form.control}
-                  name='quota_reset_custom_seconds'
+                  name='total_amount'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t('Custom Seconds')}</FormLabel>
+                      <div className='flex min-h-5 flex-row flex-wrap items-center gap-x-2 gap-y-1'>
+                        <FormLabel className='shrink-0'>
+                          {t('Reset Quota')}
+                        </FormLabel>
+                        <span className='text-muted-foreground inline-flex shrink-0 items-center text-xs leading-none'>
+                          {t('0 means unlimited')}
+                        </span>
+                      </div>
                       <FormControl>
                         <Input
                           {...field}
                           type='number'
                           min={0}
-                          disabled={resetPeriod !== 'custom'}
                           className={fieldControlClassName}
                           onChange={(e) =>
-                            field.onChange(parseInt(e.target.value, 10) || 0)
+                            field.onChange(parseFloat(e.target.value) || 0)
                           }
                         />
                       </FormControl>
@@ -641,7 +624,6 @@ export function SubscriptionsMutateDrawer({
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name='quota_reset_period'
@@ -659,7 +641,9 @@ export function SubscriptionsMutateDrawer({
                         value={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger className={fieldControlClassName}>
+                          <SelectTrigger
+                            className={`${fieldControlClassName} w-full`}
+                          >
                             <SelectValue />
                           </SelectTrigger>
                         </FormControl>
@@ -677,6 +661,89 @@ export function SubscriptionsMutateDrawer({
                     </FormItem>
                   )}
                 />
+
+                {resetPeriod === 'custom' && (
+                  <FormField
+                    control={form.control}
+                    name='quota_reset_custom_seconds'
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{t('Custom Seconds')}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type='number'
+                            min={0}
+                            className={fieldControlClassName}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value, 10) || 0)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+              </div>
+
+              <div className={compactGridClassName}>
+                <FormField
+                  control={form.control}
+                  name='five_hour_quota_enabled'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Enable 5-hour quota')}</FormLabel>
+                      <div className='flex h-9 min-h-9 flex-row items-center justify-between gap-3 rounded-md border px-3 py-0'>
+                        <FormDescription className='text-xs'>
+                          {t('Only available when reset cycle is weekly')}
+                        </FormDescription>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            disabled={resetPeriod !== 'weekly'}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                {fiveHourQuotaEnabled && (
+                  <FormField
+                    control={form.control}
+                    name='five_hour_quota'
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className='flex min-h-5 flex-row flex-wrap items-center gap-x-2 gap-y-1'>
+                          <FormLabel className='shrink-0'>
+                            {t('5-hour quota')}
+                          </FormLabel>
+                          <span className='text-muted-foreground inline-flex shrink-0 items-center text-xs leading-none'>
+                            {t('Cannot exceed weekly quota')}
+                          </span>
+                        </div>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type='number'
+                            min={0}
+                            step='0.01'
+                            disabled={
+                              resetPeriod !== 'weekly' || !fiveHourQuotaEnabled
+                            }
+                            className={fieldControlClassName}
+                            onChange={(e) =>
+                              field.onChange(parseFloat(e.target.value) || 0)
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
               </div>
             </SideDrawerSection>
 

@@ -366,10 +366,7 @@ function GroupPricingGuide({ open, onOpenChange }: GroupPricingGuideProps) {
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side='right'
-        className={sideDrawerContentClassName('sm:max-w-2xl')}
-      >
+      <SheetContent side='right' className={sideDrawerContentClassName()}>
         <SheetHeader className={sideDrawerHeaderClassName()}>
           <SheetTitle>{t('Group pricing usage guide')}</SheetTitle>
           <SheetDescription>

@@ -298,7 +298,7 @@ export function NotificationPopover({
         {unreadCount > 0 ? (
           <Badge
             variant='destructive'
-            className='absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center px-1 text-[10px] font-semibold tabular-nums'
+            className='absolute -top-1 -right-1 flex h-5 min-w-5 animate-pulse items-center justify-center px-1 text-[10px] font-semibold tabular-nums shadow-[0_0_0_2px_rgba(255,255,255,0.9)] dark:shadow-[0_0_0_2px_rgba(9,9,11,0.95)]'
           >
             {unreadCount > 99 ? '99+' : unreadCount}
           </Badge>

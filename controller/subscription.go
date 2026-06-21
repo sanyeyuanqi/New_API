@@ -138,6 +138,28 @@ type AdminUpsertSubscriptionPlanRequest struct {
 	Plan model.SubscriptionPlan `json:"plan"`
 }
 
+func validateSubscriptionPlanQuotaConfig(plan *model.SubscriptionPlan) string {
+	if plan == nil || !plan.FiveHourQuotaEnabled {
+		if plan != nil {
+			plan.FiveHourQuota = 0
+		}
+		return ""
+	}
+	if model.NormalizeResetPeriod(plan.QuotaResetPeriod) != model.SubscriptionResetWeekly {
+		return "5小时额度只能在每周重置周期下启用"
+	}
+	if plan.TotalAmount <= 0 {
+		return "启用5小时额度时，周额度必须大于0"
+	}
+	if plan.FiveHourQuota <= 0 {
+		return "5小时额度必须大于0"
+	}
+	if plan.FiveHourQuota > plan.TotalAmount {
+		return "5小时额度不能超过周额度"
+	}
+	return ""
+}
+
 func AdminCreateSubscriptionPlan(c *gin.Context) {
 	if !requirePaymentCompliance(c) {
 		return
@@ -192,6 +214,10 @@ func AdminCreateSubscriptionPlan(c *gin.Context) {
 	req.Plan.QuotaResetPeriod = model.NormalizeResetPeriod(req.Plan.QuotaResetPeriod)
 	if req.Plan.QuotaResetPeriod == model.SubscriptionResetCustom && req.Plan.QuotaResetCustomSeconds <= 0 {
 		common.ApiErrorMsg(c, "自定义重置周期需大于0秒")
+		return
+	}
+	if msg := validateSubscriptionPlanQuotaConfig(&req.Plan); msg != "" {
+		common.ApiErrorMsg(c, msg)
 		return
 	}
 	err := model.DB.Create(&req.Plan).Error
@@ -261,6 +287,10 @@ func AdminUpdateSubscriptionPlan(c *gin.Context) {
 		common.ApiErrorMsg(c, "自定义重置周期需大于0秒")
 		return
 	}
+	if msg := validateSubscriptionPlanQuotaConfig(&req.Plan); msg != "" {
+		common.ApiErrorMsg(c, msg)
+		return
+	}
 
 	err := model.DB.Transaction(func(tx *gorm.DB) error {
 		// update plan (allow zero values updates with map)
@@ -279,6 +309,8 @@ func AdminUpdateSubscriptionPlan(c *gin.Context) {
 			"waffo_pancake_product_id":   req.Plan.WaffoPancakeProductId,
 			"max_purchase_per_user":      req.Plan.MaxPurchasePerUser,
 			"total_amount":               req.Plan.TotalAmount,
+			"five_hour_quota_enabled":    req.Plan.FiveHourQuotaEnabled,
+			"five_hour_quota":            req.Plan.FiveHourQuota,
 			"upgrade_group":              req.Plan.UpgradeGroup,
 			"quota_reset_period":         req.Plan.QuotaResetPeriod,
 			"quota_reset_custom_seconds": req.Plan.QuotaResetCustomSeconds,
@@ -410,6 +442,25 @@ func AdminInvalidateUserSubscription(c *gin.Context) {
 		return
 	}
 	msg, err := model.AdminInvalidateUserSubscription(subId)
+	if err != nil {
+		common.ApiError(c, err)
+		return
+	}
+	if msg != "" {
+		common.ApiSuccess(c, gin.H{"message": msg})
+		return
+	}
+	common.ApiSuccess(c, nil)
+}
+
+// AdminActivateUserSubscription restores a cancelled user subscription.
+func AdminActivateUserSubscription(c *gin.Context) {
+	subId, _ := strconv.Atoi(c.Param("id"))
+	if subId <= 0 {
+		common.ApiErrorMsg(c, "无效的订阅ID")
+		return
+	}
+	msg, err := model.AdminActivateUserSubscription(subId)
 	if err != nil {
 		common.ApiError(c, err)
 		return

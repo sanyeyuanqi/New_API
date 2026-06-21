@@ -25,7 +25,7 @@ export function ApiKeys() {
   return (
     <ApiKeysProvider>
       <SectionPageLayout fixedContent>
-        <SectionPageLayout.Title>Key</SectionPageLayout.Title>
+        <SectionPageLayout.Title>API Key</SectionPageLayout.Title>
         <SectionPageLayout.Content>
           <ApiKeysTable />
         </SectionPageLayout.Content>

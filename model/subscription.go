@@ -175,6 +175,10 @@ type SubscriptionPlan struct {
 	// Total quota (amount in quota units, 0 = unlimited)
 	TotalAmount int64 `json:"total_amount" gorm:"type:bigint;not null;default:0"`
 
+	// Optional rolling 5-hour quota inside a weekly quota period.
+	FiveHourQuotaEnabled bool  `json:"five_hour_quota_enabled" gorm:"default:false"`
+	FiveHourQuota        int64 `json:"five_hour_quota" gorm:"type:bigint;not null;default:0"`
+
 	// Quota reset period for plan
 	QuotaResetPeriod        string `json:"quota_reset_period" gorm:"type:varchar(16);default:'never'"`
 	QuotaResetCustomSeconds int64  `json:"quota_reset_custom_seconds" gorm:"type:bigint;default:0"`
@@ -258,6 +262,10 @@ type UserSubscription struct {
 	LastResetTime int64 `json:"last_reset_time" gorm:"type:bigint;default:0"`
 	NextResetTime int64 `json:"next_reset_time" gorm:"type:bigint;default:0;index"`
 
+	FiveHourAmountUsed    int64 `json:"five_hour_amount_used" gorm:"type:bigint;not null;default:0"`
+	FiveHourWindowStart   int64 `json:"five_hour_window_start" gorm:"type:bigint;default:0"`
+	FiveHourNextResetTime int64 `json:"five_hour_next_reset_time" gorm:"type:bigint;default:0;index"`
+
 	UpgradeGroup  string `json:"upgrade_group" gorm:"type:varchar(64);default:''"`
 	PrevUserGroup string `json:"prev_user_group" gorm:"type:varchar(64);default:''"`
 
@@ -317,6 +325,35 @@ func NormalizeResetPeriod(period string) string {
 	}
 }
 
+func planHasFiveHourQuota(plan *SubscriptionPlan) bool {
+	return plan != nil &&
+		plan.FiveHourQuotaEnabled &&
+		NormalizeResetPeriod(plan.QuotaResetPeriod) == SubscriptionResetWeekly &&
+		plan.FiveHourQuota > 0
+}
+
+func resetExpiredFiveHourWindow(sub *UserSubscription, plan *SubscriptionPlan, now int64) {
+	if sub == nil || !planHasFiveHourQuota(plan) {
+		return
+	}
+	if sub.FiveHourNextResetTime > 0 && sub.FiveHourNextResetTime <= now {
+		sub.FiveHourAmountUsed = 0
+		sub.FiveHourWindowStart = 0
+		sub.FiveHourNextResetTime = 0
+	}
+}
+
+func ensureFiveHourWindowStarted(sub *UserSubscription, plan *SubscriptionPlan, now int64) {
+	if sub == nil || !planHasFiveHourQuota(plan) {
+		return
+	}
+	resetExpiredFiveHourWindow(sub, plan, now)
+	if sub.FiveHourWindowStart <= 0 || sub.FiveHourNextResetTime <= 0 {
+		sub.FiveHourWindowStart = now
+		sub.FiveHourNextResetTime = now + int64((5 * time.Hour).Seconds())
+	}
+}
+
 func calcNextResetTime(base time.Time, plan *SubscriptionPlan, endUnix int64) int64 {
 	if plan == nil {
 		return 0
@@ -331,15 +368,8 @@ func calcNextResetTime(base time.Time, plan *SubscriptionPlan, endUnix int64) in
 		next = time.Date(base.Year(), base.Month(), base.Day(), 0, 0, 0, 0, base.Location()).
 			AddDate(0, 0, 1)
 	case SubscriptionResetWeekly:
-		// Align to next Monday 00:00
-		weekday := int(base.Weekday()) // Sunday=0
-		// Convert to Monday=1..Sunday=7
-		if weekday == 0 {
-			weekday = 7
-		}
-		daysUntil := 8 - weekday
-		next = time.Date(base.Year(), base.Month(), base.Day(), 0, 0, 0, 0, base.Location()).
-			AddDate(0, 0, daysUntil)
+		// Anchor weekly resets to the exact subscription purchase time.
+		next = base.AddDate(0, 0, 7)
 	case SubscriptionResetMonthly:
 		// Align to first day of next month 00:00
 		next = time.Date(base.Year(), base.Month(), 1, 0, 0, 0, 0, base.Location()).
@@ -907,6 +937,90 @@ func AdminInvalidateUserSubscription(userSubscriptionId int) (string, error) {
 	return "", nil
 }
 
+// AdminActivateUserSubscription restores a cancelled subscription when its original plan period is still valid.
+func AdminActivateUserSubscription(userSubscriptionId int) (string, error) {
+	if userSubscriptionId <= 0 {
+		return "", errors.New("invalid userSubscriptionId")
+	}
+	now := common.GetTimestamp()
+	cacheGroup := ""
+	upgradeGroup := ""
+	var userId int
+	err := DB.Transaction(func(tx *gorm.DB) error {
+		var sub UserSubscription
+		if err := tx.Set("gorm:query_option", "FOR UPDATE").
+			Where("id = ?", userSubscriptionId).First(&sub).Error; err != nil {
+			return err
+		}
+		userId = sub.UserId
+		if sub.Status != "cancelled" {
+			return errors.New("只有已作废的订阅可以生效")
+		}
+		if sub.StartTime <= 0 {
+			return errors.New("订阅开始时间无效")
+		}
+		plan, err := getSubscriptionPlanByIdTx(tx, sub.PlanId)
+		if err != nil {
+			return err
+		}
+		restoredEndTime, err := calcPlanEndTime(time.Unix(sub.StartTime, 0), plan)
+		if err != nil {
+			return err
+		}
+		if restoredEndTime <= now {
+			return errors.New("订阅周期已结束，无法生效")
+		}
+
+		sub.Status = "active"
+		sub.EndTime = restoredEndTime
+		sub.UpdatedAt = now
+		planUpgradeGroup := strings.TrimSpace(plan.UpgradeGroup)
+		if strings.TrimSpace(sub.UpgradeGroup) == "" && planUpgradeGroup != "" {
+			sub.UpgradeGroup = planUpgradeGroup
+		}
+		if err := maybeResetUserSubscriptionWithPlanTx(tx, &sub, plan, now); err != nil {
+			return err
+		}
+		if err := tx.Save(&sub).Error; err != nil {
+			return err
+		}
+
+		targetGroup := strings.TrimSpace(sub.UpgradeGroup)
+		if targetGroup == "" {
+			return nil
+		}
+		currentGroup, err := getUserGroupByIdTx(tx, sub.UserId)
+		if err != nil {
+			return err
+		}
+		if currentGroup == targetGroup {
+			return nil
+		}
+		if strings.TrimSpace(sub.PrevUserGroup) == "" {
+			if err := tx.Model(&sub).Update("prev_user_group", currentGroup).Error; err != nil {
+				return err
+			}
+		}
+		if err := tx.Model(&User{}).Where("id = ?", sub.UserId).
+			Update("group", targetGroup).Error; err != nil {
+			return err
+		}
+		cacheGroup = targetGroup
+		upgradeGroup = targetGroup
+		return nil
+	})
+	if err != nil {
+		return "", err
+	}
+	if cacheGroup != "" && userId > 0 {
+		_ = UpdateUserGroupCache(userId, cacheGroup)
+	}
+	if upgradeGroup != "" {
+		return fmt.Sprintf("用户分组将升级到 %s", upgradeGroup), nil
+	}
+	return "", nil
+}
+
 // AdminDeleteUserSubscription hard-deletes a user subscription.
 func AdminDeleteUserSubscription(userSubscriptionId int) (string, error) {
 	if userSubscriptionId <= 0 {
@@ -1098,6 +1212,9 @@ func maybeResetUserSubscriptionWithPlanTx(tx *gorm.DB, sub *UserSubscription, pl
 		return nil
 	}
 	sub.AmountUsed = 0
+	sub.FiveHourAmountUsed = 0
+	sub.FiveHourWindowStart = 0
+	sub.FiveHourNextResetTime = 0
 	sub.LastResetTime = base.Unix()
 	sub.NextResetTime = next
 	return tx.Save(sub).Error
@@ -1159,9 +1276,17 @@ func PreConsumeUserSubscription(requestId string, userId int, modelName string, 
 			if err := maybeResetUserSubscriptionWithPlanTx(tx, &sub, plan, now); err != nil {
 				return err
 			}
+			resetExpiredFiveHourWindow(&sub, plan, now)
 			usedBefore := sub.AmountUsed
 			if sub.AmountTotal > 0 {
 				remain := sub.AmountTotal - usedBefore
+				if remain < amount {
+					continue
+				}
+			}
+			if planHasFiveHourQuota(plan) {
+				ensureFiveHourWindowStarted(&sub, plan, now)
+				remain := plan.FiveHourQuota - sub.FiveHourAmountUsed
 				if remain < amount {
 					continue
 				}
@@ -1189,6 +1314,9 @@ func PreConsumeUserSubscription(requestId string, userId int, modelName string, 
 				return err
 			}
 			sub.AmountUsed += amount
+			if planHasFiveHourQuota(plan) {
+				sub.FiveHourAmountUsed += amount
+			}
 			if err := tx.Save(&sub).Error; err != nil {
 				return err
 			}
@@ -1323,12 +1451,20 @@ func PostConsumeUserSubscriptionDelta(userSubscriptionId int, delta int64) error
 	if delta == 0 {
 		return nil
 	}
+	now := GetDBTimestamp()
 	return DB.Transaction(func(tx *gorm.DB) error {
 		var sub UserSubscription
 		if err := tx.Set("gorm:query_option", "FOR UPDATE").
 			Where("id = ?", userSubscriptionId).
 			First(&sub).Error; err != nil {
 			return err
+		}
+		plan, _ := getSubscriptionPlanByIdTx(tx, sub.PlanId)
+		if plan != nil {
+			if err := maybeResetUserSubscriptionWithPlanTx(tx, &sub, plan, now); err != nil {
+				return err
+			}
+			resetExpiredFiveHourWindow(&sub, plan, now)
 		}
 		newUsed := sub.AmountUsed + delta
 		if newUsed < 0 {
@@ -1338,6 +1474,23 @@ func PostConsumeUserSubscriptionDelta(userSubscriptionId int, delta int64) error
 			return fmt.Errorf("subscription used exceeds total, used=%d total=%d", newUsed, sub.AmountTotal)
 		}
 		sub.AmountUsed = newUsed
+		if planHasFiveHourQuota(plan) {
+			if delta > 0 {
+				ensureFiveHourWindowStarted(&sub, plan, now)
+			}
+			newFiveHourUsed := sub.FiveHourAmountUsed + delta
+			if newFiveHourUsed < 0 {
+				newFiveHourUsed = 0
+			}
+			if newFiveHourUsed > plan.FiveHourQuota {
+				return fmt.Errorf("subscription 5-hour quota insufficient, used=%d total=%d", newFiveHourUsed, plan.FiveHourQuota)
+			}
+			sub.FiveHourAmountUsed = newFiveHourUsed
+		} else if sub.FiveHourAmountUsed != 0 || sub.FiveHourWindowStart != 0 || sub.FiveHourNextResetTime != 0 {
+			sub.FiveHourAmountUsed = 0
+			sub.FiveHourWindowStart = 0
+			sub.FiveHourNextResetTime = 0
+		}
 		return tx.Save(&sub).Error
 	})
 }

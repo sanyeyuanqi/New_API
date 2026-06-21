@@ -95,6 +95,15 @@ export async function invalidateUserSubscription(
   return res.data
 }
 
+export async function activateUserSubscription(
+  subId: number
+): Promise<ApiResponse<{ message?: string }>> {
+  const res = await api.post(
+    `/api/subscription/admin/user_subscriptions/${subId}/activate`
+  )
+  return res.data
+}
+
 export async function deleteUserSubscription(
   subId: number
 ): Promise<ApiResponse> {

@@ -635,7 +635,7 @@ export function ModelMutateDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className={sideDrawerContentClassName('sm:max-w-2xl')}>
+      <SheetContent className={sideDrawerContentClassName()}>
         <SheetHeader className={sideDrawerHeaderClassName()}>
           <SheetTitle>
             {isEditing ? t('Edit Model') : t('Create Model')}

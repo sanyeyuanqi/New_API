@@ -31,6 +31,12 @@ import { type TopNavLink } from '../types'
 import { Header } from './header'
 import { TopNav } from './top-nav'
 
+const appHeaderToolButtonClass =
+  'size-8 !rounded-full text-slate-600 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-105 hover:bg-white/90 hover:text-slate-950 hover:shadow-[0_8px_18px_rgba(15,23,42,0.10)] data-popup-open:bg-white/90 dark:text-slate-300 dark:hover:bg-white/12 dark:hover:text-white dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.28)]'
+
+const appHeaderProfileButtonClass =
+  '!h-8 !w-auto max-w-[5.25rem] !rounded-full px-2.5 text-sm font-semibold text-slate-700 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:bg-white/90 hover:text-slate-950 hover:shadow-[0_8px_18px_rgba(15,23,42,0.10)] data-popup-open:bg-white/90 sm:max-w-[10rem] dark:text-slate-300 dark:hover:bg-white/12 dark:hover:text-white dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.28)]'
+
 /**
  * General application Header component
  * Integrates navigation bar, search, configuration and profile functions
@@ -186,30 +192,35 @@ export function AppHeader({
 
         {rightContent ?? (
           <div className='ms-auto flex min-w-0 items-center gap-1 sm:gap-2'>
-            <div className='flex h-full items-center gap-1 px-0 sm:px-1 [&_[data-slot=button]]:size-8'>
-              <LanguageSwitcher />
-              <ThemeSwitch />
-              {showNotifications && (
-                <NotificationPopover
-                  open={notifications.popoverOpen}
-                  onOpenChange={notifications.setPopoverOpen}
-                  unreadCount={notifications.unreadCount}
-                  activeTab={notifications.activeTab}
-                  onTabChange={notifications.setActiveTab}
-                  notice={notifications.notice}
-                  announcements={notifications.announcements}
-                  loading={notifications.loading}
-                  onCloseToday={notifications.closeToday}
-                />
-              )}
-              {showConfigDrawer && <ConfigDrawer />}
-              {showProfileDropdown && (
-                <ProfileDropdown
-                  showName
-                  nameMode='username'
-                  className='!h-8 !w-auto max-w-[5.25rem] px-2 text-sm font-semibold sm:max-w-[10rem]'
-                />
-              )}
+            <div className='flex h-full items-center gap-1 px-0 sm:px-1'>
+              <div className='flex min-w-0 items-center gap-0.5 rounded-full bg-white/35 p-0.5 ring-1 ring-slate-200/45 backdrop-blur-sm dark:bg-white/[0.03] dark:ring-white/8'>
+                <LanguageSwitcher className={appHeaderToolButtonClass} />
+                <ThemeSwitch className={appHeaderToolButtonClass} />
+                {showNotifications && (
+                  <NotificationPopover
+                    open={notifications.popoverOpen}
+                    onOpenChange={notifications.setPopoverOpen}
+                    unreadCount={notifications.unreadCount}
+                    activeTab={notifications.activeTab}
+                    onTabChange={notifications.setActiveTab}
+                    notice={notifications.notice}
+                    announcements={notifications.announcements}
+                    loading={notifications.loading}
+                    onCloseToday={notifications.closeToday}
+                    className={appHeaderToolButtonClass}
+                  />
+                )}
+                {showConfigDrawer && (
+                  <ConfigDrawer triggerClassName={appHeaderToolButtonClass} />
+                )}
+                {showProfileDropdown && (
+                  <ProfileDropdown
+                    showName
+                    nameMode='username'
+                    className={appHeaderProfileButtonClass}
+                  />
+                )}
+              </div>
               {showTopNav && (
                 <TopNav
                   links={links}

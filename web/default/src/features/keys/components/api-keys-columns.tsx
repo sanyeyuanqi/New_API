@@ -120,7 +120,7 @@ export function useApiKeysColumns(): ColumnDef<ApiKey>[] {
     {
       id: 'key',
       accessorKey: 'key',
-      header: 'Key',
+      header: 'API Key',
       cell: ({ row }) => <ApiKeyCell apiKey={row.original} />,
       enableSorting: false,
       size: 260,

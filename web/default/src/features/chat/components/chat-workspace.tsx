@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -62,20 +62,6 @@ export function ChatWorkspace() {
     config.model ||
     'AI'
 
-  const { data: modelsData, isLoading: isLoadingModels } = useQuery({
-    queryKey: ['chat-models', t],
-    queryFn: async () => {
-      try {
-        return await getUserModels()
-      } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : t('Failed to load models')
-        )
-        return []
-      }
-    },
-  })
-
   const { data: groupsData } = useQuery({
     queryKey: ['chat-groups', t],
     queryFn: async () => {
@@ -88,6 +74,27 @@ export function ChatWorkspace() {
         return []
       }
     },
+  })
+
+  const selectedGroupAvailable = useMemo(
+    () => Boolean(groupsData?.some((group) => group.value === config.group)),
+    [groupsData, config.group]
+  )
+  const selectedModelGroup = selectedGroupAvailable ? config.group : undefined
+
+  const { data: modelsData, isLoading: isLoadingModels } = useQuery({
+    queryKey: ['chat-models', selectedModelGroup, t],
+    queryFn: async () => {
+      try {
+        return await getUserModels(selectedModelGroup)
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : t('Failed to load models')
+        )
+        return []
+      }
+    },
+    enabled: Boolean(selectedModelGroup),
   })
 
   useEffect(() => {

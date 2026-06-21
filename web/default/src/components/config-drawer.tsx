@@ -64,7 +64,11 @@ import { useSidebar } from './ui/sidebar'
 
 const Item = RadioPrimitive.Root
 
-export function ConfigDrawer() {
+export function ConfigDrawer({
+  triggerClassName,
+}: {
+  triggerClassName?: string
+} = {}) {
   const { t } = useTranslation()
   const { setOpen } = useSidebar()
   const { resetDir } = useDirection()
@@ -89,13 +93,13 @@ export function ConfigDrawer() {
             variant='ghost'
             aria-label={t('Open theme settings')}
             aria-describedby='config-drawer-description'
-            className='max-md:hidden'
+            className={cn('max-md:hidden', triggerClassName)}
           />
         }
       >
         <Palette className='size-[1.2rem]' aria-hidden='true' />
       </SheetTrigger>
-      <SheetContent className={sideDrawerContentClassName('sm:max-w-md')}>
+      <SheetContent className={sideDrawerContentClassName()}>
         <SheetHeader className={sideDrawerHeaderClassName()}>
           <SheetTitle>{t('Theme Settings')}</SheetTitle>
           <SheetDescription id='config-drawer-description'>

@@ -16,8 +16,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import type { CSSProperties } from 'react'
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  type CSSProperties,
+} from 'react'
 import { Crown, RefreshCw, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -214,7 +219,6 @@ export function SubscriptionPlansCard({
 
   const hasActive = activeSubscriptions.length > 0
   const hasAny = allSubscriptions.length > 0
-  const isAvailable = loading || plans.length > 0 || hasAny
   const disablePref = !hasActive
   const isSubPref =
     billingPreference === 'subscription_first' ||
@@ -231,6 +235,21 @@ export function SubscriptionPlansCard({
     }
     return map
   }, [allSubscriptions])
+
+  const availablePlans = useMemo(
+    () =>
+      plans.filter((item) => {
+        const plan = item?.plan
+        if (!plan) return false
+        const limit = Number(plan.max_purchase_per_user || 0)
+        if (limit <= 0) return true
+        const count = planPurchaseCountMap.get(plan.id) || 0
+        return count < limit
+      }),
+    [planPurchaseCountMap, plans]
+  )
+
+  const isAvailable = loading || availablePlans.length > 0 || hasAny
 
   const planMap = useMemo(() => {
     const map = new Map<number, PlanRecord['plan']>()
@@ -329,29 +348,6 @@ export function SubscriptionPlansCard({
           </div>
 
           <div className='flex flex-col items-start gap-1.5 sm:items-end'>
-            <div className='flex min-w-0 flex-wrap items-center gap-2 px-1'>
-              <span className='text-sm font-medium'>
-                {t('My Subscriptions')}
-              </span>
-              <span className='flex items-center gap-1.5 text-xs font-medium'>
-                <span
-                  className={cn(
-                    'size-1.5 shrink-0 rounded-full',
-                    hasActive ? dotColorMap.success : dotColorMap.neutral
-                  )}
-                  aria-hidden='true'
-                />
-                {hasActive ? (
-                  <span className={cn(textColorMap.success)}>
-                    {activeSubscriptions.length} {t('active')}
-                  </span>
-                ) : (
-                  <span className='text-muted-foreground'>
-                    {t('No Active')}
-                  </span>
-                )}
-              </span>
-            </div>
             <div className='flex items-center gap-2'>
               <Select
                 items={[
@@ -423,14 +419,21 @@ export function SubscriptionPlansCard({
         <div className='space-y-5'>
           {hasActive && (
             <section className='space-y-3'>
-              <div className='flex items-center justify-between gap-3'>
-                <h4 className='text-sm font-semibold'>
-                  {t('My Subscription Plans')}
-                </h4>
-                <span
-                  className={cn('text-xs font-medium', textColorMap.success)}
-                >
-                  {activeSubscriptions.length} {t('active')}
+              <div className='flex min-w-0 flex-wrap items-center gap-2'>
+                <span className='text-sm font-semibold'>
+                  {t('My Subscriptions')}
+                </span>
+                <span className='flex items-center gap-1.5 text-xs font-medium'>
+                  <span
+                    className={cn(
+                      'size-1.5 shrink-0 rounded-full',
+                      dotColorMap.success
+                    )}
+                    aria-hidden='true'
+                  />
+                  <span className={cn(textColorMap.success)}>
+                    {activeSubscriptions.length} {t('active')}
+                  </span>
                 </span>
               </div>
 
@@ -448,15 +451,42 @@ export function SubscriptionPlansCard({
                   const remaining = Math.max(total - used, 0)
                   const quotaDisplay =
                     total > 0 ? formatQuota(remaining) : t('Unlimited')
+                  const resetCycleLabel =
+                    plan?.quota_reset_period === 'daily'
+                      ? t('Daily')
+                      : plan?.quota_reset_period === 'weekly'
+                        ? t('Weekly')
+                        : plan?.quota_reset_period === 'monthly'
+                          ? t('Monthly')
+                          : plan?.quota_reset_period === 'custom'
+                            ? formatResetPeriod(plan, t)
+                            : ''
+                  const resetTimeLabel = resetCycleLabel
+                    ? `${t('Reset Time')} (${resetCycleLabel})`
+                    : t('Reset Time')
+                  const fiveHourQuotaEnabled =
+                    plan?.five_hour_quota_enabled === true
+                  const fiveHourTotal = Number(plan?.five_hour_quota || 0)
+                  const fiveHourUsed = Number(sub.five_hour_amount_used || 0)
+                  const fiveHourRemaining = Math.max(
+                    fiveHourTotal - fiveHourUsed,
+                    0
+                  )
 
                   const details = [
-                    `${t('Status')}: ${t('Active')}`,
-                    `${t('End')}: ${formatTimestamp(sub.end_time)}`,
+                    `${t('Valid Until')}: ${formatTimestamp(sub.end_time)}`,
                     sub.next_reset_time
-                      ? `${t('Next reset')}: ${formatTimestamp(sub.next_reset_time)}`
+                      ? `${resetTimeLabel}: ${formatTimestamp(sub.next_reset_time)}`
                       : null,
                     total > 0 ? `${t('Used')}: ${formatQuota(used)}` : null,
-                    sub.source ? `${t('Source')}: ${sub.source}` : null,
+                    fiveHourQuotaEnabled && fiveHourTotal > 0
+                      ? `${t('5-hour quota')}: ${formatQuota(fiveHourRemaining)} / ${formatQuota(fiveHourTotal)}`
+                      : null,
+                    fiveHourQuotaEnabled &&
+                    fiveHourTotal > 0 &&
+                    sub.five_hour_next_reset_time
+                      ? `${t('5-hour next reset')}: ${formatTimestamp(sub.five_hour_next_reset_time)}`
+                      : null,
                   ].filter(Boolean) as string[]
 
                   return (
@@ -510,13 +540,13 @@ export function SubscriptionPlansCard({
               <h4 className='text-sm font-semibold'>{t('Available Plans')}</h4>
             )}
 
-            {plans.length > 0 ? (
+            {availablePlans.length > 0 ? (
               <div
                 ref={setPlanGridElement}
                 className={planGridClassName}
                 style={planGridStyle}
               >
-                {plans.map((p) => {
+                {availablePlans.map((p) => {
                   const plan = p?.plan
                   if (!plan) return null
                   const totalAmount = Number(plan.total_amount || 0)
@@ -524,6 +554,19 @@ export function SubscriptionPlansCard({
                   const resetQuotaDisplay = resetQuota.startsWith('$')
                     ? `${resetQuota.slice(1)}$`
                     : resetQuota
+                  const resetPeriodDisplay =
+                    plan.quota_reset_period === 'daily'
+                      ? t('Daily')
+                      : plan.quota_reset_period === 'weekly'
+                        ? t('Weekly')
+                        : plan.quota_reset_period === 'monthly'
+                          ? t('Monthly')
+                          : plan.quota_reset_period === 'custom'
+                            ? formatResetPeriod(plan, t)
+                            : t('No Reset')
+                  const resetAmountDisplay =
+                    totalAmount > 0 ? resetQuotaDisplay : t('Unlimited')
+                  const fiveHourQuota = Number(plan.five_hour_quota || 0)
                   const price = Number(plan.price_amount || 0).toFixed(2)
                   const limit = Number(plan.max_purchase_per_user || 0)
                   const count = planPurchaseCountMap.get(plan.id) || 0
@@ -531,12 +574,12 @@ export function SubscriptionPlansCard({
 
                   const benefits = [
                     `${t('Validity Period')}: ${formatDuration(plan, t)}`,
-                    formatResetPeriod(plan, t) !== t('No Reset')
-                      ? `${t('Quota Reset')}: ${formatResetPeriod(plan, t)}`
+                    resetPeriodDisplay !== t('No Reset')
+                      ? `${t('Quota Reset')}（${resetPeriodDisplay}）：${resetAmountDisplay}`
+                      : `${t('Total Quota')}: ${resetAmountDisplay}`,
+                    plan.five_hour_quota_enabled && fiveHourQuota > 0
+                      ? `${t('5-hour quota')}: ${formatQuota(fiveHourQuota)}`
                       : null,
-                    totalAmount > 0
-                      ? `${t('Reset Quota')}: ${resetQuotaDisplay}`
-                      : `${t('Reset Quota')}: ${t('Unlimited')}`,
                     limit > 0 ? `${t('Purchase Limit')}: ${limit}` : null,
                     plan.upgrade_group
                       ? `${t('Upgrade Group')}: ${plan.upgrade_group}`

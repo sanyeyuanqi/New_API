@@ -242,7 +242,7 @@ export function DataTableRowActions<TData>({
               if (ok) toast.success(t('Copied'))
             }}
           >
-            {t('Copy Key')}
+            复制 API Key
             <DropdownMenuShortcut>
               <Copy size={16} />
             </DropdownMenuShortcut>

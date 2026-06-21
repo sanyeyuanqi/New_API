@@ -16,6 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useState } from 'react'
 import { z } from 'zod'
 import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -31,6 +32,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { CopyButton } from '@/components/copy-button'
 import {
   SettingsEnableDisableButton,
   SettingsForm,
@@ -56,10 +58,22 @@ export function CheckinSettingsSection({
     enabled: boolean
     minQuota: number
     maxQuota: number
+    quotaPerUnit: number
   }
 }) {
   const { t } = useTranslation()
   const updateOption = useUpdateOption()
+  const [usdAmount, setUsdAmount] = useState('1')
+  const quotaPerUnit =
+    Number.isFinite(defaultValues.quotaPerUnit) &&
+    defaultValues.quotaPerUnit > 0
+      ? defaultValues.quotaPerUnit
+      : 500000
+  const parsedUsdAmount = Number(usdAmount || 0)
+  const calculatedQuota = Number.isFinite(parsedUsdAmount)
+    ? Math.round(parsedUsdAmount * quotaPerUnit)
+    : 0
+  const calculatedQuotaText = String(calculatedQuota)
 
   const form = useForm<Values>({
     resolver: zodResolver(schema) as unknown as Resolver<Values>,
@@ -144,50 +158,91 @@ export function CheckinSettingsSection({
           />
 
           {enabled && (
-            <div className='grid gap-6 sm:grid-cols-2'>
-              <FormField
-                control={form.control}
-                name='minQuota'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Minimum check-in quota')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        min={0}
-                        placeholder={t('1000')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Minimum quota amount awarded for check-in')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <div className='space-y-3'>
+              <div className='grid gap-6 sm:grid-cols-2'>
+                <FormField
+                  control={form.control}
+                  name='minQuota'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Minimum check-in quota')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type='number'
+                          min={0}
+                          placeholder={t('1000')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          'Minimum check-in quota / {{quotaPerUnit}} = Actual quota ($)',
+                          {
+                            quotaPerUnit,
+                          }
+                        )}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name='maxQuota'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('Maximum check-in quota')}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type='number'
-                        min={0}
-                        placeholder={t('10000')}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      {t('Maximum quota amount awarded for check-in')}
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name='maxQuota'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t('Maximum check-in quota')}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type='number'
+                          min={0}
+                          placeholder={t('10000')}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        {t(
+                          'Maximum check-in quota / {{quotaPerUnit}} = Actual quota ($)',
+                          {
+                            quotaPerUnit,
+                          }
+                        )}
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className='text-muted-foreground flex flex-wrap items-end gap-2 text-xs'>
+                <div className='w-32 space-y-1'>
+                  <div>{t('USD amount ($)')}</div>
+                  <Input
+                    type='number'
+                    min={0}
+                    step='0.01'
+                    value={usdAmount}
+                    onChange={(event) => setUsdAmount(event.target.value)}
+                    className='h-8'
+                  />
+                </div>
+                <div className='w-44 space-y-1'>
+                  <div>{t('Displayed quota')}</div>
+                  <div className='flex gap-1.5'>
+                    <Input
+                      value={calculatedQuotaText}
+                      readOnly
+                      className='h-8 font-mono'
+                    />
+                    <CopyButton
+                      value={calculatedQuotaText}
+                      tooltip={t('Copy quota')}
+                      successTooltip={t('Copied!')}
+                      className='h-8 w-8'
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </SettingsForm>
