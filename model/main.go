@@ -129,7 +129,7 @@ func chooseDB(envName string, isLog bool) (*gorm.DB, error) {
 			} else {
 				common.LogSqlType = common.DatabaseTypePostgreSQL
 			}
-			return gorm.Open(postgres.New(postgres.Config{
+			return openDBWithRetry(envName, gorm.Open, postgres.New(postgres.Config{
 				DSN:                  dsn,
 				PreferSimpleProtocol: true, // disables implicit prepared statement usage
 			}), &gorm.Config{
@@ -162,7 +162,7 @@ func chooseDB(envName string, isLog bool) (*gorm.DB, error) {
 		} else {
 			common.LogSqlType = common.DatabaseTypeMySQL
 		}
-		return gorm.Open(mysql.Open(dsn), &gorm.Config{
+		return openDBWithRetry(envName, gorm.Open, mysql.Open(dsn), &gorm.Config{
 			PrepareStmt: true, // precompile SQL
 		})
 	}
@@ -172,6 +172,39 @@ func chooseDB(envName string, isLog bool) (*gorm.DB, error) {
 	return gorm.Open(sqlite.Open(common.SQLitePath), &gorm.Config{
 		PrepareStmt: true, // precompile SQL
 	})
+}
+
+func openDBWithRetry(envName string, open func(gorm.Dialector, ...gorm.Option) (*gorm.DB, error), dialector gorm.Dialector, opts ...gorm.Option) (*gorm.DB, error) {
+	retries := common.GetEnvOrDefault("SQL_CONNECT_RETRY_TIMES", 30)
+	if retries < 1 {
+		retries = 1
+	}
+	intervalSeconds := common.GetEnvOrDefault("SQL_CONNECT_RETRY_INTERVAL_SECONDS", 2)
+	if intervalSeconds < 1 {
+		intervalSeconds = 1
+	}
+
+	var lastErr error
+	for attempt := 1; attempt <= retries; attempt++ {
+		db, err := open(dialector, opts...)
+		if err == nil {
+			return db, nil
+		}
+		lastErr = err
+		if attempt == retries {
+			break
+		}
+		common.SysLog(fmt.Sprintf(
+			"%s connection failed (attempt %d/%d): %s; retrying in %ds",
+			envName,
+			attempt,
+			retries,
+			err.Error(),
+			intervalSeconds,
+		))
+		time.Sleep(time.Duration(intervalSeconds) * time.Second)
+	}
+	return nil, lastErr
 }
 
 func InitDB() (err error) {

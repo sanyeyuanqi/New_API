@@ -222,10 +222,10 @@ export function ChatWorkspace() {
 
       <div
         className={cn(
-          'absolute left-1/2 z-10 mx-auto w-full max-w-4xl -translate-x-1/2 px-3 pb-3 transition-[top] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:px-0 md:pb-0 xl:left-[calc(50%-40px)]',
+          'absolute left-1/2 z-10 mx-auto w-full max-w-4xl -translate-x-1/2 px-3 pb-3 transition-[top,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] md:px-0 md:pb-0 xl:left-[calc(50%-40px)]',
           messages.length === 0
             ? 'top-[calc(46%-150px)]'
-            : 'top-[calc(100%-12.25rem)]'
+            : 'bottom-0'
         )}
       >
         <PlaygroundInput
