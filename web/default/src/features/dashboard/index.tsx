@@ -37,8 +37,10 @@ import { UserCharts } from './components/users/user-charts'
 import { DEFAULT_TIME_GRANULARITY } from './constants'
 import {
   buildDefaultDashboardFilters,
+  getSavedDashboardFilters,
   getSavedChartPreferences,
   processChartData,
+  saveDashboardFilters,
   saveChartPreferences,
 } from './lib'
 import {
@@ -84,15 +86,18 @@ export function Dashboard() {
   const [chartPreferences, setChartPreferences] =
     useState<DashboardChartPreferences>(() => getSavedChartPreferences())
   const [modelFilters, setModelFilters] = useState<DashboardFilters>(() =>
-    buildDefaultDashboardFilters(getSavedChartPreferences())
+    getSavedDashboardFilters(getSavedChartPreferences())
   )
 
   const handleFilterChange = useCallback((filters: DashboardFilters) => {
     setModelFilters(filters)
+    saveDashboardFilters(filters)
   }, [])
 
   const handleResetFilters = useCallback(() => {
-    setModelFilters(buildDefaultDashboardFilters(chartPreferences))
+    const filters = buildDefaultDashboardFilters(chartPreferences)
+    setModelFilters(filters)
+    saveDashboardFilters(filters)
   }, [chartPreferences])
 
   const handleDataUpdate = useCallback(
@@ -105,8 +110,10 @@ export function Dashboard() {
 
   const handleChartPreferencesChange = useCallback(
     (preferences: DashboardChartPreferences) => {
+      const filters = buildDefaultDashboardFilters(preferences)
       setChartPreferences(preferences)
-      setModelFilters(buildDefaultDashboardFilters(preferences))
+      setModelFilters(filters)
+      saveDashboardFilters(filters)
       saveChartPreferences(preferences)
     },
     []
@@ -140,6 +147,7 @@ export function Dashboard() {
           onPreferencesChange={handleChartPreferencesChange}
         />
         <ModelsFilter
+          filters={modelFilters}
           preferences={chartPreferences}
           onFilterChange={handleFilterChange}
           onReset={handleResetFilters}

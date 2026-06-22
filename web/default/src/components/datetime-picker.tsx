@@ -40,6 +40,17 @@ const calendarLocales = {
   vi,
 } as const
 
+function parseTimeValue(value: string): [number, number] | null {
+  const match = /^(\d{2}):(\d{2})$/.exec(value)
+  if (!match) return null
+
+  const hours = Number(match[1])
+  const minutes = Number(match[2])
+  if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) return null
+
+  return [hours, minutes]
+}
+
 interface DateTimePickerProps {
   value?: Date
   onChange?: (date: Date | undefined) => void
@@ -74,7 +85,7 @@ export function DateTimePicker({
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
-      const [hours, minutes] = time.split(':').map(Number)
+      const [hours, minutes] = parseTimeValue(time) ?? [0, 0]
       const newDate = new Date(selectedDate)
       newDate.setHours(hours, minutes, 0, 0)
       setDate(newDate)
@@ -93,7 +104,10 @@ export function DateTimePicker({
     setTime(newTime)
 
     if (date) {
-      const [hours, minutes] = newTime.split(':').map(Number)
+      const parsedTime = parseTimeValue(newTime)
+      if (!parsedTime) return
+
+      const [hours, minutes] = parsedTime
       const newDate = new Date(date)
       newDate.setHours(hours, minutes, 0, 0)
       setDate(newDate)
@@ -141,8 +155,9 @@ export function DateTimePicker({
         type='time'
         value={time}
         onChange={handleTimeChange}
+        step={60}
+        aria-label={t('Time')}
         className='w-32 appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
-        disabled={!date}
       />
       {date && (
         <Button

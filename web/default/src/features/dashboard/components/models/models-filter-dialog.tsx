@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Filter, RotateCcw, Calendar, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
@@ -50,6 +50,7 @@ import type {
 } from '@/features/dashboard/types'
 
 interface ModelsFilterProps {
+  filters: DashboardFilters
   preferences: DashboardChartPreferences
   onFilterChange: (filters: DashboardFilters) => void
   onReset: () => void
@@ -76,20 +77,26 @@ export function ModelsFilter(props: ModelsFilterProps) {
   const isAdmin = user?.role && user.role >= 10
 
   const [open, setOpen] = useState(false)
-  const [filters, setFilters] = useState<DashboardFilters>(() =>
-    buildDefaultDashboardFilters(props.preferences)
-  )
+  const [filters, setFilters] = useState<DashboardFilters>(() => props.filters)
   const [selectedRange, setSelectedRange] = useState<number | null>(
-    () => props.preferences.defaultTimeRangeDays
+    () => props.filters.quick_range_days ?? null
+  )
+  const timeGranularityItems = useMemo(
+    () =>
+      TIME_GRANULARITY_OPTIONS.map((option) => ({
+        value: option.value,
+        label: t(option.label),
+      })),
+    [t]
   )
 
-  const resetFiltersFromPreferences = () => {
-    setFilters(buildDefaultDashboardFilters(props.preferences))
-    setSelectedRange(props.preferences.defaultTimeRangeDays)
+  const syncFiltersFromAppliedState = () => {
+    setFilters(props.filters)
+    setSelectedRange(props.filters.quick_range_days ?? null)
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (nextOpen) resetFiltersFromPreferences()
+    if (nextOpen) syncFiltersFromAppliedState()
     setOpen(nextOpen)
   }
 
@@ -109,6 +116,7 @@ export function ModelsFilter(props: ModelsFilterProps) {
       ...buildDefaultDashboardFilters(props.preferences),
       start_timestamp: start,
       end_timestamp: end,
+      quick_range_days: days,
     })
     setSelectedRange(days)
     props.onReset()
@@ -119,7 +127,13 @@ export function ModelsFilter(props: ModelsFilterProps) {
     field: keyof DashboardFilters,
     value: Date | string | undefined
   ) => {
-    setFilters((prev) => ({ ...prev, [field]: value }))
+    setFilters((prev) => ({
+      ...prev,
+      [field]: value,
+      ...(field === 'start_timestamp' || field === 'end_timestamp'
+        ? { quick_range_days: null }
+        : {}),
+    }))
     if (field === 'start_timestamp' || field === 'end_timestamp')
       setSelectedRange(null)
   }
@@ -131,6 +145,7 @@ export function ModelsFilter(props: ModelsFilterProps) {
       ...prev,
       start_timestamp: start,
       end_timestamp: end,
+      quick_range_days: days,
     }))
     setSelectedRange(days)
   }
@@ -223,12 +238,7 @@ export function ModelsFilter(props: ModelsFilterProps) {
           <div className='grid gap-2'>
             <Label htmlFor='time_granularity'>{t('Time Granularity')}</Label>
             <Select
-              items={[
-                ...TIME_GRANULARITY_OPTIONS.map((option) => ({
-                  value: option.value,
-                  label: t(option.label),
-                })),
-              ]}
+              items={timeGranularityItems}
               value={filters.time_granularity}
               onValueChange={(value) =>
                 handleChange('time_granularity', value as TimeGranularity)

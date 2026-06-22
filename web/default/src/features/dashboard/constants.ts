@@ -21,6 +21,8 @@ import type { DashboardChartPreferences, DashboardFilters } from './types'
 export const TIME_GRANULARITY_STORAGE_KEY = 'data_export_default_time'
 export const DASHBOARD_CHART_PREFERENCES_STORAGE_KEY =
   'dashboard_models_chart_preferences'
+export const DASHBOARD_MODEL_FILTERS_STORAGE_KEY =
+  'dashboard_models_applied_filters'
 export const DEFAULT_TIME_GRANULARITY = 'hour' as const
 export const MAX_CHART_TREND_POINTS = 7
 
@@ -66,4 +68,5 @@ export const EMPTY_DASHBOARD_FILTERS: DashboardFilters = {
   end_timestamp: undefined,
   time_granularity: 'hour',
   username: '',
+  quick_range_days: null,
 }

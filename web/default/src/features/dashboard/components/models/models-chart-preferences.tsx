@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Save, Settings2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { TimeGranularity } from '@/lib/time'
@@ -54,6 +54,38 @@ export function ModelsChartPreferences(props: ModelsChartPreferencesProps) {
   const [draft, setDraft] = useState<DashboardChartPreferences>(
     props.preferences
   )
+  const timeRangeItems = useMemo(
+    () =>
+      TIME_RANGE_PRESETS.map((option) => ({
+        value: String(option.days),
+        label: t(option.label),
+      })),
+    [t]
+  )
+  const timeGranularityItems = useMemo(
+    () =>
+      TIME_GRANULARITY_OPTIONS.map((option) => ({
+        value: option.value,
+        label: t(option.label),
+      })),
+    [t]
+  )
+  const consumptionChartItems = useMemo(
+    () =>
+      CONSUMPTION_DISTRIBUTION_CHART_OPTIONS.map((option) => ({
+        value: option.value,
+        label: t(option.labelKey),
+      })),
+    [t]
+  )
+  const modelChartItems = useMemo(
+    () =>
+      MODEL_ANALYTICS_CHART_OPTIONS.map((option) => ({
+        value: option.value,
+        label: t(option.labelKey),
+      })),
+    [t]
+  )
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (nextOpen) setDraft(props.preferences)
@@ -90,12 +122,7 @@ export function ModelsChartPreferences(props: ModelsChartPreferencesProps) {
       <div className='grid gap-1.5'>
         <Label htmlFor='default-time-range'>{t('Default range')}</Label>
         <Select
-          items={[
-            ...TIME_RANGE_PRESETS.map((option) => ({
-              value: String(option.days),
-              label: t(option.label),
-            })),
-          ]}
+          items={timeRangeItems}
           value={String(draft.defaultTimeRangeDays)}
           onValueChange={(value) =>
             setDraft((prev) => ({
@@ -123,12 +150,7 @@ export function ModelsChartPreferences(props: ModelsChartPreferencesProps) {
           {t('Default time granularity')}
         </Label>
         <Select
-          items={[
-            ...TIME_GRANULARITY_OPTIONS.map((option) => ({
-              value: option.value,
-              label: t(option.label),
-            })),
-          ]}
+          items={timeGranularityItems}
           value={draft.defaultTimeGranularity}
           onValueChange={(value) =>
             setDraft((prev) => ({
@@ -156,12 +178,7 @@ export function ModelsChartPreferences(props: ModelsChartPreferencesProps) {
           {t('Default consumption chart')}
         </Label>
         <Select
-          items={[
-            ...CONSUMPTION_DISTRIBUTION_CHART_OPTIONS.map((option) => ({
-              value: option.value,
-              label: t(option.labelKey),
-            })),
-          ]}
+          items={consumptionChartItems}
           value={draft.consumptionDistributionChart}
           onValueChange={(value) =>
             setDraft((prev) => ({
@@ -190,12 +207,7 @@ export function ModelsChartPreferences(props: ModelsChartPreferencesProps) {
           {t('Default model call chart')}
         </Label>
         <Select
-          items={[
-            ...MODEL_ANALYTICS_CHART_OPTIONS.map((option) => ({
-              value: option.value,
-              label: t(option.labelKey),
-            })),
-          ]}
+          items={modelChartItems}
           value={draft.modelAnalyticsChart}
           onValueChange={(value) =>
             setDraft((prev) => ({

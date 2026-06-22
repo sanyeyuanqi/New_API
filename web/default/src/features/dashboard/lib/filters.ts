@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 import { getRollingDateRange, type TimeGranularity } from '@/lib/time'
 import {
   DASHBOARD_CHART_PREFERENCES_STORAGE_KEY,
+  DASHBOARD_MODEL_FILTERS_STORAGE_KEY,
   DEFAULT_DASHBOARD_CHART_PREFERENCES,
   DEFAULT_TIME_GRANULARITY,
   EMPTY_DASHBOARD_FILTERS,
@@ -57,6 +58,12 @@ function isModelAnalyticsChartTab(
 
 function isTimeRangePresetDays(value: unknown): value is number {
   return TIME_RANGE_PRESETS.some((preset) => preset.days === value)
+}
+
+function parseSavedDate(value: unknown): Date | undefined {
+  if (typeof value !== 'string') return undefined
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? undefined : date
 }
 
 export function cleanFilters<T extends Record<string, unknown>>(
@@ -135,6 +142,74 @@ export function saveChartPreferences(
   )
 }
 
+export function getSavedDashboardFilters(
+  preferences: DashboardChartPreferences = getSavedChartPreferences()
+): DashboardFilters {
+  if (typeof window === 'undefined')
+    return buildDefaultDashboardFilters(preferences)
+
+  try {
+    const raw = localStorage.getItem(DASHBOARD_MODEL_FILTERS_STORAGE_KEY)
+    if (!raw) return buildDefaultDashboardFilters(preferences)
+
+    const parsed = JSON.parse(raw) as Partial<{
+      start_timestamp: string
+      end_timestamp: string
+      time_granularity: TimeGranularity
+      username: string
+      quick_range_days: number | null
+    }>
+    const timeGranularity = isTimeGranularity(parsed.time_granularity)
+      ? parsed.time_granularity
+      : preferences.defaultTimeGranularity
+    const username = typeof parsed.username === 'string' ? parsed.username : ''
+    const quickRangeDays = isTimeRangePresetDays(parsed.quick_range_days)
+      ? parsed.quick_range_days
+      : null
+
+    if (quickRangeDays) {
+      const { start, end } = getRollingDateRange(quickRangeDays)
+      return {
+        ...EMPTY_DASHBOARD_FILTERS,
+        start_timestamp: start,
+        end_timestamp: end,
+        time_granularity: timeGranularity,
+        username,
+        quick_range_days: quickRangeDays,
+      }
+    }
+
+    return {
+      ...EMPTY_DASHBOARD_FILTERS,
+      start_timestamp: parseSavedDate(parsed.start_timestamp),
+      end_timestamp: parseSavedDate(parsed.end_timestamp),
+      time_granularity: timeGranularity,
+      username,
+      quick_range_days: null,
+    }
+  } catch {
+    return buildDefaultDashboardFilters(preferences)
+  }
+}
+
+export function saveDashboardFilters(filters: DashboardFilters): void {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(
+    DASHBOARD_MODEL_FILTERS_STORAGE_KEY,
+    JSON.stringify({
+      start_timestamp: filters.start_timestamp?.toISOString(),
+      end_timestamp: filters.end_timestamp?.toISOString(),
+      time_granularity: isTimeGranularity(filters.time_granularity)
+        ? filters.time_granularity
+        : DEFAULT_TIME_GRANULARITY,
+      username: filters.username ?? '',
+      quick_range_days: isTimeRangePresetDays(filters.quick_range_days)
+        ? filters.quick_range_days
+        : null,
+    })
+  )
+}
+
 export function getDefaultDays(granularity?: TimeGranularity): number {
   if (!granularity) return getSavedChartPreferences().defaultTimeRangeDays
   return TIME_RANGE_BY_GRANULARITY[getSavedGranularity(granularity)]
@@ -149,6 +224,7 @@ export function buildDefaultDashboardFilters(
     start_timestamp: start,
     end_timestamp: end,
     time_granularity: preferences.defaultTimeGranularity,
+    quick_range_days: preferences.defaultTimeRangeDays,
   }
 }
 
