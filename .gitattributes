@@ -34,9 +34,18 @@
 # ============================================
 # GitHub Linguist - Language Detection
 # ============================================
-electron/** linguist-vendored
-web/** linguist-vendored
 
-# Un-vendor core frontend source to keep JavaScript visible in language stats
-web/src/components/** linguist-vendored=false
-web/src/pages/** linguist-vendored=false
+# Mark SQL files as documentation to exclude from language stats
+*.sql linguist-documentation
+
+# Exclude vendored/generated files
+electron/** linguist-vendored
+web/default/dist/** linguist-generated
+web/default/node_modules/** linguist-vendored
+web/pnpm-lock.yaml linguist-generated
+
+# Keep frontend source visible
+web/default/src/** linguist-vendored=false
+
+# Exclude build caches
+.codex/** linguist-generated
